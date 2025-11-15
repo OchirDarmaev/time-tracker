@@ -79,7 +79,7 @@ function getRoleSelector(availableRoles: string[], currentRole: string | undefin
     <select 
       hx-post="/auth-stub/set-role"
       hx-target="body"
-      hx-swap="transition:true"
+      hx-swap="outerHTML transition:true"
       hx-trigger="change"
       hx-include="[name='role']"
       name="role"

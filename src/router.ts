@@ -162,7 +162,7 @@ function renderEntriesTable(entries: TimeEntry[], projects: Project[]): string {
               <button 
                 hx-delete="/worker/time/entries/${entry.id}"
                 hx-target="#entries-container"
-                hx-swap="transition:true"
+                hx-swap="innerHTML transition:true"
                 hx-confirm="Delete this entry?"
                 hx-on::after-request="htmx.trigger('body', 'entries-changed')"
                 class="bg-transparent text-red-500 dark:text-red-400 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-xs font-medium cursor-pointer hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-500 dark:hover:border-red-400"
@@ -264,7 +264,7 @@ function renderReportsPage(req: AuthStubRequest) {
             id="worker-select"
             hx-get="/manager/reports/worker"
             hx-target="#report-content"
-            hx-swap="transition:true"
+            hx-swap="innerHTML transition:true"
             hx-trigger="change"
             hx-include="[name='worker_id']"
             name="worker_id"
@@ -285,7 +285,7 @@ function renderReportsPage(req: AuthStubRequest) {
             id="project-select"
             hx-get="/manager/reports/project"
             hx-target="#report-content"
-            hx-swap="transition:true"
+            hx-swap="innerHTML transition:true"
             hx-trigger="change"
             hx-include="[name='project_id']"
             name="project_id"
@@ -625,7 +625,7 @@ function renderUsersProjectsPage(req: AuthStubRequest) {
           id="project-select"
           hx-get="/admin/users-projects/project"
           hx-target="#project-workers"
-          hx-swap="transition:true"
+          hx-swap="innerHTML transition:true"
           hx-trigger="change"
           hx-include="[name='project_id']"
           name="project_id"
@@ -676,7 +676,7 @@ function renderProjectWorkers(projectId: number): string {
           <form
             hx-post="/admin/users-projects"
             hx-target="#project-workers"
-            hx-swap="transition:true"
+            hx-swap="innerHTML transition:true"
             hx-trigger="submit"
             hx-on::after-request="this.reset()"
             class="flex gap-4"
@@ -731,7 +731,7 @@ function renderProjectWorkers(projectId: number): string {
                       <button 
                         hx-delete="/admin/users-projects/${pu.id}"
                         hx-target="#project-workers"
-                        hx-swap="transition:true"
+                        hx-swap="innerHTML transition:true"
                         hx-confirm="Remove this worker from the project?"
                         class="bg-transparent text-red-500 dark:text-red-400 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-xs font-medium cursor-pointer hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-500 dark:hover:border-red-400"
                       >
@@ -762,7 +762,7 @@ function renderSystemReportsPage(req: AuthStubRequest) {
       <div
         id="reports-data"
         hx-get="/admin/system-reports/data"
-        hx-swap="transition:true"
+        hx-swap="innerHTML transition:true"
         hx-trigger="load"
       >
         ${renderSystemReports()}

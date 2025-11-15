@@ -19,10 +19,8 @@ export function renderBaseLayout(content: string, req: AuthStubRequest, activeNa
     return `<option value="${u.id}" data-roles='${rolesJson}' ${selected}>${u.email}</option>`;
   }).join('');
   
-  // Get available roles for current user
-  const currentUserId = 'id' in currentUser ? currentUser.id : undefined;
-  const currentUserObj = currentUserId ? users.find(u => u.id === currentUserId) : null;
-  const availableRoles: string[] = currentUserObj?.roles || currentUser.roles || ['worker'];
+  // Get available roles for current user - use currentUser.roles directly (set by middleware)
+  const availableRoles: string[] = currentUser.roles || ['worker'];
   
   // Format all roles for display
   const roleLabels: Record<string, string> = {
@@ -67,6 +65,7 @@ export function renderBaseLayout(content: string, req: AuthStubRequest, activeNa
   ];
   
   const navButtons = navItems.map(item => {
+    // Check if user has ANY of the required roles (same logic as requireRole middleware)
     const hasAccess = item.requiredRoles.some(role => availableRoles.includes(role));
     const isActive = activeNav === item.activeNav;
     const activeClass = isActive ? 'font-bold' : '';
@@ -74,8 +73,12 @@ export function renderBaseLayout(content: string, req: AuthStubRequest, activeNa
     if (hasAccess) {
       return `<a href="${item.href}" class="text-blue-600 hover:text-blue-800 ${activeClass}">${item.label}</a>`;
     } else {
-      const requiredRolesText = item.requiredRoles.map(r => roleLabels[r] || r).join(' or ');
-      return `<span class="text-gray-400 cursor-not-allowed" title="Requires ${requiredRolesText} role">${item.label}</span>`;
+      // Format tooltip: "role 'Admin' required" or "role 'Admin' or 'Office Manager' required"
+      const requiredRolesText = item.requiredRoles
+        .map(r => `'${roleLabels[r] || r}'`)
+        .join(' or ');
+      const tooltipText = `role ${requiredRolesText} required`;
+      return `<span class="text-gray-400 cursor-not-allowed" title="${tooltipText}">${item.label}</span>`;
     }
   }).join('');
   

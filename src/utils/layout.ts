@@ -15,7 +15,7 @@ export function renderBaseLayout(content: string, req: AuthStubRequest, activeNa
   const users = userModel.getAll();
   const userOptions = users.map(u => {
     const selected = req.session?.userId === u.id ? 'selected' : '';
-    return `<option value="${u.id}" ${selected}>${u.email}</option>`;
+    return `<option value="${u.id}" data-role="${u.role}" ${selected}>${u.email}</option>`;
   }).join('');
   
   const roleSelected = {

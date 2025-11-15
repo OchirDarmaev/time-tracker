@@ -377,7 +377,7 @@
       }
 
       this.totalHours = options.totalHours || 8;
-      this.snapIncrement = options.snapIncrement || 15; // minutes
+      this.snapIncrement = options.snapIncrement || 30; // minutes
       this.segments = options.segments || [];
       this.projects = options.projects || [];
       this.onChange = options.onChange || (() => {});
@@ -387,6 +387,7 @@
       this.dragStartX = 0;
       this.dragStartPosition = 0;
       this.trackWidth = 0;
+      this.rafId = null;
 
       this.projectColors = this.generateProjectColors();
       this.init();
@@ -571,25 +572,43 @@
       if (this.activeHandle === null) return;
 
       e.preventDefault();
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      const track = this.container.querySelector('#time-slider-track');
-      if (!track) return;
+      
+      // Cancel any pending animation frame
+      if (this.rafId !== null) {
+        cancelAnimationFrame(this.rafId);
+      }
+      
+      // Use requestAnimationFrame to throttle updates
+      this.rafId = requestAnimationFrame(() => {
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const track = this.container.querySelector('#time-slider-track');
+        if (!track) return;
 
-      const trackRect = track.getBoundingClientRect();
-      const deltaX = clientX - this.dragStartX;
-      const deltaPercent = (deltaX / trackRect.width) * 100;
-      const newPosition = Math.max(0, Math.min(100, this.dragStartPosition + deltaPercent));
+        const trackRect = track.getBoundingClientRect();
+        const deltaX = clientX - this.dragStartX;
+        const deltaPercent = (deltaX / trackRect.width) * 100;
+        const newPosition = Math.max(0, Math.min(100, this.dragStartPosition + deltaPercent));
 
-      this.updateHandlePosition(this.activeHandle, newPosition);
+        this.updateHandlePosition(this.activeHandle, newPosition);
+        this.rafId = null;
+      });
     };
 
     stopDrag = () => {
+      // Cancel any pending animation frame
+      if (this.rafId !== null) {
+        cancelAnimationFrame(this.rafId);
+        this.rafId = null;
+      }
+
       if (this.activeHandle !== null) {
         const handle = this.container.querySelector(`[data-handle-index="${this.activeHandle}"]`);
         if (handle) {
           handle.classList.remove('active');
         }
         this.activeHandle = null;
+        // Full re-render only when drag is complete
+        this.render();
         this.onChange(this.getSegmentsData());
       }
 
@@ -608,8 +627,6 @@
       const handle = this.container.querySelector(`[data-handle-index="${handleIndex}"]`);
       if (!handle) return;
 
-      handle.style.left = `${snappedPercent}%`;
-
       // Update adjacent segments
       const segmentBefore = this.segments[handleIndex];
       const segmentAfter = this.segments[handleIndex + 1];
@@ -619,21 +636,89 @@
         const newBoundary = snappedMinutes;
 
         const delta = newBoundary - currentBoundary;
-        const segmentBeforeMinutes = segmentBefore.minutes + delta;
-        const segmentAfterMinutes = segmentAfter.minutes - delta;
+        let segmentBeforeMinutes = this.snapToIncrement(segmentBefore.minutes + delta);
+        let segmentAfterMinutes = this.snapToIncrement(segmentAfter.minutes - delta);
 
-        // Ensure minimum segment size (15 minutes)
-        const minMinutes = 15;
+        // Ensure minimum segment size (30 minutes to match snap increment)
+        const minMinutes = 30;
         if (segmentBeforeMinutes >= minMinutes && segmentAfterMinutes >= minMinutes) {
+          // Update segment data
           segmentBefore.minutes = segmentBeforeMinutes;
           segmentAfter.minutes = segmentAfterMinutes;
-          this.render();
+          
+          // Update visual positions without full re-render
+          this.updateSegmentVisuals(handleIndex, snappedPercent);
         } else {
           // Revert handle position if constraints violated
           const revertPercent = (currentBoundary / totalMinutes) * 100;
           handle.style.left = `${revertPercent}%`;
         }
       }
+    }
+
+    updateSegmentVisuals(handleIndex, handlePercent) {
+      // Update handle position
+      const handle = this.container.querySelector(`[data-handle-index="${handleIndex}"]`);
+      if (handle) {
+        handle.style.left = `${handlePercent}%`;
+      }
+
+      // Update segment positions and widths without full re-render
+      const totalMinutes = this.hoursToMinutes(this.totalHours);
+      let currentPosition = 0;
+
+      this.segments.forEach((segment, index) => {
+        const segmentEl = this.container.querySelector(`[data-segment-index="${index}"]`);
+        if (!segmentEl) return;
+
+        const segmentWidth = (segment.minutes / totalMinutes) * 100;
+        const leftPercent = (currentPosition / totalMinutes) * 100;
+
+        segmentEl.style.left = `${leftPercent}%`;
+        segmentEl.style.width = `${segmentWidth}%`;
+
+        // Update segment duration text
+        const durationEl = segmentEl.querySelector('.time-slider-segment-duration');
+        if (durationEl) {
+          durationEl.textContent = `${this.minutesToHours(segment.minutes).toFixed(1)}h`;
+        }
+
+        currentPosition += segment.minutes;
+      });
+
+      // Update segments info without full re-render
+      this.updateSegmentsInfoOnly();
+    }
+
+    updateSegmentsInfoOnly() {
+      const infoContainer = this.container.querySelector('#time-slider-segments-info');
+      if (!infoContainer) return;
+
+      if (this.segments.length === 0) {
+        infoContainer.innerHTML = '';
+        return;
+      }
+
+      const totalMinutes = this.segments.reduce((sum, s) => sum + s.minutes, 0);
+      const totalHours = this.minutesToHours(totalMinutes);
+
+      // Update total allocated text
+      const totalText = infoContainer.querySelector('div:first-child strong');
+      if (totalText) {
+        totalText.textContent = `Total Allocated: ${totalHours.toFixed(1)}h / ${this.totalHours}h`;
+      }
+
+      // Update duration values for each segment item
+      const segmentItems = infoContainer.querySelectorAll('.time-slider-segment-item');
+      this.segments.forEach((segment, index) => {
+        if (segmentItems[index]) {
+          const durationEl = segmentItems[index].querySelector('.time-slider-segment-item-duration');
+          if (durationEl) {
+            const hours = this.minutesToHours(segment.minutes);
+            durationEl.textContent = `${hours.toFixed(1)}h`;
+          }
+        }
+      });
     }
 
     getCurrentBoundaryPosition(handleIndex) {
@@ -688,28 +773,31 @@
     addSegment(projectId) {
       const totalMinutes = this.hoursToMinutes(this.totalHours);
       
-      // First segment: use full Total Hours value
+      // First segment: use full Total Hours value (snapped to 30 min increments)
       if (this.segments.length === 0) {
         this.segments.push({
           project_id: projectId,
-          minutes: totalMinutes,
+          minutes: this.snapToIncrement(totalMinutes),
         });
       } else {
         // When adding a new project, redistribute time among all segments (including new one)
         // Offset existing workloads to make room for the new segment
         const newSegmentCount = this.segments.length + 1;
-        const minutesPerSegment = Math.floor(totalMinutes / newSegmentCount);
-        const remainder = totalMinutes % newSegmentCount;
+        let minutesPerSegment = Math.floor(totalMinutes / newSegmentCount);
+        // Snap to 30-minute increments
+        minutesPerSegment = this.snapToIncrement(minutesPerSegment);
+        const totalAllocated = minutesPerSegment * newSegmentCount;
+        const remainder = totalMinutes - totalAllocated;
         
-        // Redistribute time to existing segments
+        // Redistribute time to existing segments (snapped to 30 min)
         this.segments.forEach(segment => {
           segment.minutes = minutesPerSegment;
         });
         
-        // Add new segment with its share, plus any remainder
+        // Add new segment with its share, plus any remainder (snapped to 30 min)
         this.segments.push({
           project_id: projectId,
-          minutes: minutesPerSegment + remainder,
+          minutes: this.snapToIncrement(minutesPerSegment + remainder),
         });
       }
 
@@ -724,12 +812,15 @@
       // If there are remaining segments, redistribute the removed segment's time
       if (this.segments.length > 0) {
         const totalMinutes = this.hoursToMinutes(this.totalHours);
-        const minutesPerSegment = Math.floor(totalMinutes / this.segments.length);
-        const remainder = totalMinutes % this.segments.length;
+        let minutesPerSegment = Math.floor(totalMinutes / this.segments.length);
+        // Snap to 30-minute increments
+        minutesPerSegment = this.snapToIncrement(minutesPerSegment);
+        const totalAllocated = minutesPerSegment * this.segments.length;
+        const remainder = totalMinutes - totalAllocated;
         
-        // Redistribute time to remaining segments
+        // Redistribute time to remaining segments (snapped to 30 min)
         this.segments.forEach((segment, idx) => {
-          segment.minutes = minutesPerSegment + (idx === 0 ? remainder : 0);
+          segment.minutes = this.snapToIncrement(minutesPerSegment + (idx === 0 ? remainder : 0));
         });
       }
       

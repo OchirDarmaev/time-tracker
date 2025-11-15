@@ -666,15 +666,6 @@
         return;
       }
 
-      const totalMinutes = this.segments.reduce((sum, s) => sum + s.minutes, 0);
-      const totalHours = this.minutesToHours(totalMinutes);
-
-      // Update total allocated text
-      const totalText = infoContainer.querySelector('div:first-child strong');
-      if (totalText) {
-        totalText.textContent = `Total Allocated: ${totalHours.toFixed(1)}h / ${this.totalHours}h`;
-      }
-
       // Update duration values for each segment item
       const segmentItems = infoContainer.querySelectorAll('.time-slider-segment-item');
       this.segments.forEach((segment, index) => {
@@ -854,10 +845,9 @@
 
       const totalMinutes = this.segments.reduce((sum, s) => sum + s.minutes, 0);
       const totalHours = this.minutesToHours(totalMinutes);
+      const isOverLimit = totalHours > 8;
 
-      let html = `<div style="margin-bottom: 8px; font-size: 12px; color: var(--text-secondary);">
-        <strong>Total Allocated: ${totalHours.toFixed(1)}h / ${this.totalHours}h</strong>
-      </div>`;
+      let html = '';
 
       this.segments.forEach((segment, index) => {
         const project = this.projects.find(p => p.id === segment.project_id);
@@ -878,39 +868,40 @@
                 </div>
                 <div class="time-slider-segment-note-container" style="margin-top: 4px;">
                   ${isEditingNote ? `
-                    <div style="display: flex; gap: 6px; align-items: flex-start; width: 100%;">
-                      <input 
-                        type="text" 
+                    <div style="display: flex; flex-direction: column; gap: 6px; width: 100%;">
+                      <textarea 
                         class="time-slider-note-input"
                         id="note-input-${index}"
-                        value="${(segment.comment || '').replace(/"/g, '&quot;')}"
+                        rows="3"
                         placeholder="Add note or tags (e.g., #meeting #setup)..."
-                        style="flex: 1; padding: 4px 8px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg-primary); color: var(--text-primary); font-size: 11px;"
+                        style="width: 100%; padding: 4px 8px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg-primary); color: var(--text-primary); font-size: 11px; resize: vertical; min-height: 60px; font-family: inherit;"
                         autofocus
-                      />
+                      >${(segment.comment || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</textarea>
+                      <div style="display: flex; gap: 6px; justify-content: flex-end;">
                       <button 
                         class="time-slider-note-save"
                         id="note-save-${index}"
-                        style="padding: 4px 8px; background: #14b8a6; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 500;"
+                          style="padding: 4px 8px; background: #14b8a6; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 500;"
                       >
                         Save
                       </button>
                       <button 
                         class="time-slider-note-cancel"
                         id="note-cancel-${index}"
-                        style="padding: 4px 8px; background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border); border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 500;"
+                          style="padding: 4px 8px; background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border); border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 500;"
                       >
                         Cancel
                       </button>
+                      </div>
                     </div>
                   ` : `
                     ${hasNote ? `
                       <div style="font-size: 11px; color: var(--text-secondary); padding: 2px 0;">
-                        <span style="font-style: italic;">${segment.comment.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>
+                        <span style="font-style: italic; white-space: pre-wrap; word-wrap: break-word; display: block; line-height: 1.4;">${segment.comment.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>
                         <button 
                           class="time-slider-edit-note"
                           data-note-index="${index}"
-                          style="margin-left: 6px; background: none; border: none; color: var(--accent); cursor: pointer; font-size: 10px; text-decoration: underline;"
+                          style="margin-top: 4px; background: none; border: none; color: var(--accent); cursor: pointer; font-size: 10px; text-decoration: underline;"
                         >
                           Edit
                         </button>
@@ -961,12 +952,14 @@
         }
         if (input) {
           input.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault();
-              this.saveNote(index);
-            } else if (e.key === 'Escape') {
+            if (e.key === 'Escape') {
               e.preventDefault();
               this.cancelEditNote();
+            }
+            // Allow Enter in textarea, but Ctrl+Enter or Cmd+Enter to save
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+              e.preventDefault();
+              this.saveNote(index);
             }
           });
         }

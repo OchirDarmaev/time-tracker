@@ -63,15 +63,18 @@ export function renderTimeTrackingPage(req: AuthStubRequest, includeLayout: bool
 
   // Calculate remaining hours needed
   const remainingHours = Math.max(0, 8 - totalHours);
-  const isComplete = totalHours >= 8;
-  const statusColor = isComplete
-    ? "text-green-600 dark:text-green-400"
-    : totalHours >= 4
-      ? "text-yellow-600 dark:text-yellow-400"
-      : "text-red-600 dark:text-red-400";
+  const isComplete = totalHours >= 8 && totalHours <= 8;
+  const isOverLimit = totalHours > 8;
+  const statusColor = isOverLimit
+    ? "text-orange-600 dark:text-orange-400"
+    : isComplete
+      ? "text-green-600 dark:text-green-400"
+      : totalHours >= 4
+        ? "text-yellow-600 dark:text-yellow-400"
+        : "text-red-600 dark:text-red-400";
 
   const content = html`
-    <div class="space-y-4">
+    <div id="time-tracking-content" class="space-y-4">
       <!-- Enhanced Status Bar -->
       <div
         class="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-3 shadow-sm"
@@ -84,11 +87,15 @@ export function renderTimeTrackingPage(req: AuthStubRequest, includeLayout: bool
             <div class="flex items-baseline gap-2 flex-wrap">
               <span class="text-2xl font-bold ${statusColor}">${totalHours.toFixed(1)}h</span>
               <span class="text-sm text-gray-500 dark:text-gray-400">/ 8h</span>
-              ${!isComplete
-                ? html`<span class="text-xs text-gray-600 dark:text-gray-400"
-                    >(${remainingHours.toFixed(1)}h needed)</span
+              ${isOverLimit
+                ? html`<span class="text-xs text-orange-600 dark:text-orange-400 font-medium"
+                    >⚠ over limit</span
                   >`
-                : html`<span class="text-xs text-green-600 dark:text-green-400">✓ Complete</span>`}
+                : isComplete
+                  ? html`<span class="text-xs text-green-600 dark:text-green-400">✓ Complete</span>`
+                  : html`<span class="text-xs text-gray-600 dark:text-gray-400"
+                      >(${remainingHours.toFixed(1)}h needed)</span
+                    >`}
             </div>
           </div>
           <div class="h-12 w-px bg-gray-300 dark:bg-gray-600 self-stretch"></div>
@@ -101,13 +108,14 @@ export function renderTimeTrackingPage(req: AuthStubRequest, includeLayout: bool
           </div>
         </div>
       </div>
-
-      ${renderMonthlyCalendar({
-        selectedDate: selectedDate,
-        hxGet: "/account/time",
-        hxTarget: "main",
-        dayHoursMap: dayHoursMap,
-      })}
+      <div class="w-1/2">
+        ${renderMonthlyCalendar({
+          selectedDate: selectedDate,
+          hxGet: "/account/time",
+          hxTarget: "#time-tracking-content",
+          dayHoursMap: dayHoursMap,
+        })}
+      </div>
       ${renderTimeSlider({
         totalHours: sliderTotalHours,
         segments: segments,

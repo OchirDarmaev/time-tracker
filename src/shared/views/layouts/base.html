@@ -476,7 +476,7 @@
 <body>
     <!-- DATA Stub Panel -->
     <div class="bg-gray-200 dark:bg-gray-700 border-b border-gray-300 dark:border-gray-600 py-3 text-xs" style="view-transition-name: stub-panel;">
-        <div class="max-w-7xl mx-auto px-6">
+        <div class="max-w-5xl mx-auto px-6">
             <div class="flex items-center justify-between gap-4">
                 <div class="flex items-center gap-4">
                     <div>
@@ -509,7 +509,7 @@
 
     <!-- Top Navigation Bar -->
     <nav class="bg-gray-100 dark:bg-gray-800 border-b border-gray-300 dark:border-gray-700 backdrop-blur-sm sticky top-0 z-[100]" style="view-transition-name: nav-bar;">
-        <div class="max-w-7xl mx-auto px-6">
+        <div class="max-w-5xl mx-auto px-6">
             <div class="flex items-center justify-between h-16" id="nav-bar-content">
                 <div class="flex items-center gap-1">
                     {{nav_buttons}}
@@ -523,8 +523,10 @@
     </nav>
 
     <!-- Content -->
-    <main class="max-w-7xl mx-auto px-6 py-8 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen overflow-x-hidden w-full max-w-full" style="view-transition-name: main-content;">
+    <main class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen overflow-x-hidden w-full" style="view-transition-name: main-content;">
+        <div class="max-w-5xl mx-auto px-6 py-8 w-full">
         {{content}}
+        </div>
     </main>
 </body>
 </html>

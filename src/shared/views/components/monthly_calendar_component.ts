@@ -69,11 +69,12 @@ export function renderMonthlyCalendar(props: MonthlyCalendarProps): string {
 
   const dayButtons = gridDays.map((day) => {
     if (day.isEmpty) {
-      return html`<div class="min-w-[2.5rem]"></div>`;
+      return html`<div class="min-w-[2rem]"></div>`;
     }
 
     const hours = dayHoursMap[day.date] || 0;
-    const isComplete = hours >= requiredHours;
+    const isOverLimit = hours > requiredHours;
+    const isComplete = hours === requiredHours;
     const isSelected = day.date === selectedDate;
     const isToday = day.date === today;
 
@@ -81,6 +82,8 @@ export function renderMonthlyCalendar(props: MonthlyCalendarProps): string {
     let bgClass = "bg-gray-100 dark:bg-gray-800";
     if (isSelected) {
       bgClass = "bg-indigo-500 text-white";
+    } else if (isOverLimit) {
+      bgClass = "bg-orange-100 dark:bg-orange-900/30";
     } else if (isComplete) {
       bgClass = "bg-green-100 dark:bg-green-900/30";
     } else if (hours > 0) {
@@ -93,57 +96,43 @@ export function renderMonthlyCalendar(props: MonthlyCalendarProps): string {
     const textClass = isSelected
       ? "text-white"
       : day.isWeekend
-        ? "text-gray-400 dark:text-gray-500"
+        ? "text-gray-500 dark:text-gray-500"
         : "text-gray-900 dark:text-gray-100";
 
     return html`
       <button
         type="button"
-        class="flex flex-col items-center justify-center p-1 rounded border border-gray-200 dark:border-gray-700 ${bgClass} ${textClass} hover:ring-1 hover:ring-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500 min-w-[2.5rem] transition-all"
+        class="flex items-center  justify-center p-1 rounded-full border border-gray-200 dark:border-gray-700 ${bgClass} ${textClass} hover:ring-2 hover:ring-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 min-w-[2rem] h-[2rem] transition-all font-medium"
         ${hxGet ? `hx-get="${hxGet}?date=${day.date}"` : ""}
         ${hxTarget ? `hx-target="${hxTarget}"` : ""}
+        ${hxGet ? `hx-swap="outerHTML transition:true"` : ""}
         hx-trigger="click"
+        hx-scroll="false"
         title="${day.date} - ${hours.toFixed(1)}h"
       >
         <span
-          class="text-xs font-bold leading-tight ${isToday && !isSelected
+          class="text-xs font-semibold leading-tight ${isToday && !isSelected
             ? "text-indigo-600 dark:text-indigo-400"
             : ""}"
           >${day.dayNumber}</span
         >
-        <span
-          class="text-[10px] leading-tight ${isSelected
-            ? "text-white/90"
-            : hours >= requiredHours
-              ? "text-green-700 dark:text-green-400"
-              : hours > 0
-                ? "text-yellow-700 dark:text-yellow-400"
-                : "text-gray-400 dark:text-gray-500"}"
-        >
-          ${hours > 0 ? hours.toFixed(1) + "h" : "-"}
-        </span>
-        ${isComplete
-          ? html`<span class="text-[10px] leading-tight">✓</span>`
-          : hours > 0
-            ? html`<span class="text-[10px] leading-tight">⚠</span>`
-            : ""}
       </button>
     `;
   });
 
-  const weekDayHeaders = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const weekDayHeaders = ["M", "T", "W", "T", "F", "S", "S"];
 
   return html`
     <div class="mb-4">
-      <h3 class="text-xs font-medium mb-2 text-gray-700 dark:text-gray-300">
-        Monthly View - ${monthName} ${year}
+      <h3 class="text-sm  mb-3 text-gray-900 dark:text-gray-100 tracking-tight">
+        ${monthName} ${year}
       </h3>
-      <div class="grid grid-cols-7 gap-1">
+      <div class="grid grid-cols-7 gap-1.5">
         ${weekDayHeaders
           .map(
             (day) => html`
               <div
-                class="text-center text-[10px] font-semibold text-gray-500 dark:text-gray-400 py-1"
+                class="text-center text-xs font-semibold text-gray-600 dark:text-gray-400 py-1.5 uppercase "
               >
                 ${day}
               </div>

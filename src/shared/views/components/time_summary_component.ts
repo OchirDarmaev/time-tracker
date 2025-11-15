@@ -21,8 +21,13 @@ export function renderTimeSummary(props: TimeSummaryProps = {}): string {
   // Determine the trigger attribute
   let triggerAttr = "";
   if (hxGet && hxTrigger) {
+    // If trigger includes entries-changed, ensure load is also included
     if (hxTrigger.includes("entries-changed")) {
-      triggerAttr = `hx-trigger="entries-changed from:body"`;
+      if (hxTrigger.includes("load")) {
+        triggerAttr = `hx-trigger="${hxTrigger}"`;
+      } else {
+        triggerAttr = `hx-trigger="load, ${hxTrigger}"`;
+      }
     } else {
       triggerAttr = `hx-trigger="${hxTrigger}"`;
     }

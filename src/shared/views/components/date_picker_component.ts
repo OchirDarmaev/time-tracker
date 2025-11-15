@@ -15,17 +15,21 @@ export function renderDatePicker(props: DatePickerProps = {}): string {
   const hxTrigger = props.hxTrigger || "change";
   const label = props.label || "Date";
 
-  return html`
-    <div class="mb-6 w-full max-w-full box-border">
-      <label
+  const labelHtml = label
+    ? html`<label
         for="date-picker"
-        class="block text-sm font-medium mb-2 text-gray-600 dark:text-gray-400"
+        class="block text-xs font-medium mb-1 text-gray-600 dark:text-gray-400"
         >${label}</label
-      >
+      >`
+    : "";
+
+  return html`
+    <div class="mb-0 w-full max-w-full box-border">
+      ${labelHtml}
       <input
         type="date"
         id="date-picker"
-        class="bg-gray-200 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-lg px-3.5 py-2.5 text-sm w-full focus:outline-none focus:border-indigo-500 focus:ring-3 focus:ring-indigo-500/10"
+        class="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-md px-2.5 py-1.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10"
         value="${value}"
         ${hxGet ? `hx-get="${hxGet}"` : ""}
         ${hxTarget ? `hx-target="${hxTarget}"` : ""}

@@ -1,68 +1,22 @@
-<div id="time-slider-container" class="time-slider-wrapper">
-  <div class="time-slider-header">
-    <h3 class="time-slider-title">Daily Time Allocation</h3>
-    <div class="time-slider-controls">
-      <div id="time-slider-sync-status" class="time-slider-sync-status" style="display: flex; align-items: center; gap: 8px; margin-right: 12px;">
-        <span id="time-slider-sync-icon" class="time-slider-sync-icon" style="font-size: 14px; color: var(--success);">Synced</span>
-      </div>
-      <label class="time-slider-total-label">
-        Total Hours:
-        <input 
-          type="number" 
-          id="total-hours-input" 
-          class="time-slider-total-input"
-          min="1" 
-          max="24" 
-          step="0.5" 
-          value="8"
-        />
-      </label>
-    </div>
-  </div>
-
-  <div class="time-slider-track-container">
-    <div id="time-slider-track" class="time-slider-track">
-      <!-- Segments and handles will be dynamically inserted here -->
-    </div>
-    <div class="time-slider-labels">
-      <div class="time-slider-label">0h</div>
-      <div class="time-slider-label" id="time-slider-end-label">8h</div>
-    </div>
-  </div>
-
-  <div class="time-slider-projects">
-    <div class="time-slider-projects-header">
-      <span class="time-slider-projects-title">Available Projects</span>
-    </div>
-    <div id="time-slider-project-chips" class="time-slider-project-chips">
-      <!-- Project chips will be dynamically inserted here -->
-    </div>
-  </div>
-
-  <div id="time-slider-segments-info" class="time-slider-segments-info">
-    <!-- Segment information will be displayed here -->
-  </div>
-</div>
-
 <style>
   .time-slider-wrapper {
     background-color: var(--bg-secondary);
     border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 24px;
+    border-radius: 8px;
+    padding: 12px;
     box-shadow: var(--shadow-sm);
-    margin: 24px 0;
+    margin: 16px 0;
   }
 
   .time-slider-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 24px;
+    margin-bottom: 12px;
   }
 
   .time-slider-title {
-    font-size: 18px;
+    font-size: 14px;
     font-weight: 600;
     color: var(--text-primary);
     margin: 0;
@@ -71,14 +25,14 @@
   .time-slider-controls {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 12px;
   }
 
   .time-slider-total-label {
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-size: 14px;
+    gap: 6px;
+    font-size: 12px;
     color: var(--text-secondary);
     font-weight: 500;
   }
@@ -88,9 +42,9 @@
     border: 1px solid var(--border);
     color: var(--text-primary);
     border-radius: 6px;
-    padding: 6px 10px;
-    font-size: 14px;
-    width: 70px;
+    padding: 4px 8px;
+    font-size: 12px;
+    width: 60px;
   }
 
   .time-slider-total-input:focus {
@@ -101,17 +55,17 @@
 
   .time-slider-track-container {
     position: relative;
-    margin: 32px 0;
+    margin: 16px 0;
   }
 
   .time-slider-track {
     position: relative;
-    height: 80px;
+    height: 64px;
     background: linear-gradient(to right, 
       var(--bg-tertiary) 0%, 
       rgba(20, 184, 166, 0.05) 50%, 
       var(--bg-tertiary) 100%);
-    border-radius: 8px;
+    border-radius: 6px;
     border: 1px solid var(--border);
     overflow: visible;
     cursor: pointer;
@@ -120,8 +74,8 @@
   .time-slider-labels {
     display: flex;
     justify-content: space-between;
-    margin-top: 8px;
-    font-size: 12px;
+    margin-top: 4px;
+    font-size: 10px;
     color: var(--text-tertiary);
   }
 
@@ -156,15 +110,15 @@
   }
 
   .time-slider-segment-name {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
     color: white;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-    margin-bottom: 2px;
+    margin-bottom: 1px;
   }
 
   .time-slider-segment-duration {
-    font-size: 11px;
+    font-size: 10px;
     color: rgba(255, 255, 255, 0.9);
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   }
@@ -222,17 +176,17 @@
   }
 
   .time-slider-projects {
-    margin-top: 32px;
-    padding-top: 24px;
+    margin-top: 16px;
+    padding-top: 12px;
     border-top: 1px solid var(--border);
   }
 
   .time-slider-projects-header {
-    margin-bottom: 12px;
+    margin-bottom: 8px;
   }
 
   .time-slider-projects-title {
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 600;
     color: var(--text-secondary);
     text-transform: uppercase;
@@ -242,15 +196,15 @@
   .time-slider-project-chips {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 6px;
   }
 
   .time-slider-project-chip {
     display: inline-flex;
     align-items: center;
-    padding: 8px 14px;
-    border-radius: 8px;
-    font-size: 13px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 12px;
     font-weight: 500;
     cursor: pointer;
     border: 1px solid var(--border);
@@ -279,8 +233,8 @@
   }
 
   .time-slider-segments-info {
-    margin-top: 24px;
-    padding-top: 24px;
+    margin-top: 16px;
+    padding-top: 12px;
     border-top: 1px solid var(--border);
   }
 
@@ -288,10 +242,10 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 16px;
+    padding: 8px 12px;
     background-color: var(--bg-tertiary);
-    border-radius: 8px;
-    margin-bottom: 8px;
+    border-radius: 6px;
+    margin-bottom: 6px;
     border: 1px solid var(--border);
   }
 
@@ -316,11 +270,11 @@
   .time-slider-segment-item-name {
     font-weight: 500;
     color: var(--text-primary);
-    font-size: 14px;
+    font-size: 12px;
   }
 
   .time-slider-segment-item-duration {
-    font-size: 14px;
+    font-size: 12px;
     color: var(--text-secondary);
     font-weight: 600;
   }
@@ -473,7 +427,7 @@
       }
 
       if (this.segments.length === 0) {
-        track.innerHTML = '<div class="time-slider-empty-state"><div class="time-slider-empty-state-text">Click a project chip to add a time segment</div></div>';
+        track.innerHTML = '<div class="time-slider-empty-state" style="display: flex; align-items: center; justify-content: center; height: 100%; width: 100%;"><div class="time-slider-empty-state-text" style="text-align: center; color: var(--text-tertiary); font-size: 12px;">Click a project chip to add a time segment</div></div>';
         return;
       }
 
@@ -901,7 +855,7 @@
       const totalMinutes = this.segments.reduce((sum, s) => sum + s.minutes, 0);
       const totalHours = this.minutesToHours(totalMinutes);
 
-      let html = `<div style="margin-bottom: 12px; font-size: 14px; color: var(--text-secondary);">
+      let html = `<div style="margin-bottom: 8px; font-size: 12px; color: var(--text-secondary);">
         <strong>Total Allocated: ${totalHours.toFixed(1)}h / ${this.totalHours}h</strong>
       </div>`;
 
@@ -922,40 +876,41 @@
                   <span class="time-slider-segment-item-name">${project ? project.name : 'Unknown'}</span>
                   <span class="time-slider-segment-item-duration">${hours.toFixed(1)}h</span>
                 </div>
-                <div class="time-slider-segment-note-container" style="margin-top: 6px;">
+                <div class="time-slider-segment-note-container" style="margin-top: 4px;">
                   ${isEditingNote ? `
-                    <div style="display: flex; gap: 8px; align-items: flex-start; width: 100%;">
+                    <div style="display: flex; gap: 6px; align-items: flex-start; width: 100%;">
                       <input 
                         type="text" 
                         class="time-slider-note-input"
                         id="note-input-${index}"
                         value="${(segment.comment || '').replace(/"/g, '&quot;')}"
-                        placeholder="Add note about activity..."
-                        style="flex: 1; padding: 6px 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-primary); color: var(--text-primary); font-size: 13px;"
+                        placeholder="Add note or tags (e.g., #meeting #setup)..."
+                        style="flex: 1; padding: 4px 8px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg-primary); color: var(--text-primary); font-size: 11px;"
+                        autofocus
                       />
                       <button 
                         class="time-slider-note-save"
                         id="note-save-${index}"
-                        style="padding: 6px 12px; background: #14b8a6; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500;"
+                        style="padding: 4px 8px; background: #14b8a6; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 500;"
                       >
                         Save
                       </button>
                       <button 
                         class="time-slider-note-cancel"
                         id="note-cancel-${index}"
-                        style="padding: 6px 12px; background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500;"
+                        style="padding: 4px 8px; background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border); border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 500;"
                       >
                         Cancel
                       </button>
                     </div>
                   ` : `
                     ${hasNote ? `
-                      <div style="font-size: 12px; color: var(--text-secondary); padding: 4px 0;">
+                      <div style="font-size: 11px; color: var(--text-secondary); padding: 2px 0;">
                         <span style="font-style: italic;">${segment.comment.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>
                         <button 
                           class="time-slider-edit-note"
                           data-note-index="${index}"
-                          style="margin-left: 8px; background: none; border: none; color: var(--accent); cursor: pointer; font-size: 11px; text-decoration: underline;"
+                          style="margin-left: 6px; background: none; border: none; color: var(--accent); cursor: pointer; font-size: 10px; text-decoration: underline;"
                         >
                           Edit
                         </button>
@@ -964,9 +919,9 @@
                       <button 
                         class="time-slider-add-note"
                         data-note-index="${index}"
-                        style="background: none; border: none; color: var(--text-tertiary); cursor: pointer; font-size: 11px; text-decoration: underline; padding: 0;"
+                        style="background: none; border: 1px dashed var(--border); color: var(--text-tertiary); cursor: pointer; font-size: 10px; text-decoration: none; padding: 2px 6px; border-radius: 3px; width: 100%; text-align: left;"
                       >
-                        + Add note
+                        + Add note or tags
                       </button>
                     `}
                   `}
@@ -1027,8 +982,10 @@
         if (input) {
           input.focus();
           input.select();
+          // Scroll into view if needed
+          input.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
-      }, 0);
+      }, 50);
     }
 
     saveNote(index) {

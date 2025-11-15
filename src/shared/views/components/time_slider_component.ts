@@ -30,31 +30,40 @@ export function renderTimeSlider(props: TimeSliderProps = {}): string {
   return html`
     <div
       id="time-slider-container"
-      class="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl p-6 shadow-sm my-6 w-full max-w-full box-border"
+      class="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-3 shadow-sm my-4 w-full max-w-full box-border"
       data-total-hours="${totalHours}"
       data-segments="${segmentsJson.replace(/"/g, "&quot;")}"
       data-projects="${projectsJson.replace(/"/g, "&quot;")}"
       data-date="${date}"
       data-sync-url="${syncUrl}"
     >
-      <div class="flex justify-between items-center mb-6">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 m-0">
-          Daily Time Allocation
-        </h3>
-        <div class="flex items-center gap-4">
-          <div id="time-slider-sync-status" class="flex items-center gap-2 mr-3">
-            <span id="time-slider-sync-icon" class="text-sm text-green-500 dark:text-green-400"
+      <div class="mb-4 pb-3 border-b border-gray-300 dark:border-gray-700">
+        <div class="mb-2">
+          <span
+            class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide block"
+            >Available Projects</span
+          >
+        </div>
+        <div id="time-slider-project-chips" class="flex flex-wrap gap-1.5">
+          <!-- Project chips will be dynamically inserted here -->
+        </div>
+      </div>
+
+      <div class="flex justify-end items-center mb-3">
+        <div class="flex items-center gap-3">
+          <div id="time-slider-sync-status" class="flex items-center gap-1.5 mr-2">
+            <span id="time-slider-sync-icon" class="text-xs text-green-500 dark:text-green-400 block"
               >Synced</span
             >
           </div>
           <label
-            class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 font-medium"
+            class="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400 font-medium"
           >
-            Total Hours:
+            <span class="block">Total Hours:</span>
             <input
               type="number"
               id="total-hours-input"
-              class="bg-gray-200 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-md px-2.5 py-1.5 text-sm w-[70px] focus:outline-none focus:border-teal-500 focus:ring-3 focus:ring-teal-500/10"
+              class="bg-gray-200 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-md px-2 py-1 text-xs w-[60px] focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10 block"
               min="1"
               max="24"
               step="0.5"
@@ -64,34 +73,22 @@ export function renderTimeSlider(props: TimeSliderProps = {}): string {
         </div>
       </div>
 
-      <div class="relative my-8">
+      <div class="relative my-4">
         <div
           id="time-slider-track"
-          class="relative h-20 bg-gradient-to-r from-gray-200 via-teal-50/5 to-gray-200 dark:from-gray-700 dark:via-teal-900/5 dark:to-gray-700 rounded-lg border border-gray-300 dark:border-gray-600 overflow-visible cursor-pointer"
+          class="relative h-16 bg-gradient-to-r from-gray-200 via-teal-50/5 to-gray-200 dark:from-gray-700 dark:via-teal-900/5 dark:to-gray-700 rounded-md border border-gray-300 dark:border-gray-600 overflow-visible cursor-pointer min-h-[64px]"
         >
           <!-- Segments and handles will be dynamically inserted here -->
         </div>
-        <div class="flex justify-between mt-2 text-xs text-gray-500 dark:text-gray-400">
-          <div class="font-medium">0h</div>
-          <div class="font-medium" id="time-slider-end-label">${totalHours}h</div>
-        </div>
-      </div>
-
-      <div class="mt-8 pt-6 border-t border-gray-300 dark:border-gray-700">
-        <div class="mb-3">
-          <span
-            class="text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide"
-            >Available Projects</span
-          >
-        </div>
-        <div id="time-slider-project-chips" class="flex flex-wrap gap-2">
-          <!-- Project chips will be dynamically inserted here -->
+        <div class="flex justify-between mt-1 text-[10px] text-gray-500 dark:text-gray-400">
+          <span class="font-medium">0h</span>
+          <span class="font-medium" id="time-slider-end-label">${totalHours}h</span>
         </div>
       </div>
 
       <div
         id="time-slider-segments-info"
-        class="mt-6 pt-6 border-t border-gray-300 dark:border-gray-700"
+        class="mt-4 pt-3 border-t border-gray-300 dark:border-gray-700"
       >
         <!-- Segment information will be displayed here -->
       </div>

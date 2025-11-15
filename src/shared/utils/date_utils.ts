@@ -46,7 +46,7 @@ export function hoursToMinutes(hours: number): number {
 
 export function getAllDaysInMonth(
   dateString: string
-): Array<{ date: string; dayNumber: number; dayName: string; isWeekend: boolean }> {
+): Array<{ date: string; dayNumber: number; dayName: string; isWeekend: boolean; dayOfWeek: number }> {
   const baseDate = parseDate(dateString);
   const year = baseDate.getFullYear();
   const month = baseDate.getMonth();
@@ -55,17 +55,20 @@ export function getAllDaysInMonth(
   const lastDay = new Date(year, month + 1, 0);
   const daysInMonth = lastDay.getDate();
 
-  const days: Array<{ date: string; dayNumber: number; dayName: string; isWeekend: boolean }> = [];
-  const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const days: Array<{ date: string; dayNumber: number; dayName: string; isWeekend: boolean; dayOfWeek: number }> = [];
+  const dayNames = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]; // Monday first
 
   for (let day = 1; day <= daysInMonth; day++) {
     const date = new Date(year, month, day);
-    const dayOfWeek = date.getDay();
+    const dayOfWeek = date.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+    // Convert to Monday-based: 0=Sun->6, 1=Mon->0, 2=Tue->1, ..., 6=Sat->5
+    const mondayBasedDayOfWeek = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
     days.push({
       date: formatDate(date),
       dayNumber: day,
-      dayName: dayNames[dayOfWeek],
+      dayName: dayNames[mondayBasedDayOfWeek],
       isWeekend: dayOfWeek === 0 || dayOfWeek === 6,
+      dayOfWeek: mondayBasedDayOfWeek,
     });
   }
 

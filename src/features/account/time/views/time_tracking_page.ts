@@ -10,7 +10,6 @@ import {
   getMonthFromDate,
 } from "../../../../shared/utils/date_utils.js";
 import { renderBaseLayout } from "../../../../shared/utils/layout.js";
-import { renderDatePicker } from "../../../../shared/views/components/date_picker_component.js";
 import { renderTimeSlider } from "../../../../shared/views/components/time_slider_component.js";
 import { renderTimeSummary } from "../../../../shared/views/components/time_summary_component.js";
 import { renderMonthlyCalendar } from "../../../../shared/views/components/monthly_calendar_component.js";
@@ -62,20 +61,45 @@ export function renderTimeTrackingPage(req: AuthStubRequest, includeLayout: bool
   const timeSliderPath = join(__dirname, "../../../../shared/views/components/time_slider.html");
   const timeSliderHtml = readFileSync(timeSliderPath, "utf-8");
 
+  // Calculate remaining hours needed
+  const remainingHours = Math.max(0, 8 - totalHours);
+  const isComplete = totalHours >= 8;
+  const statusColor = isComplete
+    ? "text-green-600 dark:text-green-400"
+    : totalHours >= 4
+      ? "text-yellow-600 dark:text-yellow-400"
+      : "text-red-600 dark:text-red-400";
+
   const content = html`
-    <div class="space-y-8">
-      <div class="flex items-center justify-between">
-        <div>
-          <h1 class="text-3xl font-bold mb-2 text-gray-900 dark:text-gray-100">Time Tracking</h1>
-          <p class="text-sm text-gray-600 dark:text-gray-400">Track your daily work hours</p>
+    <div class="space-y-4">
+      <!-- Enhanced Status Bar -->
+      <div
+        class="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-3 shadow-sm"
+      >
+        <div class="flex items-start gap-4 flex-wrap">
+          <div class="flex-1 min-w-[140px]">
+            <div class="text-[10px] font-medium mb-0.5 text-gray-600 dark:text-gray-400">
+              Daily Status
+            </div>
+            <div class="flex items-baseline gap-2 flex-wrap">
+              <span class="text-2xl font-bold ${statusColor}">${totalHours.toFixed(1)}h</span>
+              <span class="text-sm text-gray-500 dark:text-gray-400">/ 8h</span>
+              ${!isComplete
+                ? html`<span class="text-xs text-gray-600 dark:text-gray-400"
+                    >(${remainingHours.toFixed(1)}h needed)</span
+                  >`
+                : html`<span class="text-xs text-green-600 dark:text-green-400">✓ Complete</span>`}
+            </div>
+          </div>
+          <div class="h-12 w-px bg-gray-300 dark:bg-gray-600 self-stretch"></div>
+          <div class="flex-1 min-w-[160px]">
+            ${renderTimeSummary({
+              date: selectedDate,
+              hxGet: "/account/time/summary",
+              hxTrigger: "load, entries-changed from:body",
+            })}
+          </div>
         </div>
-        ${renderDatePicker({
-          value: selectedDate,
-          hxGet: "/account/time",
-          hxTarget: "main",
-          hxTrigger: "change",
-          label: "Date",
-        })}
       </div>
 
       ${renderMonthlyCalendar({
@@ -94,11 +118,6 @@ export function renderTimeTrackingPage(req: AuthStubRequest, includeLayout: bool
         })),
         date: selectedDate,
         syncUrl: "/account/time/sync",
-      })}
-      ${renderTimeSummary({
-        date: selectedDate,
-        hxGet: "/account/time/summary",
-        hxTrigger: "load, entries-changed from:body",
       })}
     </div>
 

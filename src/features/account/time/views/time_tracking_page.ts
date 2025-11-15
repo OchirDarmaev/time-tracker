@@ -3,11 +3,17 @@ import { html } from "../../../../shared/utils/html.js";
 import { AuthStubRequest } from "../../../../shared/middleware/auth_stub.js";
 import { projectModel } from "../../../../shared/models/project.js";
 import { timeEntryModel } from "../../../../shared/models/time_entry.js";
-import { formatDate, minutesToHours } from "../../../../shared/utils/date_utils.js";
+import {
+  formatDate,
+  minutesToHours,
+  getAllDaysInMonth,
+  getMonthFromDate,
+} from "../../../../shared/utils/date_utils.js";
 import { renderBaseLayout } from "../../../../shared/utils/layout.js";
 import { renderDatePicker } from "../../../../shared/views/components/date_picker_component.js";
 import { renderTimeSlider } from "../../../../shared/views/components/time_slider_component.js";
 import { renderTimeSummary } from "../../../../shared/views/components/time_summary_component.js";
+import { renderMonthlyCalendar } from "../../../../shared/views/components/monthly_calendar_component.js";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 
@@ -23,6 +29,23 @@ export function renderTimeTrackingPage(req: AuthStubRequest, includeLayout: bool
   const entries = timeEntryModel.getByUserIdAndDate(currentUser.id, selectedDate);
   const totalMinutes = timeEntryModel.getTotalMinutesByUserAndDate(currentUser.id, selectedDate);
   const totalHours = minutesToHours(totalMinutes);
+
+  // Get hours for all days in the current month for the monthly calendar
+  const month = getMonthFromDate(selectedDate);
+  const monthEntries = timeEntryModel.getByUserIdAndMonth(currentUser.id, month);
+  const allDaysInMonth = getAllDaysInMonth(selectedDate);
+  const dayHoursMap: Record<string, number> = {};
+
+  // Initialize all days with 0 hours
+  allDaysInMonth.forEach((day) => {
+    dayHoursMap[day.date] = 0;
+  });
+
+  // Calculate hours for each day from entries
+  monthEntries.forEach((entry) => {
+    const hours = minutesToHours(entry.minutes);
+    dayHoursMap[entry.date] = (dayHoursMap[entry.date] || 0) + hours;
+  });
 
   // Monthly totals are now handled by time-summary component
   // Convert entries to segments format for the time slider
@@ -55,6 +78,12 @@ export function renderTimeTrackingPage(req: AuthStubRequest, includeLayout: bool
         })}
       </div>
 
+      ${renderMonthlyCalendar({
+        selectedDate: selectedDate,
+        hxGet: "/account/time",
+        hxTarget: "main",
+        dayHoursMap: dayHoursMap,
+      })}
       ${renderTimeSlider({
         totalHours: sliderTotalHours,
         segments: segments,

@@ -15,11 +15,13 @@ A simple internal tool for tracking daily time across multiple projects with rol
 ## Setup
 
 1. Install dependencies:
+
 ```bash
 yarn install
 ```
 
 2. Run migrations and seed data:
+
 ```bash
 yarn dev
 ```
@@ -29,6 +31,7 @@ The database will be initialized automatically on first run.
 ## Usage
 
 1. Start the development server:
+
 ```bash
 yarn dev
 ```
@@ -42,4 +45,3 @@ yarn dev
 - **Account**: Track time, view own reports
 - **Office-manager**: View aggregated reports across accounts/projects
 - **Admin**: Manage projects, assign accounts, view system-wide reports
-

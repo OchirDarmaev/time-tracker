@@ -43,3 +43,31 @@ export function minutesToHours(minutes: number): number {
 export function hoursToMinutes(hours: number): number {
   return Math.round(hours * 60);
 }
+
+export function getAllDaysInMonth(
+  dateString: string
+): Array<{ date: string; dayNumber: number; dayName: string; isWeekend: boolean }> {
+  const baseDate = parseDate(dateString);
+  const year = baseDate.getFullYear();
+  const month = baseDate.getMonth();
+
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+  const daysInMonth = lastDay.getDate();
+
+  const days: Array<{ date: string; dayNumber: number; dayName: string; isWeekend: boolean }> = [];
+  const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const date = new Date(year, month, day);
+    const dayOfWeek = date.getDay();
+    days.push({
+      date: formatDate(date),
+      dayNumber: day,
+      dayName: dayNames[dayOfWeek],
+      isWeekend: dayOfWeek === 0 || dayOfWeek === 6,
+    });
+  }
+
+  return days;
+}

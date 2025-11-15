@@ -1,4 +1,7 @@
 // Time Summary Web Component
+
+import { html } from "../../html";
+
 // Uses light DOM (no shadow) for simpler HTMX integration and CSS class access
 interface HtmxInstance {
   process: (element: ShadowRoot | HTMLElement) => void;
@@ -95,11 +98,15 @@ class TimeSummaryComponent extends HTMLElement {
     const hxTrigger =
       this.getAttribute("data-hx-trigger") || this.getAttribute("hx-trigger") || "load";
 
-    this.innerHTML = `
-      <div id="summary-content" class="block w-full max-w-full box-border min-h-[60px]" ${hxGet && hxTrigger.includes("entries-changed") ? `hx-get="${hxGet}" hx-target="this" hx-swap="innerHTML" hx-trigger="entries-changed from:body"` : ""}>
-        <div class="text-gray-500 dark:text-gray-400 text-center py-5">
-          Loading...
-        </div>
+    this.innerHTML = html`
+      <div
+        id="summary-content"
+        class="block w-full max-w-full box-border min-h-[60px]"
+        ${hxGet && hxTrigger.includes("entries-changed")
+          ? `hx-get="${hxGet}" hx-target="this" hx-swap="innerHTML" hx-trigger="entries-changed from:body"`
+          : ""}
+      >
+        <div class="text-gray-500 dark:text-gray-400 text-center py-5">Loading...</div>
       </div>
     `;
   }

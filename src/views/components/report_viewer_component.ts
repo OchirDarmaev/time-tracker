@@ -1,5 +1,7 @@
 // Report Viewer Web Component
 
+import { html } from "../../html";
+
 interface HtmxInstance {
   process: (element: ShadowRoot | HTMLElement) => void;
 }
@@ -79,8 +81,10 @@ class ReportViewerComponent extends HTMLElement {
     const dataJson = this.getAttribute("data") || "{}";
     const data: ReportData = JSON.parse(dataJson);
 
-    this.shadow.innerHTML = `
-      <div class="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-5 shadow-sm">
+    this.shadow.innerHTML = html`
+      <div
+        class="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-5 shadow-sm"
+      >
         ${this.renderReport(type, data)}
       </div>
     `;

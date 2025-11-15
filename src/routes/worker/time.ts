@@ -14,6 +14,7 @@ import { renderBaseLayout } from "../../utils/layout.js";
 import { readFileSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
+import { html } from "../../html.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -58,15 +59,15 @@ function renderTimeTrackingPage(req: AuthStubRequest, res: Response) {
   const projectsJson = JSON.stringify(projects.map((p) => ({ id: p.id, name: p.name })));
   const segmentsJson = JSON.stringify(segments);
 
-  const content = `
+  const content = html`
     <div class="container mx-auto px-4 py-8">
       <h1 class="text-3xl font-bold mb-6">My Time Tracking</h1>
-      
+
       <div class="mb-6">
         <label for="date-picker" class="block text-sm font-medium mb-2">Date</label>
-        <input 
-          type="date" 
-          id="date-picker" 
+        <input
+          type="date"
+          id="date-picker"
           value="${selectedDate}"
           hx-get="/worker/time"
           hx-target="body"
@@ -76,32 +77,42 @@ function renderTimeTrackingPage(req: AuthStubRequest, res: Response) {
           class="border rounded px-3 py-2"
         />
       </div>
-      
+
       ${timeSliderHtml}
-      
+
       <div class="mt-8">
         <h2 class="text-xl font-semibold mb-4">Summary</h2>
-        <div id="summary-container" hx-get="/worker/time/summary?date=${selectedDate}" hx-trigger="load, entries-changed from:body">
-          ${renderSummary(totalHours, monthlyTotalHours, requiredMonthlyHours, dailyWarning, monthlyWarning)}
+        <div
+          id="summary-container"
+          hx-get="/worker/time/summary?date=${selectedDate}"
+          hx-trigger="load, entries-changed from:body"
+        >
+          ${renderSummary(
+            totalHours,
+            monthlyTotalHours,
+            requiredMonthlyHours,
+            dailyWarning,
+            monthlyWarning
+          )}
         </div>
       </div>
     </div>
     <script>
-      document.addEventListener('DOMContentLoaded', function() {
+      document.addEventListener("DOMContentLoaded", function () {
         if (window.TimeSlider) {
           const projects = ${projectsJson};
           const segments = ${segmentsJson};
           const totalHours = ${sliderTotalHours};
-          
-          window.timeSliderInstance = new TimeSlider('time-slider-container', {
+
+          window.timeSliderInstance = new TimeSlider("time-slider-container", {
             totalHours: totalHours,
             segments: segments,
             projects: projects,
-            date: '${selectedDate}',
-            onChange: function(data) {
+            date: "${selectedDate}",
+            onChange: function (data) {
               // Handle time slider changes if needed
-              console.log('Time slider changed:', data);
-            }
+              console.log("Time slider changed:", data);
+            },
           });
         }
       });
@@ -113,12 +124,12 @@ function renderTimeTrackingPage(req: AuthStubRequest, res: Response) {
 
 function renderEntriesTable(entries: TimeEntry[], projects: Project[]): string {
   if (entries.length === 0) {
-    return '<p class="text-gray-500">No entries for this date.</p>';
+    return html`<p class="text-gray-500">No entries for this date.</p>`;
   }
 
   const projectMap = new Map(projects.map((p) => [p.id, p.name]));
 
-  return `
+  return html`
     <table class="w-full border-collapse border border-gray-300">
       <thead>
         <tr class="bg-gray-100">
@@ -164,18 +175,32 @@ function renderSummary(
   dailyWarning: boolean,
   monthlyWarning: boolean
 ): string {
-  return `
+  return html`
     <div class="space-y-4">
-      <div class="p-4 border rounded ${dailyWarning ? "bg-red-50 border-red-300" : "bg-green-50 border-green-300"}">
+      <div
+        class="p-4 border rounded ${dailyWarning
+          ? "bg-red-50 border-red-300"
+          : "bg-green-50 border-green-300"}"
+      >
         <div class="flex items-center justify-between">
           <span class="font-semibold">Daily Total: ${totalHours.toFixed(1)} hours</span>
-          ${dailyWarning ? '<span class="text-red-600">❗ Less than 8 hours</span>' : '<span class="text-green-600">✓ Complete</span>'}
+          ${dailyWarning
+            ? '<span class="text-red-600">❗ Less than 8 hours</span>'
+            : '<span class="text-green-600">✓ Complete</span>'}
         </div>
       </div>
-      <div class="p-4 border rounded ${monthlyWarning ? "bg-yellow-50 border-yellow-300" : "bg-green-50 border-green-300"}">
+      <div
+        class="p-4 border rounded ${monthlyWarning
+          ? "bg-yellow-50 border-yellow-300"
+          : "bg-green-50 border-green-300"}"
+      >
         <div class="flex items-center justify-between">
-          <span class="font-semibold">Monthly Total: ${monthlyTotalHours.toFixed(1)} / ${requiredMonthlyHours} hours</span>
-          ${monthlyWarning ? '<span class="text-yellow-600">⚠️ Below target</span>' : '<span class="text-green-600">✓ On track</span>'}
+          <span class="font-semibold"
+            >Monthly Total: ${monthlyTotalHours.toFixed(1)} / ${requiredMonthlyHours} hours</span
+          >
+          ${monthlyWarning
+            ? '<span class="text-yellow-600">⚠️ Below target</span>'
+            : '<span class="text-green-600">✓ On track</span>'}
         </div>
       </div>
     </div>

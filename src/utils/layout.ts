@@ -4,6 +4,7 @@ import { fileURLToPath } from "url";
 import { AuthStubRequest } from "../middleware/auth_stub.js";
 import { userModel } from "../models/user.js";
 import { projectModel } from "../models/project.js";
+import { html } from "../html.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -66,7 +67,11 @@ function getNavButtons(availableRoles: string[], activeNav: string): string {
           .map((r) => `'${roleLabels[r] || r}'`)
           .join(" or ");
         const tooltipText = `role ${requiredRolesText} required`;
-        return `<span class="text-gray-500 dark:text-gray-500 cursor-not-allowed px-3 py-2 text-sm" title="${tooltipText}">${item.label}</span>`;
+        return html`<span
+          class="text-gray-500 dark:text-gray-500 cursor-not-allowed px-3 py-2 text-sm"
+          title="${tooltipText}"
+          >${item.label}</span
+        >`;
       }
     })
     .join("");
@@ -75,8 +80,8 @@ function getNavButtons(availableRoles: string[], activeNav: string): string {
 function getRoleSelector(availableRoles: string[], currentRole: string | undefined): string {
   if (availableRoles.length <= 1) return "";
 
-  return `
-    <select 
+  return html`
+    <select
       hx-post="/auth-stub/set-role"
       hx-target="body"
       hx-swap="outerHTML transition:true"
@@ -101,8 +106,8 @@ function getProjectSelector(availableRoles: string[], userId: number | undefined
   const userProjects = projectModel.getByUserId(userId);
   if (userProjects.length === 0) return "";
 
-  return `
-    <select 
+  return html`
+    <select
       class="bg-gray-200 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-lg px-3 py-2 text-sm cursor-pointer hover:border-indigo-500 dark:hover:border-indigo-500 hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:border-indigo-500 focus:ring-3 focus:ring-indigo-500/10 min-w-[160px]"
       onchange="if(this.value) window.location.href='/worker/time?project=' + this.value"
     >
@@ -164,13 +169,8 @@ export function renderNavBar(req: AuthStubRequest, activeNav: string = ""): stri
   const userId = "id" in currentUser ? currentUser.id : undefined;
   const projectSelector = getProjectSelector(availableRoles, userId);
 
-  return `
-    <div class="flex items-center gap-1">
-      ${navButtons}
-    </div>
-    <div class="flex items-center gap-3">
-      ${roleSelector}
-      ${projectSelector}
-    </div>
+  return html`
+    <div class="flex items-center gap-1">${navButtons}</div>
+    <div class="flex items-center gap-3">${roleSelector} ${projectSelector}</div>
   `;
 }

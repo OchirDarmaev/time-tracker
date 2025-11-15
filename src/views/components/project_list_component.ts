@@ -1,6 +1,8 @@
 // Project List Web Component
 // Uses light DOM (no shadow) for simpler HTMX integration
 
+import { html } from "../../html";
+
 interface Project {
   id: number;
   name: string;
@@ -57,14 +59,32 @@ class ProjectListComponent extends HTMLElement {
       return '<p class="text-gray-600 dark:text-gray-400">No projects found.</p>';
     }
 
-    return `
-      <table class="w-full border-separate border-spacing-0 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden shadow-sm">
+    return html`
+      <table
+        class="w-full border-separate border-spacing-0 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden shadow-sm"
+      >
         <thead class="bg-gray-200 dark:bg-gray-700">
           <tr>
-            <th class="px-5 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600">ID</th>
-            <th class="px-5 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600">Name</th>
-            <th class="px-5 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600">Status</th>
-            <th class="px-5 py-4 text-right text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600">Actions</th>
+            <th
+              class="px-5 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600"
+            >
+              ID
+            </th>
+            <th
+              class="px-5 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600"
+            >
+              Name
+            </th>
+            <th
+              class="px-5 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600"
+            >
+              Status
+            </th>
+            <th
+              class="px-5 py-4 text-right text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600"
+            >
+              Actions
+            </th>
           </tr>
         </thead>
         <tbody>

@@ -6,7 +6,11 @@
     "dev": "tsx  src/server.ts",
     "dev:watch": "tsx watch src/server.ts",
     "build": "tsc",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write \"src/**/*.{ts,json,md}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,json,md}\""
   },
   "dependencies": {
     "@ts-rest/core": "^3.52.1",
@@ -18,13 +22,19 @@
     "zod": "3.22.3"
   },
   "devDependencies": {
+    "@eslint/js": "^9.0.0",
     "@types/better-sqlite3": "^7.6.8",
     "@types/cookie-parser": "^1.4.6",
-    "@types/express": "5.1.0",
+    "@types/express": "^5.0.0",
     "@types/express-session": "^1.17.10",
     "@types/node": "^20.10.6",
+    "eslint": "^9.0.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.0",
+    "prettier": "^3.4.0",
     "tsx": "^4.7.0",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "typescript-eslint": "^8.0.0"
   },
   "packageManager": "yarn@4.10.3"
 }

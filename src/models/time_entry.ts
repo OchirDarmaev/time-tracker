@@ -1,4 +1,4 @@
-import { db } from '../config/database.js';
+import { db } from "../config/database.js";
 
 export interface TimeEntry {
   id: number;
@@ -11,94 +11,141 @@ export interface TimeEntry {
 
 export const timeEntryModel = {
   getByUserIdAndDate(userId: number, date: string): TimeEntry[] {
-    return db.prepare(`
+    return db
+      .prepare(
+        `
       SELECT * FROM time_entries
       WHERE user_id = ? AND date = ?
       ORDER BY id
-    `).all(userId, date) as TimeEntry[];
+    `
+      )
+      .all(userId, date) as TimeEntry[];
   },
 
   getByUserIdAndMonth(userId: number, month: string): TimeEntry[] {
-    return db.prepare(`
+    return db
+      .prepare(
+        `
       SELECT * FROM time_entries
       WHERE user_id = ? AND date LIKE ?
       ORDER BY date, id
-    `).all(userId, `${month}%`) as TimeEntry[];
+    `
+      )
+      .all(userId, `${month}%`) as TimeEntry[];
   },
 
   getByProjectId(projectId: number, startDate?: string, endDate?: string): TimeEntry[] {
     if (startDate && endDate) {
-      return db.prepare(`
+      return db
+        .prepare(
+          `
         SELECT * FROM time_entries
         WHERE project_id = ? AND date >= ? AND date <= ?
         ORDER BY date, user_id
-      `).all(projectId, startDate, endDate) as TimeEntry[];
+      `
+        )
+        .all(projectId, startDate, endDate) as TimeEntry[];
     }
-    return db.prepare(`
+    return db
+      .prepare(
+        `
       SELECT * FROM time_entries
       WHERE project_id = ?
       ORDER BY date DESC, user_id
-    `).all(projectId) as TimeEntry[];
+    `
+      )
+      .all(projectId) as TimeEntry[];
   },
 
   getByUserId(userId: number, startDate?: string, endDate?: string): TimeEntry[] {
     if (startDate && endDate) {
-      return db.prepare(`
+      return db
+        .prepare(
+          `
         SELECT * FROM time_entries
         WHERE user_id = ? AND date >= ? AND date <= ?
         ORDER BY date, project_id
-      `).all(userId, startDate, endDate) as TimeEntry[];
+      `
+        )
+        .all(userId, startDate, endDate) as TimeEntry[];
     }
-    return db.prepare(`
+    return db
+      .prepare(
+        `
       SELECT * FROM time_entries
       WHERE user_id = ?
       ORDER BY date DESC, project_id
-    `).all(userId) as TimeEntry[];
+    `
+      )
+      .all(userId) as TimeEntry[];
   },
 
-  create(userId: number, projectId: number, date: string, minutes: number, comment: string | null): TimeEntry {
-    const result = db.prepare(`
+  create(
+    userId: number,
+    projectId: number,
+    date: string,
+    minutes: number,
+    comment: string | null
+  ): TimeEntry {
+    const result = db
+      .prepare(
+        `
       INSERT INTO time_entries (user_id, project_id, date, minutes, comment)
       VALUES (?, ?, ?, ?, ?)
-    `).run(userId, projectId, date, minutes, comment);
+    `
+      )
+      .run(userId, projectId, date, minutes, comment);
     return this.getById(result.lastInsertRowid as number)!;
   },
 
   getById(id: number): TimeEntry | undefined {
-    return db.prepare('SELECT * FROM time_entries WHERE id = ?').get(id) as TimeEntry | undefined;
+    return db.prepare("SELECT * FROM time_entries WHERE id = ?").get(id) as TimeEntry | undefined;
   },
 
   delete(id: number): void {
-    db.prepare('DELETE FROM time_entries WHERE id = ?').run(id);
+    db.prepare("DELETE FROM time_entries WHERE id = ?").run(id);
   },
 
   getTotalMinutesByUserAndDate(userId: number, date: string): number {
-    const result = db.prepare(`
+    const result = db
+      .prepare(
+        `
       SELECT COALESCE(SUM(minutes), 0) as total
       FROM time_entries
       WHERE user_id = ? AND date = ?
-    `).get(userId, date) as { total: number };
+    `
+      )
+      .get(userId, date) as { total: number };
     return result.total;
   },
 
   getTotalMinutesByUserAndMonth(userId: number, month: string): number {
-    const result = db.prepare(`
+    const result = db
+      .prepare(
+        `
       SELECT COALESCE(SUM(minutes), 0) as total
       FROM time_entries
       WHERE user_id = ? AND date LIKE ?
-    `).get(userId, `${month}%`) as { total: number };
+    `
+      )
+      .get(userId, `${month}%`) as { total: number };
     return result.total;
   },
 
   getAll(startDate?: string, endDate?: string): TimeEntry[] {
     if (startDate && endDate) {
-      return db.prepare(`
+      return db
+        .prepare(
+          `
         SELECT * FROM time_entries
         WHERE date >= ? AND date <= ?
         ORDER BY date DESC, user_id
-      `).all(startDate, endDate) as TimeEntry[];
+      `
+        )
+        .all(startDate, endDate) as TimeEntry[];
     }
-    return db.prepare('SELECT * FROM time_entries ORDER BY date DESC, user_id').all() as TimeEntry[];
+    return db
+      .prepare("SELECT * FROM time_entries ORDER BY date DESC, user_id")
+      .all() as TimeEntry[];
   },
 };
-

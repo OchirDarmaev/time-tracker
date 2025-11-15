@@ -8,7 +8,7 @@ export function validateDate(dateString: string): boolean {
   if (!dateRegex.test(dateString)) {
     return false;
   }
-  const date = new Date(dateString + 'T00:00:00');
+  const date = new Date(dateString + "T00:00:00");
   return date instanceof Date && !isNaN(date.getTime());
 }
 
@@ -23,6 +23,5 @@ export function validateProjectName(name: string): boolean {
 export function extractTags(comment: string): string[] {
   const tagRegex = /#(\w+)/g;
   const matches = comment.match(tagRegex);
-  return matches ? matches.map(tag => tag.substring(1)) : [];
+  return matches ? matches.map((tag) => tag.substring(1)) : [];
 }
-

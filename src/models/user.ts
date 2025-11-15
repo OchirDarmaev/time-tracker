@@ -1,6 +1,6 @@
-import { db } from '../config/database.js';
+import { db } from "../config/database.js";
 
-export type UserRole = 'worker' | 'office-manager' | 'admin';
+export type UserRole = "worker" | "office-manager" | "admin";
 
 export interface User {
   id: number;
@@ -22,7 +22,7 @@ function parseUser(row: UserRow): User {
     roles = JSON.parse(row.roles);
   } catch (e) {
     // Fallback: if roles is a single string (old format), convert it
-    if (typeof row.roles === 'string' && !row.roles.startsWith('[')) {
+    if (typeof row.roles === "string" && !row.roles.startsWith("[")) {
       roles = [row.roles as UserRole];
     }
   }
@@ -36,31 +36,32 @@ function parseUser(row: UserRow): User {
 
 export const userModel = {
   getAll(): User[] {
-    const rows = db.prepare('SELECT * FROM users ORDER BY email').all() as UserRow[];
+    const rows = db.prepare("SELECT * FROM users ORDER BY email").all() as UserRow[];
     return rows.map(parseUser);
   },
 
   getById(id: number): User | undefined {
-    const row = db.prepare('SELECT * FROM users WHERE id = ?').get(id) as UserRow | undefined;
+    const row = db.prepare("SELECT * FROM users WHERE id = ?").get(id) as UserRow | undefined;
     return row ? parseUser(row) : undefined;
   },
 
   getByEmail(email: string): User | undefined {
-    const row = db.prepare('SELECT * FROM users WHERE email = ?').get(email) as UserRow | undefined;
+    const row = db.prepare("SELECT * FROM users WHERE email = ?").get(email) as UserRow | undefined;
     return row ? parseUser(row) : undefined;
   },
 
   getWorkers(): User[] {
-    const rows = db.prepare("SELECT * FROM users WHERE active = 1 ORDER BY email").all() as UserRow[];
-    return rows
-      .map(parseUser)
-      .filter(user => user.roles.includes('worker'));
+    const rows = db
+      .prepare("SELECT * FROM users WHERE active = 1 ORDER BY email")
+      .all() as UserRow[];
+    return rows.map(parseUser).filter((user) => user.roles.includes("worker"));
   },
 
   create(email: string, roles: UserRole[]): User {
     const rolesJson = JSON.stringify(roles);
-    const result = db.prepare('INSERT INTO users (email, roles, active) VALUES (?, ?, 1)').run(email, rolesJson);
+    const result = db
+      .prepare("INSERT INTO users (email, roles, active) VALUES (?, ?, 1)")
+      .run(email, rolesJson);
     return this.getById(result.lastInsertRowid as number)!;
   },
 };
-

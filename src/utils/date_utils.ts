@@ -17,19 +17,19 @@ export function getWorkingDaysInMonth(year: number, month: number): number {
 
 export function formatDate(date: Date): string {
   const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 }
 
 export function parseDate(dateString: string): Date {
-  return new Date(dateString + 'T00:00:00');
+  return new Date(dateString + "T00:00:00");
 }
 
 export function getCurrentMonth(): string {
   const now = new Date();
   const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const month = String(now.getMonth() + 1).padStart(2, "0");
   return `${year}-${month}`;
 }
 
@@ -44,4 +44,3 @@ export function minutesToHours(minutes: number): number {
 export function hoursToMinutes(hours: number): number {
   return Math.round(hours * 60);
 }
-

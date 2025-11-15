@@ -1,36 +1,42 @@
-import { initServer } from '@ts-rest/express';
-import { apiContract } from './contracts/api.js';
-import { AuthStubRequest } from './middleware/auth_stub.js';
-import { userModel, UserRole } from './models/user.js';
-import { timeEntryModel } from './models/time_entry.js';
-import { projectModel } from './models/project.js';
-import { projectUserModel } from './models/project_user.js';
-import { formatDate, getMonthFromDate, minutesToHours, getWorkingDaysInMonth, parseDate } from './utils/date_utils.js';
-import { validateDate, validateMinutes, validateProjectName } from './utils/validation.js';
-import { renderBaseLayout, renderNavBar } from './utils/layout.js';
+import { initServer } from "@ts-rest/express";
+import { apiContract } from "./contracts/api.js";
+import { AuthStubRequest } from "./middleware/auth_stub.js";
+import { userModel, UserRole } from "./models/user.js";
+import { timeEntryModel } from "./models/time_entry.js";
+import { projectModel } from "./models/project.js";
+import { projectUserModel } from "./models/project_user.js";
+import {
+  formatDate,
+  getMonthFromDate,
+  minutesToHours,
+  getWorkingDaysInMonth,
+  parseDate,
+} from "./utils/date_utils.js";
+import { validateDate, validateMinutes, validateProjectName } from "./utils/validation.js";
+import { renderBaseLayout, renderNavBar } from "./utils/layout.js";
 
 // Worker time helper functions
 function renderTimeTrackingPage(req: AuthStubRequest) {
   const currentUser = req.currentUser!;
   const today = formatDate(new Date());
   const selectedDate = (req.query.date as string) || today;
-  
+
   const projects = projectModel.getByUserId(currentUser.id);
   const entries = timeEntryModel.getByUserIdAndDate(currentUser.id, selectedDate);
   const totalMinutes = timeEntryModel.getTotalMinutesByUserAndDate(currentUser.id, selectedDate);
   const totalHours = minutesToHours(totalMinutes);
-  
+
   const month = getMonthFromDate(selectedDate);
   const monthlyTotalMinutes = timeEntryModel.getTotalMinutesByUserAndMonth(currentUser.id, month);
   const monthlyTotalHours = minutesToHours(monthlyTotalMinutes);
-  
+
   const dateObj = parseDate(selectedDate);
   const workingDays = getWorkingDaysInMonth(dateObj.getFullYear(), dateObj.getMonth() + 1);
   const requiredMonthlyHours = workingDays * 8;
-  
+
   const dailyWarning = totalHours < 8;
   const monthlyWarning = monthlyTotalHours < requiredMonthlyHours;
-  
+
   const content = `
     <div class="space-y-8">
       <div class="flex items-center justify-between">
@@ -82,7 +88,7 @@ function renderTimeTrackingPage(req: AuthStubRequest) {
           <input type="hidden" name="date" value="${selectedDate}" />
           <select name="project_id" required class="select-modern">
             <option value="">Select Project</option>
-            ${projects.map(p => `<option value="${p.id}">${p.name}</option>`).join('')}
+            ${projects.map((p) => `<option value="${p.id}">${p.name}</option>`).join("")}
           </select>
           <input 
             type="number" 
@@ -105,8 +111,8 @@ function renderTimeTrackingPage(req: AuthStubRequest) {
       </div>
     </div>
   `;
-  
-  return renderBaseLayout(content, req, 'worker');
+
+  return renderBaseLayout(content, req, "worker");
 }
 
 function renderEntriesTable(entries: any[], projects: any[]): string {
@@ -117,16 +123,16 @@ function renderEntriesTable(entries: any[], projects: any[]): string {
       </div>
     `;
   }
-  
-  const projectMap = new Map(projects.map(p => [p.id, p.name]));
-  
+
+  const projectMap = new Map(projects.map((p) => [p.id, p.name]));
+
   // Extract tags from comments (words starting with #)
   const extractTags = (comment: string | null): string[] => {
     if (!comment) return [];
     const matches = comment.match(/#\w+/g);
     return matches || [];
   };
-  
+
   return `
     <table class="table-modern">
       <thead>
@@ -138,16 +144,19 @@ function renderEntriesTable(entries: any[], projects: any[]): string {
         </tr>
       </thead>
       <tbody>
-        ${entries.map((entry, index) => {
-          const tags = extractTags(entry.comment);
-          const commentWithoutTags = entry.comment ? entry.comment.replace(/#\w+/g, '').trim() : '';
-          return `
+        ${entries
+          .map((entry, index) => {
+            const tags = extractTags(entry.comment);
+            const commentWithoutTags = entry.comment
+              ? entry.comment.replace(/#\w+/g, "").trim()
+              : "";
+            return `
           <tr id="entry-${entry.id}">
-            <td style="font-weight: 500;">${projectMap.get(entry.project_id) || 'Unknown'}</td>
+            <td style="font-weight: 500;">${projectMap.get(entry.project_id) || "Unknown"}</td>
             <td style="font-weight: 600; color: var(--accent);">${minutesToHours(entry.minutes).toFixed(1)}h</td>
             <td>
-              ${commentWithoutTags ? `<span style="color: var(--text-primary);">${commentWithoutTags}</span>` : ''}
-              ${tags.length > 0 ? tags.map(tag => `<span class="tag" style="margin-left: 6px;">${tag}</span>`).join('') : ''}
+              ${commentWithoutTags ? `<span style="color: var(--text-primary);">${commentWithoutTags}</span>` : ""}
+              ${tags.length > 0 ? tags.map((tag) => `<span class="tag" style="margin-left: 6px;">${tag}</span>`).join("") : ""}
             </td>
             <td style="text-align: right;">
               <button 
@@ -163,29 +172,36 @@ function renderEntriesTable(entries: any[], projects: any[]): string {
             </td>
           </tr>
         `;
-        }).join('')}
+          })
+          .join("")}
       </tbody>
     </table>
   `;
 }
 
-function renderSummary(totalHours: number, monthlyTotalHours: number, requiredMonthlyHours: number, dailyWarning: boolean, monthlyWarning: boolean): string {
+function renderSummary(
+  totalHours: number,
+  monthlyTotalHours: number,
+  requiredMonthlyHours: number,
+  dailyWarning: boolean,
+  monthlyWarning: boolean
+): string {
   // Determine daily status color
-  let dailyStatus = 'success';
-  let dailyColor = 'var(--success)';
+  let dailyStatus = "success";
+  let dailyColor = "var(--success)";
   if (totalHours < 4) {
-    dailyStatus = 'error';
-    dailyColor = 'var(--error)';
+    dailyStatus = "error";
+    dailyColor = "var(--error)";
   } else if (totalHours < 6) {
-    dailyStatus = 'error';
-    dailyColor = 'var(--error)';
+    dailyStatus = "error";
+    dailyColor = "var(--error)";
   } else if (totalHours < 8) {
-    dailyStatus = 'warning';
-    dailyColor = 'var(--warning)';
+    dailyStatus = "warning";
+    dailyColor = "var(--warning)";
   }
-  
+
   const dailyPercentage = Math.min((totalHours / 8) * 100, 100);
-  
+
   return `
     <div class="flex items-center gap-6">
       <div style="min-width: 140px;">
@@ -213,7 +229,7 @@ function renderSummary(totalHours: number, monthlyTotalHours: number, requiredMo
 function renderReportsPage(req: AuthStubRequest) {
   const workers = userModel.getWorkers();
   const projects = projectModel.getAll();
-  
+
   const content = `
     <div class="space-y-8">
       <div>
@@ -235,7 +251,7 @@ function renderReportsPage(req: AuthStubRequest) {
             class="select-modern w-full"
           >
             <option value="">Select Worker</option>
-            ${workers.map(w => `<option value="${w.id}">${w.email}</option>`).join('')}
+            ${workers.map((w) => `<option value="${w.id}">${w.email}</option>`).join("")}
           </select>
         </div>
         
@@ -252,7 +268,7 @@ function renderReportsPage(req: AuthStubRequest) {
             class="select-modern w-full"
           >
             <option value="">Select Project</option>
-            ${projects.map(p => `<option value="${p.id}">${p.name}</option>`).join('')}
+            ${projects.map((p) => `<option value="${p.id}">${p.name}</option>`).join("")}
           </select>
         </div>
       </div>
@@ -264,8 +280,8 @@ function renderReportsPage(req: AuthStubRequest) {
       </div>
     </div>
   `;
-  
-  return renderBaseLayout(content, req, 'manager');
+
+  return renderBaseLayout(content, req, "manager");
 }
 
 function renderWorkerReport(userId: number): string {
@@ -273,13 +289,13 @@ function renderWorkerReport(userId: number): string {
   if (!user) {
     return '<div class="card"><p style="color: var(--error);">Worker not found.</p></div>';
   }
-  
+
   const entries = timeEntryModel.getByUserId(userId);
   const projects = projectModel.getAll();
-  const projectMap = new Map(projects.map(p => [p.id, p.name]));
-  
+  const projectMap = new Map(projects.map((p) => [p.id, p.name]));
+
   const grouped: Record<string, Record<number, number>> = {};
-  entries.forEach(entry => {
+  entries.forEach((entry) => {
     if (!grouped[entry.date]) {
       grouped[entry.date] = {};
     }
@@ -288,19 +304,19 @@ function renderWorkerReport(userId: number): string {
     }
     grouped[entry.date][entry.project_id] += entry.minutes;
   });
-  
+
   const dates = Object.keys(grouped).sort();
-  
+
   if (dates.length === 0) {
     return `<div class="card"><p style="color: var(--text-secondary);">No time entries for ${user.email}.</p></div>`;
   }
-  
+
   let grandTotal = 0;
-  dates.forEach(date => {
+  dates.forEach((date) => {
     const dayTotal = Object.values(grouped[date]).reduce((sum, mins) => sum + mins, 0);
     grandTotal += dayTotal;
   });
-  
+
   let html = `
     <div class="card">
       <div class="flex items-center justify-between mb-6">
@@ -312,36 +328,43 @@ function renderWorkerReport(userId: number): string {
           <thead>
             <tr>
               <th>Date</th>
-              ${projects.map(p => `<th>${p.name}</th>`).join('')}
+              ${projects.map((p) => `<th>${p.name}</th>`).join("")}
               <th style="text-align: right;">Total</th>
             </tr>
           </thead>
           <tbody>
   `;
-  
+
   dates.forEach((date, index) => {
     const dayTotal = Object.values(grouped[date]).reduce((sum, mins) => sum + mins, 0);
     html += `
       <tr id="report-row-${userId}-${date}">
         <td style="font-weight: 500;">${date}</td>
-        ${projects.map(p => {
-          const minutes = grouped[date][p.id] || 0;
-          return `<td style="color: ${minutes > 0 ? 'var(--text-primary)' : 'var(--text-tertiary)'};">${minutesToHours(minutes).toFixed(1)}</td>`;
-        }).join('')}
+        ${projects
+          .map((p) => {
+            const minutes = grouped[date][p.id] || 0;
+            return `<td style="color: ${minutes > 0 ? "var(--text-primary)" : "var(--text-tertiary)"};">${minutesToHours(minutes).toFixed(1)}</td>`;
+          })
+          .join("")}
         <td style="text-align: right; font-weight: 600; color: var(--accent);">${minutesToHours(dayTotal).toFixed(1)}h</td>
       </tr>
     `;
   });
-  
+
   html += `
           </tbody>
           <tfoot>
             <tr style="background-color: var(--bg-tertiary);">
               <td style="font-weight: 600;">Total</td>
-              ${projects.map(p => {
-                const projectTotal = dates.reduce((sum, date) => sum + (grouped[date][p.id] || 0), 0);
-                return `<td style="font-weight: 600; color: var(--accent);">${minutesToHours(projectTotal).toFixed(1)}h</td>`;
-              }).join('')}
+              ${projects
+                .map((p) => {
+                  const projectTotal = dates.reduce(
+                    (sum, date) => sum + (grouped[date][p.id] || 0),
+                    0
+                  );
+                  return `<td style="font-weight: 600; color: var(--accent);">${minutesToHours(projectTotal).toFixed(1)}h</td>`;
+                })
+                .join("")}
               <td style="text-align: right; font-weight: 700; color: var(--accent);">${minutesToHours(grandTotal).toFixed(1)}h</td>
             </tr>
           </tfoot>
@@ -349,7 +372,7 @@ function renderWorkerReport(userId: number): string {
       </div>
     </div>
   `;
-  
+
   return html;
 }
 
@@ -358,13 +381,13 @@ function renderProjectReport(projectId: number): string {
   if (!project) {
     return '<div class="card"><p style="color: var(--error);">Project not found.</p></div>';
   }
-  
+
   const entries = timeEntryModel.getByProjectId(projectId);
   const workers = userModel.getWorkers();
-  const workerMap = new Map(workers.map(w => [w.id, w.email]));
-  
+  const workerMap = new Map(workers.map((w) => [w.id, w.email]));
+
   const grouped: Record<string, Record<number, number>> = {};
-  entries.forEach(entry => {
+  entries.forEach((entry) => {
     if (!grouped[entry.date]) {
       grouped[entry.date] = {};
     }
@@ -373,19 +396,19 @@ function renderProjectReport(projectId: number): string {
     }
     grouped[entry.date][entry.user_id] += entry.minutes;
   });
-  
+
   const dates = Object.keys(grouped).sort();
-  
+
   if (dates.length === 0) {
     return `<div class="card"><p style="color: var(--text-secondary);">No time entries for project ${project.name}.</p></div>`;
   }
-  
+
   let grandTotal = 0;
-  dates.forEach(date => {
+  dates.forEach((date) => {
     const dayTotal = Object.values(grouped[date]).reduce((sum, mins) => sum + mins, 0);
     grandTotal += dayTotal;
   });
-  
+
   let html = `
     <div class="card">
       <div class="flex items-center justify-between mb-6">
@@ -397,36 +420,43 @@ function renderProjectReport(projectId: number): string {
           <thead>
             <tr>
               <th>Date</th>
-              ${workers.map(w => `<th>${w.email}</th>`).join('')}
+              ${workers.map((w) => `<th>${w.email}</th>`).join("")}
               <th style="text-align: right;">Total</th>
             </tr>
           </thead>
           <tbody>
   `;
-  
+
   dates.forEach((date, index) => {
     const dayTotal = Object.values(grouped[date]).reduce((sum, mins) => sum + mins, 0);
     html += `
       <tr id="report-row-project-${projectId}-${date}">
         <td style="font-weight: 500;">${date}</td>
-        ${workers.map(w => {
-          const minutes = grouped[date][w.id] || 0;
-          return `<td style="color: ${minutes > 0 ? 'var(--text-primary)' : 'var(--text-tertiary)'};">${minutesToHours(minutes).toFixed(1)}</td>`;
-        }).join('')}
+        ${workers
+          .map((w) => {
+            const minutes = grouped[date][w.id] || 0;
+            return `<td style="color: ${minutes > 0 ? "var(--text-primary)" : "var(--text-tertiary)"};">${minutesToHours(minutes).toFixed(1)}</td>`;
+          })
+          .join("")}
         <td style="text-align: right; font-weight: 600; color: var(--accent);">${minutesToHours(dayTotal).toFixed(1)}h</td>
       </tr>
     `;
   });
-  
+
   html += `
           </tbody>
           <tfoot>
             <tr style="background-color: var(--bg-tertiary);">
               <td style="font-weight: 600;">Total</td>
-              ${workers.map(w => {
-                const workerTotal = dates.reduce((sum, date) => sum + (grouped[date][w.id] || 0), 0);
-                return `<td style="font-weight: 600; color: var(--accent);">${minutesToHours(workerTotal).toFixed(1)}h</td>`;
-              }).join('')}
+              ${workers
+                .map((w) => {
+                  const workerTotal = dates.reduce(
+                    (sum, date) => sum + (grouped[date][w.id] || 0),
+                    0
+                  );
+                  return `<td style="font-weight: 600; color: var(--accent);">${minutesToHours(workerTotal).toFixed(1)}h</td>`;
+                })
+                .join("")}
               <td style="text-align: right; font-weight: 700; color: var(--accent);">${minutesToHours(grandTotal).toFixed(1)}h</td>
             </tr>
           </tfoot>
@@ -434,14 +464,14 @@ function renderProjectReport(projectId: number): string {
       </div>
     </div>
   `;
-  
+
   return html;
 }
 
 // Admin projects helper functions
 function renderProjectsPage(req: AuthStubRequest) {
   const projects = projectModel.getAll(true);
-  
+
   const content = `
     <div class="space-y-8">
       <div>
@@ -475,15 +505,15 @@ function renderProjectsPage(req: AuthStubRequest) {
       </div>
     </div>
   `;
-  
-  return renderBaseLayout(content, req, 'admin_projects');
+
+  return renderBaseLayout(content, req, "admin_projects");
 }
 
 function renderProjectsList(projects: any[]): string {
   if (projects.length === 0) {
     return '<div class="card"><p style="color: var(--text-secondary);">No projects found.</p></div>';
   }
-  
+
   return `
     <div class="card">
       <table class="table-modern">
@@ -496,8 +526,10 @@ function renderProjectsList(projects: any[]): string {
           </tr>
         </thead>
         <tbody>
-          ${projects.map((project, index) => `
-            <tr id="project-${project.id}" style="${project.suppressed ? 'opacity: 0.6;' : ''}">
+          ${projects
+            .map(
+              (project, index) => `
+            <tr id="project-${project.id}" style="${project.suppressed ? "opacity: 0.6;" : ""}">
               <td style="color: var(--text-tertiary); font-size: 13px;">#${project.id}</td>
               <td style="font-weight: 500;">${project.name}</td>
               <td>
@@ -511,11 +543,13 @@ function renderProjectsList(projects: any[]): string {
                   class="btn-secondary"
                   style="font-size: 13px; padding: 6px 12px;"
                 >
-                  ${project.suppressed ? 'Activate' : 'Suppress'}
+                  ${project.suppressed ? "Activate" : "Suppress"}
                 </button>
               </td>
             </tr>
-          `).join('')}
+          `
+            )
+            .join("")}
         </tbody>
       </table>
     </div>
@@ -526,7 +560,7 @@ function renderProjectsList(projects: any[]): string {
 function renderUsersProjectsPage(req: AuthStubRequest) {
   const projects = projectModel.getAll();
   const workers = userModel.getWorkers();
-  
+
   const content = `
     <div class="space-y-8">
       <div>
@@ -547,7 +581,7 @@ function renderUsersProjectsPage(req: AuthStubRequest) {
           class="select-modern w-full"
         >
           <option value="">Select a project</option>
-          ${projects.map(p => `<option value="${p.id}">${p.name}</option>`).join('')}
+          ${projects.map((p) => `<option value="${p.id}">${p.name}</option>`).join("")}
         </select>
       </div>
       
@@ -558,8 +592,8 @@ function renderUsersProjectsPage(req: AuthStubRequest) {
       </div>
     </div>
   `;
-  
-  return renderBaseLayout(content, req, 'admin_users');
+
+  return renderBaseLayout(content, req, "admin_users");
 }
 
 function renderProjectWorkers(projectId: number): string {
@@ -567,12 +601,12 @@ function renderProjectWorkers(projectId: number): string {
   if (!project) {
     return '<p class="text-red-500">Project not found.</p>';
   }
-  
+
   const projectUsers = projectUserModel.getByProjectId(projectId, true);
   const allWorkers = userModel.getWorkers();
-  const assignedWorkerIds = new Set(projectUsers.map(pu => pu.user_id));
-  const availableWorkers = allWorkers.filter(w => !assignedWorkerIds.has(w.id));
-  
+  const assignedWorkerIds = new Set(projectUsers.map((pu) => pu.user_id));
+  const availableWorkers = allWorkers.filter((w) => !assignedWorkerIds.has(w.id));
+
   return `
     <div class="space-y-6">
       <div class="card">
@@ -591,7 +625,7 @@ function renderProjectWorkers(projectId: number): string {
             <input type="hidden" name="project_id" value="${projectId}" />
             <select name="user_id" required class="select-modern flex-1">
               <option value="">Select worker</option>
-              ${availableWorkers.map(w => `<option value="${w.id}">${w.email}</option>`).join('')}
+              ${availableWorkers.map((w) => `<option value="${w.id}">${w.email}</option>`).join("")}
             </select>
             <button type="submit" class="btn-primary">Add Worker</button>
           </form>
@@ -600,7 +634,10 @@ function renderProjectWorkers(projectId: number): string {
       
       <div class="card">
         <h3 class="text-base font-semibold mb-4" style="color: var(--text-primary);">Assigned Workers</h3>
-        ${projectUsers.length === 0 ? '<p style="color: var(--text-secondary); text-align: center; padding: 24px;">No workers assigned to this project.</p>' : `
+        ${
+          projectUsers.length === 0
+            ? '<p style="color: var(--text-secondary); text-align: center; padding: 24px;">No workers assigned to this project.</p>'
+            : `
           <table class="table-modern">
             <thead>
               <tr>
@@ -610,11 +647,12 @@ function renderProjectWorkers(projectId: number): string {
               </tr>
             </thead>
             <tbody>
-              ${projectUsers.map((pu, index) => {
-                const worker = userModel.getById(pu.user_id);
-                return `
-                  <tr id="project-user-${pu.id}" style="${pu.suppressed ? 'opacity: 0.6;' : ''}">
-                    <td style="font-weight: 500;">${worker?.email || 'Unknown'}</td>
+              ${projectUsers
+                .map((pu, index) => {
+                  const worker = userModel.getById(pu.user_id);
+                  return `
+                  <tr id="project-user-${pu.id}" style="${pu.suppressed ? "opacity: 0.6;" : ""}">
+                    <td style="font-weight: 500;">${worker?.email || "Unknown"}</td>
                     <td>
                       ${pu.suppressed ? '<span class="badge badge-neutral">Suppressed</span>' : '<span class="badge badge-success">Active</span>'}
                     </td>
@@ -631,10 +669,12 @@ function renderProjectWorkers(projectId: number): string {
                     </td>
                   </tr>
                 `;
-              }).join('')}
+                })
+                .join("")}
             </tbody>
           </table>
-        `}
+        `
+        }
       </div>
     </div>
   `;
@@ -654,29 +694,29 @@ function renderSystemReportsPage(req: AuthStubRequest) {
       </div>
     </div>
   `;
-  
-  return renderBaseLayout(content, req, 'admin_reports');
+
+  return renderBaseLayout(content, req, "admin_reports");
 }
 
 function renderSystemReports(): string {
   const allEntries = timeEntryModel.getAll();
   const workers = userModel.getWorkers();
   const projects = projectModel.getAll();
-  
+
   const workerTotals: Record<number, number> = {};
-  workers.forEach(w => {
+  workers.forEach((w) => {
     const entries = timeEntryModel.getByUserId(w.id);
     workerTotals[w.id] = entries.reduce((sum, e) => sum + e.minutes, 0);
   });
-  
+
   const projectTotals: Record<number, number> = {};
-  projects.forEach(p => {
+  projects.forEach((p) => {
     const entries = timeEntryModel.getByProjectId(p.id);
     projectTotals[p.id] = entries.reduce((sum, e) => sum + e.minutes, 0);
   });
-  
+
   const totalSystemHours = minutesToHours(allEntries.reduce((sum, e) => sum + e.minutes, 0));
-  
+
   return `
     <div class="space-y-6">
       <div class="card" style="background: linear-gradient(135deg, rgba(107, 117, 216, 0.08) 0%, rgba(107, 117, 216, 0.04) 100%); border-color: var(--accent);">
@@ -695,15 +735,17 @@ function renderSystemReports(): string {
             </tr>
           </thead>
           <tbody>
-            ${workers.map((w, index) => {
-              const hours = minutesToHours(workerTotals[w.id] || 0);
-              return `
+            ${workers
+              .map((w, index) => {
+                const hours = minutesToHours(workerTotals[w.id] || 0);
+                return `
                 <tr id="system-worker-${w.id}">
                   <td style="font-weight: 500;">${w.email}</td>
                   <td style="text-align: right; font-weight: 600; color: var(--accent);">${hours.toFixed(1)}h</td>
                 </tr>
               `;
-            }).join('')}
+              })
+              .join("")}
           </tbody>
         </table>
       </div>
@@ -718,15 +760,17 @@ function renderSystemReports(): string {
             </tr>
           </thead>
           <tbody>
-            ${projects.map((p, index) => {
-              const hours = minutesToHours(projectTotals[p.id] || 0);
-              return `
+            ${projects
+              .map((p, index) => {
+                const hours = minutesToHours(projectTotals[p.id] || 0);
+                return `
                 <tr id="system-project-${p.id}">
                   <td style="font-weight: 500;">${p.name}</td>
                   <td style="text-align: right; font-weight: 600; color: var(--accent);">${hours.toFixed(1)}h</td>
                 </tr>
               `;
-            }).join('')}
+              })
+              .join("")}
           </tbody>
         </table>
       </div>
@@ -755,8 +799,8 @@ export const router = s.router(apiContract, {
       // Save session explicitly to ensure it's persisted
       return new Promise((resolve) => {
         authReq.session!.save(() => {
-          const referer = authReq.get('Referer') || '/';
-          res.setHeader('Location', referer);
+          const referer = authReq.get("Referer") || "/";
+          res.setHeader("Location", referer);
           resolve({
             status: 302,
             body: undefined,
@@ -764,19 +808,19 @@ export const router = s.router(apiContract, {
         });
       });
     }
-    const referer = authReq.get('Referer') || '/';
-    res.setHeader('Location', referer);
-    
+    const referer = authReq.get("Referer") || "/";
+    res.setHeader("Location", referer);
+
     return {
       status: 302,
       body: undefined,
     };
   },
-  
-  setRole: async ({ body, req,}) => {
+
+  setRole: async ({ body, req }) => {
     const authReq = req as unknown as AuthStubRequest;
     const role = body.role;
-    if (role && ['worker', 'office-manager', 'admin'].includes(role)) {
+    if (role && ["worker", "office-manager", "admin"].includes(role)) {
       const userId = authReq.session!.userId as number | undefined;
       if (userId) {
         const user = userModel.getById(userId);
@@ -788,107 +832,107 @@ export const router = s.router(apiContract, {
         authReq.session!.userRole = role as UserRole;
       }
     }
-    const referer = authReq.get('Referer') || '/';
-    res.setHeader('Location', referer);
+    const referer = authReq.get("Referer") || "/";
+    res.setHeader("Location", referer);
     return {
       status: 302,
       body: undefined,
     };
   },
-  
-  getNavBar: async ({ query, req,}) => {
+
+  getNavBar: async ({ query, req }) => {
     const authReq = req as unknown as AuthStubRequest;
-    const activeNav = (query?.active_nav as string) || '';
+    const activeNav = (query?.active_nav as string) || "";
     const html = renderNavBar(authReq, activeNav);
     return {
       status: 200,
       body: html,
     };
   },
-  
+
   // Root redirect
-  root: async ({ req,}) => {
+  root: async ({ req }) => {
     const authReq = req as unknown as AuthStubRequest;
     const currentUser = authReq.currentUser;
     if (currentUser) {
-      if (currentUser.roles.includes('admin')) {
-        res.setHeader('Location', '/admin/projects');
+      if (currentUser.roles.includes("admin")) {
+        res.setHeader("Location", "/admin/projects");
         return {
           status: 302,
           body: undefined,
         };
-      } else if (currentUser.roles.includes('office-manager')) {
-        res.setHeader('Location', '/manager/reports');
+      } else if (currentUser.roles.includes("office-manager")) {
+        res.setHeader("Location", "/manager/reports");
         return {
           status: 302,
           body: undefined,
         };
-      } else if (currentUser.roles.includes('worker')) {
-        res.setHeader('Location', '/worker/time');
+      } else if (currentUser.roles.includes("worker")) {
+        res.setHeader("Location", "/worker/time");
         return {
           status: 302,
           body: undefined,
         };
       }
     }
-    res.setHeader('Location', '/');
+    res.setHeader("Location", "/");
     return {
       status: 302,
       body: undefined,
     };
   },
-  
+
   // Worker time routes
-  workerTime: async ({ query, req,}) => {
+  workerTime: async ({ query, req }) => {
     const authReq = req as unknown as AuthStubRequest;
-    
+
     if (!authReq.currentUser) {
       return {
         status: 401,
-        body: { body: 'Unauthorized' },
+        body: { body: "Unauthorized" },
       };
     }
-    if (!authReq.currentUser.roles.includes('worker')) {
+    if (!authReq.currentUser.roles.includes("worker")) {
       return {
         status: 403,
-        body: { body: 'Forbidden' },
+        body: { body: "Forbidden" },
       };
     }
-    
+
     const html = renderTimeTrackingPage(authReq);
-    
+
     return {
       status: 200,
       body: html,
-    }
+    };
   },
-  
-  workerTimeEntries: async ({ query, req,}) => {
+
+  workerTimeEntries: async ({ query, req }) => {
     const authReq = req as unknown as AuthStubRequest;
-    
+
     if (!authReq.currentUser) {
       return {
         status: 401,
-        body: { body: 'Unauthorized' },
+        body: { body: "Unauthorized" },
       };
     }
-    if (!authReq.currentUser.roles.includes('worker')) {
+    if (!authReq.currentUser.roles.includes("worker")) {
       return {
         status: 403,
-        body: { body: 'Forbidden' },
+        body: { body: "Forbidden" },
       };
     }
-    
+
     const currentUser = authReq.currentUser;
     const date = (query?.date as string) || formatDate(new Date());
-    
+
     if (!validateDate(date)) {
       return {
         status: 400,
-        body: { body: 'Invalid date' },
+        body: { body: "Invalid date" },
       };
     }
-    
+
     const projects = projectModel.getByUserId(currentUser.id);
     const entries = timeEntryModel.getByUserIdAndDate(currentUser.id, date);
     const html = renderEntriesTable(entries, projects);
@@ -897,59 +941,59 @@ export const router = s.router(apiContract, {
       body: html,
     };
   },
-  
-  createTimeEntry: async ({ body, req,}) => {
+
+  createTimeEntry: async ({ body, req }) => {
     const authReq = req as unknown as AuthStubRequest;
-    
+
     if (!authReq.currentUser) {
       return {
         status: 401,
-        body: { body: 'Unauthorized' },
+        body: { body: "Unauthorized" },
       };
     }
-    if (!authReq.currentUser.roles.includes('worker')) {
+    if (!authReq.currentUser.roles.includes("worker")) {
       return {
         status: 403,
-        body: { body: 'Forbidden' },
+        body: { body: "Forbidden" },
       };
     }
-    
+
     const currentUser = authReq.currentUser;
     const { project_id, date, hours, comment } = body;
-    
+
     if (!validateDate(date)) {
       return {
         status: 400,
-        body: { body: 'Invalid date' },
+        body: { body: "Invalid date" },
       };
     }
-    
+
     const minutes = Math.round(parseFloat(hours) * 60);
     if (!validateMinutes(minutes)) {
       return {
         status: 400,
-        body: { body: 'Invalid hours' },
+        body: { body: "Invalid hours" },
       };
     }
-    
+
     const project = projectModel.getById(parseInt(project_id));
     if (!project) {
       return {
         status: 400,
-        body: { body: 'Invalid project' },
+        body: { body: "Invalid project" },
       };
     }
-    
+
     const userProjects = projectModel.getByUserId(currentUser.id);
-    if (!userProjects.find(p => p.id === project.id)) {
+    if (!userProjects.find((p) => p.id === project.id)) {
       return {
         status: 403,
-        body: { body: 'Access denied to this project' },
+        body: { body: "Access denied to this project" },
       };
     }
-    
+
     timeEntryModel.create(currentUser.id, project.id, date, minutes, comment || null);
-    
+
     const projects = projectModel.getByUserId(currentUser.id);
     const entries = timeEntryModel.getByUserIdAndDate(currentUser.id, date);
     const html = renderEntriesTable(entries, projects);
@@ -958,43 +1002,43 @@ export const router = s.router(apiContract, {
       body: html,
     };
   },
-  
-  deleteTimeEntry: async ({ params, req,}) => {
+
+  deleteTimeEntry: async ({ params, req }) => {
     const authReq = req as unknown as AuthStubRequest;
-    
+
     if (!authReq.currentUser) {
       return {
         status: 401,
-        body: { body: 'Unauthorized' },
+        body: { body: "Unauthorized" },
       };
     }
-    if (!authReq.currentUser.roles.includes('worker')) {
+    if (!authReq.currentUser.roles.includes("worker")) {
       return {
         status: 403,
-        body: { body: 'Forbidden' },
+        body: { body: "Forbidden" },
       };
     }
-    
+
     const currentUser = authReq.currentUser;
     const entryId = parseInt(params.id);
-    
+
     const entry = timeEntryModel.getById(entryId);
     if (!entry) {
       return {
         status: 404,
-        body: { body: 'Entry not found' },
+        body: { body: "Entry not found" },
       };
     }
-    
+
     if (entry.user_id !== currentUser.id) {
       return {
         status: 403,
-        body: { body: 'Access denied' },
+        body: { body: "Access denied" },
       };
     }
-    
+
     timeEntryModel.delete(entryId);
-    
+
     const date = entry.date;
     const projects = projectModel.getByUserId(currentUser.id);
     const entries = timeEntryModel.getByUserIdAndDate(currentUser.id, date);
@@ -1004,94 +1048,106 @@ export const router = s.router(apiContract, {
       body: html,
     };
   },
-  
-  workerTimeSummary: async ({ query, req,}) => {
+
+  workerTimeSummary: async ({ query, req }) => {
     const authReq = req as unknown as AuthStubRequest;
-    
+
     if (!authReq.currentUser) {
       return {
         status: 401,
-        body: { body: 'Unauthorized' },
+        body: { body: "Unauthorized" },
       };
     }
-    if (!authReq.currentUser.roles.includes('worker')) {
+    if (!authReq.currentUser.roles.includes("worker")) {
       return {
         status: 403,
-        body: { body: 'Forbidden' },
+        body: { body: "Forbidden" },
       };
     }
-    
+
     const currentUser = authReq.currentUser;
     const date = (query?.date as string) || formatDate(new Date());
-    
+
     if (!validateDate(date)) {
       return {
         status: 400,
-        body: { body: 'Invalid date' },
+        body: { body: "Invalid date" },
       };
     }
-    
+
     const totalMinutes = timeEntryModel.getTotalMinutesByUserAndDate(currentUser.id, date);
     const totalHours = minutesToHours(totalMinutes);
-    
+
     const month = getMonthFromDate(date);
     const monthlyTotalMinutes = timeEntryModel.getTotalMinutesByUserAndMonth(currentUser.id, month);
     const monthlyTotalHours = minutesToHours(monthlyTotalMinutes);
-    
+
     const dateObj = parseDate(date);
     const workingDays = getWorkingDaysInMonth(dateObj.getFullYear(), dateObj.getMonth() + 1);
     const requiredMonthlyHours = workingDays * 8;
-    
+
     const dailyWarning = totalHours < 8;
     const monthlyWarning = monthlyTotalHours < requiredMonthlyHours;
-    
-    const html = renderSummary(totalHours, monthlyTotalHours, requiredMonthlyHours, dailyWarning, monthlyWarning);
+
+    const html = renderSummary(
+      totalHours,
+      monthlyTotalHours,
+      requiredMonthlyHours,
+      dailyWarning,
+      monthlyWarning
+    );
     return {
       status: 200,
       body: html,
     };
   },
-  
+
   // Manager reports routes
-  managerReports: async ({ req,}) => {
+  managerReports: async ({ req }) => {
     const authReq = req as unknown as AuthStubRequest;
-    
+
     if (!authReq.currentUser) {
       return {
         status: 401,
         body: undefined,
       };
     }
-    if (!authReq.currentUser.roles.includes('office-manager') && !authReq.currentUser.roles.includes('admin')) {
+    if (
+      !authReq.currentUser.roles.includes("office-manager") &&
+      !authReq.currentUser.roles.includes("admin")
+    ) {
       return {
         status: 403,
-        body: { body: 'Forbidden' },
+        body: { body: "Forbidden" },
       };
     }
-    
+
     const html = renderReportsPage(authReq);
     return {
       status: 200,
       body: html,
     };
   },
-  
-  managerReportsWorker: async ({ query, req, }) => {
+
+  managerReportsWorker: async ({ query, req }) => {
     const authReq = req as unknown as AuthStubRequest;
-    
+
     if (!authReq.currentUser) {
       return {
         status: 401,
         body: undefined,
       };
     }
-    if (!authReq.currentUser.roles.includes('office-manager') && !authReq.currentUser.roles.includes('admin')) {
+    if (
+      !authReq.currentUser.roles.includes("office-manager") &&
+      !authReq.currentUser.roles.includes("admin")
+    ) {
       return {
         status: 403,
-        body: { body: 'Forbidden' },
+        body: { body: "Forbidden" },
       };
     }
-    
+
     const userId = parseInt(query?.worker_id as string);
     if (!userId) {
       return {
@@ -1105,23 +1161,26 @@ export const router = s.router(apiContract, {
       body: html,
     };
   },
-  
-  managerReportsProject: async ({ query, req, }) => {
+
+  managerReportsProject: async ({ query, req }) => {
     const authReq = req as unknown as AuthStubRequest;
-    
+
     if (!authReq.currentUser) {
       return {
         status: 401,
         body: undefined,
       };
     }
-    if (!authReq.currentUser.roles.includes('office-manager') && !authReq.currentUser.roles.includes('admin')) {
+    if (
+      !authReq.currentUser.roles.includes("office-manager") &&
+      !authReq.currentUser.roles.includes("admin")
+    ) {
       return {
         status: 403,
-        body: { body: 'Forbidden' },
+        body: { body: "Forbidden" },
       };
     }
-    
+
     const projectId = parseInt(query?.project_id as string);
     if (!projectId) {
       return {
@@ -1135,56 +1194,56 @@ export const router = s.router(apiContract, {
       body: html,
     };
   },
-  
+
   // Admin projects routes
-  adminProjects: async ({ req ,}) => {
+  adminProjects: async ({ req }) => {
     const authReq = req as unknown as AuthStubRequest;
-    
+
     if (!authReq.currentUser) {
       return {
         status: 401,
         body: undefined,
       };
     }
-    if (!authReq.currentUser.roles.includes('admin')) {
+    if (!authReq.currentUser.roles.includes("admin")) {
       return {
         status: 403,
-        body: { body: 'Forbidden' },
+        body: { body: "Forbidden" },
       };
     }
-    
+
     const html = renderProjectsPage(authReq);
     return {
       status: 200,
       body: html,
     };
   },
-  
-  createProject: async ({ body, req, }) => {
+
+  createProject: async ({ body, req }) => {
     const authReq = req as unknown as AuthStubRequest;
-    
+
     if (!authReq.currentUser) {
       return {
         status: 401,
         body: undefined,
       };
     }
-    if (!authReq.currentUser.roles.includes('admin')) {
+    if (!authReq.currentUser.roles.includes("admin")) {
       return {
         status: 403,
-        body: { body: 'Forbidden' },
+        body: { body: "Forbidden" },
       };
     }
-    
+
     const { name } = body;
-    
+
     if (!validateProjectName(name)) {
       return {
         status: 400,
-        body: { body: 'Invalid project name' },
+        body: { body: "Invalid project name" },
       };
     }
-    
+
     try {
       projectModel.create(name.trim());
       const projects = projectModel.getAll(true);
@@ -1194,35 +1253,35 @@ export const router = s.router(apiContract, {
         body: html,
       };
     } catch (error: any) {
-      if (error.message.includes('UNIQUE constraint')) {
+      if (error.message.includes("UNIQUE constraint")) {
         return {
           status: 400,
-          body: { body: 'Project name already exists' },
+          body: { body: "Project name already exists" },
         };
       }
       return {
         status: 500,
-        body: { body: 'Error creating project' },
+        body: { body: "Error creating project" },
       };
     }
   },
-  
-  toggleProjectSuppress: async ({ params, req, }) => {
+
+  toggleProjectSuppress: async ({ params, req }) => {
     const authReq = req as unknown as AuthStubRequest;
-    
+
     if (!authReq.currentUser) {
       return {
         status: 401,
         body: undefined,
       };
     }
-    if (!authReq.currentUser.roles.includes('admin')) {
+    if (!authReq.currentUser.roles.includes("admin")) {
       return {
         status: 403,
-        body: { body: 'Forbidden' },
+        body: { body: "Forbidden" },
       };
     }
-    
+
     const id = parseInt(params.id);
     projectModel.toggleSuppress(id);
     const projects = projectModel.getAll(true);
@@ -1232,47 +1291,47 @@ export const router = s.router(apiContract, {
       body: html,
     };
   },
-  
+
   // Admin users-projects routes
-  adminUsersProjects: async ({ req ,}) => {
+  adminUsersProjects: async ({ req }) => {
     const authReq = req as unknown as AuthStubRequest;
-    
+
     if (!authReq.currentUser) {
       return {
         status: 401,
         body: undefined,
       };
     }
-    if (!authReq.currentUser.roles.includes('admin')) {
+    if (!authReq.currentUser.roles.includes("admin")) {
       return {
         status: 403,
-        body: { body: 'Forbidden' },
+        body: { body: "Forbidden" },
       };
     }
-    
+
     const html = renderUsersProjectsPage(authReq);
     return {
       status: 200,
       body: html,
     };
   },
-  
-  adminUsersProjectsProject: async ({ query, req, }) => {
+
+  adminUsersProjectsProject: async ({ query, req }) => {
     const authReq = req as unknown as AuthStubRequest;
-    
+
     if (!authReq.currentUser) {
       return {
         status: 401,
         body: undefined,
       };
     }
-    if (!authReq.currentUser.roles.includes('admin')) {
+    if (!authReq.currentUser.roles.includes("admin")) {
       return {
         status: 403,
-        body: { body: 'Forbidden' },
+        body: { body: "Forbidden" },
       };
     }
-    
+
     const projectId = parseInt(query?.project_id as string);
     if (!projectId) {
       return {
@@ -1286,34 +1345,34 @@ export const router = s.router(apiContract, {
       body: html,
     };
   },
-  
-  assignWorkerToProject: async ({ body, req, }) => {
+
+  assignWorkerToProject: async ({ body, req }) => {
     const authReq = req as unknown as AuthStubRequest;
-    
+
     if (!authReq.currentUser) {
       return {
         status: 401,
         body: undefined,
       };
     }
-    if (!authReq.currentUser.roles.includes('admin')) {
+    if (!authReq.currentUser.roles.includes("admin")) {
       return {
         status: 403,
-        body: { body: 'Forbidden' },
+        body: { body: "Forbidden" },
       };
     }
-    
+
     const { project_id, user_id } = body;
     const projectId = parseInt(project_id as string);
     const userId = user_id;
-    
+
     if (!projectId || !userId) {
       return {
         status: 400,
-        body: { body: 'Invalid project or user ID' },
+        body: { body: "Invalid project or user ID" },
       };
     }
-    
+
     try {
       projectUserModel.create(userId, projectId);
       const html = renderProjectWorkers(projectId);
@@ -1322,55 +1381,55 @@ export const router = s.router(apiContract, {
         body: html,
       };
     } catch (error: any) {
-      if (error.message.includes('UNIQUE constraint')) {
+      if (error.message.includes("UNIQUE constraint")) {
         return {
           status: 400,
-          body: { body: 'Worker already assigned to this project' },
+          body: { body: "Worker already assigned to this project" },
         };
       }
       return {
         status: 500,
-        body: { body: 'Error assigning worker' },
+        body: { body: "Error assigning worker" },
       };
     }
   },
-  
-  removeWorkerFromProject: async ({ params, req, }) => {
+
+  removeWorkerFromProject: async ({ params, req }) => {
     const authReq = req as unknown as AuthStubRequest;
-    
+
     if (!authReq.currentUser) {
       return {
         status: 401,
         body: undefined,
       };
     }
-    if (!authReq.currentUser.roles.includes('admin')) {
+    if (!authReq.currentUser.roles.includes("admin")) {
       return {
         status: 403,
-        body: { body: 'Forbidden' },
+        body: { body: "Forbidden" },
       };
     }
-    
+
     const id = parseInt(params.id);
-    
+
     const allProjects = projectModel.getAll(true);
     let projectUser: any = null;
     for (const project of allProjects) {
       const projectUsers = projectUserModel.getByProjectId(project.id, true);
-      const found = projectUsers.find(pu => pu.id === id);
+      const found = projectUsers.find((pu) => pu.id === id);
       if (found) {
         projectUser = found;
         break;
       }
     }
-    
+
     if (!projectUser) {
       return {
         status: 404,
-        body: { body: 'Assignment not found' },
+        body: { body: "Assignment not found" },
       };
     }
-    
+
     projectUserModel.delete(id);
     const html = renderProjectWorkers(projectUser.project_id);
     return {
@@ -1378,47 +1437,47 @@ export const router = s.router(apiContract, {
       body: html,
     };
   },
-  
+
   // Admin system reports routes
-  adminSystemReports: async ({ req, }) => {
+  adminSystemReports: async ({ req }) => {
     const authReq = req as unknown as AuthStubRequest;
-    
+
     if (!authReq.currentUser) {
       return {
         status: 401,
         body: undefined,
       };
     }
-    if (!authReq.currentUser.roles.includes('admin')) {
+    if (!authReq.currentUser.roles.includes("admin")) {
       return {
         status: 403,
-        body: { body: 'Forbidden' },
+        body: { body: "Forbidden" },
       };
     }
-    
+
     const html = renderSystemReportsPage(authReq);
     return {
       status: 200,
       body: html,
     };
   },
-  
-  adminSystemReportsData: async ({ req, }) => {
+
+  adminSystemReportsData: async ({ req }) => {
     const authReq = req as unknown as AuthStubRequest;
-    
+
     if (!authReq.currentUser) {
       return {
         status: 401,
         body: undefined,
       };
     }
-    if (!authReq.currentUser.roles.includes('admin')) {
+    if (!authReq.currentUser.roles.includes("admin")) {
       return {
         status: 403,
-        body: { body: 'Forbidden' },
+        body: { body: "Forbidden" },
       };
     }
-    
+
     const html = renderSystemReports();
     return {
       status: 200,
@@ -1426,4 +1485,3 @@ export const router = s.router(apiContract, {
     };
   },
 });
-

@@ -2,7 +2,9 @@
   <div class="time-slider-header">
     <h3 class="time-slider-title">Daily Time Allocation</h3>
     <div class="time-slider-controls">
-      <span id="time-slider-sync-icon" class="time-slider-sync-icon time-slider-sync-default" style="font-size: 18px; cursor: default; margin-right: 12px;" title="Auto-sync enabled">💾</span>
+      <div id="time-slider-sync-status" class="time-slider-sync-status" style="display: flex; align-items: center; gap: 8px; margin-right: 12px;">
+        <span id="time-slider-sync-icon" class="time-slider-sync-icon" style="font-size: 14px; color: var(--success);">Synced</span>
+      </div>
       <label class="time-slider-total-label">
         Total Hours:
         <input 
@@ -348,6 +350,30 @@
 
   .time-slider-empty-state-text {
     margin-bottom: 16px;
+  }
+
+  .time-slider-sync-status {
+    display: flex;
+    align-items: center;
+  }
+
+  .time-slider-sync-icon {
+    font-size: 14px;
+    font-weight: 500;
+    transition: color 0.2s ease;
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  .pulse-animation {
+    animation: pulse 1.5s ease-in-out infinite;
   }
 
 </style>
@@ -795,25 +821,24 @@
     }
 
     scheduleSync() {
+      // Show "Saving..." immediately when timer starts
+      this.updateSyncIcon('syncing');
+      
       // Clear existing timeout
       if (this.syncTimeout) {
         clearTimeout(this.syncTimeout);
       }
       
-      // Schedule sync after 3 seconds
+      // Schedule sync after 1.5 seconds
       this.syncTimeout = setTimeout(() => {
         this.sync();
-      }, 3000);
-      
-      // Update sync icon to show pending
-      this.updateSyncIcon('pending');
+      }, 1500);
     }
 
     sync() {
       if (this.isSyncing) return;
       
       this.isSyncing = true;
-      this.updateSyncIcon('syncing');
       
       // Call onChange callback which should handle the sync
       this.onChange(this.getSegmentsData());
@@ -822,11 +847,6 @@
       setTimeout(() => {
         this.isSyncing = false;
         this.updateSyncIcon('synced');
-        
-        // Reset to default after 2 seconds
-        setTimeout(() => {
-          this.updateSyncIcon('default');
-        }, 2000);
       }, 500);
     }
 
@@ -834,24 +854,15 @@
       const syncIcon = document.getElementById('time-slider-sync-icon');
       if (!syncIcon) return;
       
-      syncIcon.className = `time-slider-sync-icon time-slider-sync-${state}`;
-      
-      switch(state) {
-        case 'pending':
-          syncIcon.innerHTML = '⏳';
-          syncIcon.title = 'Changes pending sync...';
-          break;
-        case 'syncing':
-          syncIcon.innerHTML = '🔄';
-          syncIcon.title = 'Syncing...';
-          break;
-        case 'synced':
-          syncIcon.innerHTML = '✓';
-          syncIcon.title = 'Synced';
-          break;
-        default:
-          syncIcon.innerHTML = '💾';
-          syncIcon.title = 'Auto-sync enabled';
+      if (state === 'syncing') {
+        syncIcon.innerHTML = 'Saving...';
+        syncIcon.style.color = 'var(--accent)';
+        syncIcon.classList.add('pulse-animation');
+      } else {
+        // synced or default
+        syncIcon.innerHTML = 'Synced';
+        syncIcon.style.color = 'var(--success)';
+        syncIcon.classList.remove('pulse-animation');
       }
     }
 

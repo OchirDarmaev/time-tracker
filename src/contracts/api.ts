@@ -24,7 +24,7 @@ export const apiContract = c.router({
   getNavBar: {
     method: 'GET',
     path: '/auth-stub/nav-bar',
-    query: c.type<{ active_nav?: string }>(),
+    query: z.any(),
     responses: {
       200: z.any(),
     },
@@ -43,8 +43,7 @@ export const apiContract = c.router({
   workerTime: {
     method: 'GET',
     path: '/worker/time',
-    query: c.type<{ date?: string }>(),
-    // headers: c.type<{ 'Content-Type': 'text/html' }>(),
+    query: z.any(),
     responses: {
       200: z.any(),
     },
@@ -52,10 +51,10 @@ export const apiContract = c.router({
   workerTimeEntries: {
     method: 'GET',
     path: '/worker/time/entries',
-    query: c.type<{ date: string }>(),
+    query: z.any(),
     responses: {
       200: z.any(),
-      400: c.type<{ body: string }>(),
+      400: z.any(),
     },
   },
   createTimeEntry: {
@@ -64,8 +63,8 @@ export const apiContract = c.router({
     body: z.object({ project_id: z.string(), date: z.string(), hours: z.string(), comment: z.string().optional() }),
     responses: {
       200: z.any(),
-      400: c.type<{ body: string }>(),
-      403: c.type<{ body: string }>(),
+      400: z.any(),
+      403: z.any(),
     },
   },
   deleteTimeEntry: {
@@ -74,17 +73,17 @@ export const apiContract = c.router({
     pathParams: z.object({ id: z.string() }),
     responses: {
       200: z.any(),
-      403: c.type<{ body: string }>(),
-      404: c.type<{ body: string }>(),
+      403: z.any(),
+      404: z.any(),
     },
   },
   workerTimeSummary: {
     method: 'GET',
     path: '/worker/time/summary',
-    query: c.type<{ date: string }>(),
+    query: z.any(),
     responses: {
       200: z.any(),
-      400: c.type<{ body: string }>(),
+      400: z.any(),
     },
   },
   
@@ -99,7 +98,7 @@ export const apiContract = c.router({
   managerReportsWorker: {
     method: 'GET',
     path: '/manager/reports/worker',
-    query: c.type<{ worker_id?: string }>(),
+    query: z.any(),
     responses: {
       200: z.any(),
     },
@@ -107,7 +106,7 @@ export const apiContract = c.router({
   managerReportsProject: {
     method: 'GET',
     path: '/manager/reports/project',
-    query: c.type<{ project_id?: string }>(),
+    query: z.any(),
     responses: {
       200: z.any(),
     },
@@ -127,8 +126,8 @@ export const apiContract = c.router({
     body: z.object({ name: z.string() }),
     responses: {
       200: z.any(),
-      400: c.type<{ body: string }>(),
-      500: c.type<{ body: string }>(),
+      400: z.any(),
+      500: z.any(),
     },
   },
   toggleProjectSuppress: {
@@ -152,7 +151,7 @@ export const apiContract = c.router({
   adminUsersProjectsProject: {
     method: 'GET',
     path: '/admin/users-projects/project',
-    query: c.type<{ project_id?: string }>(),
+    query: z.object({ project_id: z.string().optional() }),
     responses: {
       200: z.any(),
     },
@@ -163,8 +162,8 @@ export const apiContract = c.router({
     body: z.object({ project_id: z.string(), user_id: z.coerce.number() }),
     responses: {
       200: z.any(),
-      400: c.type<{ body: string }>(),
-      500: c.type<{ body: string }>(),
+      400: z.any(),
+      500: z.any(),
     },
   },
   removeWorkerFromProject: {
@@ -173,7 +172,7 @@ export const apiContract = c.router({
     pathParams: z.object({ id: z.string() }),
     responses: {
       200: z.any(),
-      404: c.type<{ body: string }>(),
+      404: z.any(),
     },
   },
   

@@ -1,6 +1,6 @@
 import { Router, Response } from "express";
 import { AuthStubRequest, requireRole } from "../../middleware/auth_stub.js";
-import { projectUserModel } from "../../models/project_user.js";
+import { ProjectUser, projectUserModel } from "../../models/project_user.js";
 import { projectModel } from "../../models/project.js";
 import { userModel } from "../../models/user.js";
 import { renderBaseLayout } from "../../utils/layout.js";
@@ -9,7 +9,6 @@ const router = Router();
 
 function renderUsersProjectsPage(req: AuthStubRequest, res: Response) {
   const projects = projectModel.getAll();
-  const workers = userModel.getWorkers();
 
   const content = `
     <div class="container mx-auto px-4 py-8">
@@ -146,8 +145,8 @@ router.post("/", requireRole("admin"), (req: AuthStubRequest, res: Response) => 
   try {
     projectUserModel.create(userId, projectId);
     res.send(renderProjectWorkers(projectId));
-  } catch (error: any) {
-    if (error.message.includes("UNIQUE constraint")) {
+  } catch (error) {
+    if (error instanceof Error && error.message.includes("UNIQUE constraint")) {
       return res.status(400).send("Worker already assigned to this project");
     }
     return res.status(500).send("Error assigning worker");
@@ -159,7 +158,7 @@ router.delete("/:id", requireRole("admin"), (req: AuthStubRequest, res: Response
 
   // Find the project_user by id across all projects
   const allProjects = projectModel.getAll(true);
-  let projectUser: any = null;
+  let projectUser: ProjectUser | null = null;
   for (const project of allProjects) {
     const projectUsers = projectUserModel.getByProjectId(project.id, true);
     const found = projectUsers.find((pu) => pu.id === id);

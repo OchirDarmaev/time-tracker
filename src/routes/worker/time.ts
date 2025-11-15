@@ -1,10 +1,9 @@
 import { Router, Response } from "express";
 import { AuthStubRequest, requireRole } from "../../middleware/auth_stub.js";
-import { timeEntryModel } from "../../models/time_entry.js";
-import { projectModel } from "../../models/project.js";
+import { TimeEntry, timeEntryModel } from "../../models/time_entry.js";
+import { Project, projectModel } from "../../models/project.js";
 import {
   formatDate,
-  getCurrentMonth,
   getMonthFromDate,
   minutesToHours,
   getWorkingDaysInMonth,
@@ -107,7 +106,7 @@ function renderTimeTrackingPage(req: AuthStubRequest, res: Response) {
   res.send(renderBaseLayout(content, req, "worker"));
 }
 
-function renderEntriesTable(entries: any[], projects: any[]): string {
+function renderEntriesTable(entries: TimeEntry[], projects: Project[]): string {
   if (entries.length === 0) {
     return '<p class="text-gray-500">No entries for this date.</p>';
   }

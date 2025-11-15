@@ -1,6 +1,6 @@
 import { Router, Response } from "express";
 import { AuthStubRequest, requireRole } from "../../middleware/auth_stub.js";
-import { projectModel } from "../../models/project.js";
+import { Project, projectModel } from "../../models/project.js";
 import { validateProjectName } from "../../utils/validation.js";
 import { renderBaseLayout } from "../../utils/layout.js";
 
@@ -43,7 +43,7 @@ function renderProjectsPage(req: AuthStubRequest, res: Response) {
   res.send(renderBaseLayout(content, req, "admin_projects"));
 }
 
-function renderProjectsList(projects: any[]): string {
+function renderProjectsList(projects: Project[]): string {
   if (projects.length === 0) {
     return '<p class="text-gray-500">No projects found.</p>';
   }
@@ -102,8 +102,8 @@ router.post("/", requireRole("admin"), (req: AuthStubRequest, res: Response) => 
     projectModel.create(name.trim());
     const projects = projectModel.getAll(true);
     res.send(renderProjectsList(projects));
-  } catch (error: any) {
-    if (error.message.includes("UNIQUE constraint")) {
+  } catch (error) {
+    if (error instanceof Error && error.message.includes("UNIQUE constraint")) {
       return res.status(400).send("Project name already exists");
     }
     return res.status(500).send("Error creating project");

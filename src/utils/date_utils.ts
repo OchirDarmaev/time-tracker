@@ -1,5 +1,4 @@
 export function getWorkingDaysInMonth(year: number, month: number): number {
-  const firstDay = new Date(year, month - 1, 1);
   const lastDay = new Date(year, month, 0);
   let workingDays = 0;
 

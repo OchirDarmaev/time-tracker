@@ -67,7 +67,6 @@ function renderWorkerReport(userId: number): string {
 
   const entries = timeEntryModel.getByUserId(userId);
   const projects = projectModel.getAll();
-  const projectMap = new Map(projects.map((p) => [p.id, p.name]));
 
   // Group by date and project
   const grouped: Record<string, Record<number, number>> = {};
@@ -151,7 +150,6 @@ function renderProjectReport(projectId: number): string {
 
   const entries = timeEntryModel.getByProjectId(projectId);
   const workers = userModel.getWorkers();
-  const workerMap = new Map(workers.map((w) => [w.id, w.email]));
 
   // Group by date and user
   const grouped: Record<string, Record<number, number>> = {};

@@ -2,9 +2,9 @@ import { initServer } from "@ts-rest/express";
 import { apiContract } from "./contracts/api.js";
 import { AuthStubRequest } from "./middleware/auth_stub.js";
 import { userModel, UserRole } from "./models/user.js";
-import { timeEntryModel } from "./models/time_entry.js";
-import { projectModel } from "./models/project.js";
-import { projectUserModel } from "./models/project_user.js";
+import { TimeEntry, timeEntryModel } from "./models/time_entry.js";
+import { Project, projectModel } from "./models/project.js";
+import { ProjectUser, projectUserModel } from "./models/project_user.js";
 import {
   formatDate,
   getMonthFromDate,
@@ -34,7 +34,6 @@ function renderTimeTrackingPage(req: AuthStubRequest) {
   const workingDays = getWorkingDaysInMonth(dateObj.getFullYear(), dateObj.getMonth() + 1);
   const requiredMonthlyHours = workingDays * 8;
 
-  const dailyWarning = totalHours < 8;
   const monthlyWarning = monthlyTotalHours < requiredMonthlyHours;
 
   const content = `
@@ -66,7 +65,7 @@ function renderTimeTrackingPage(req: AuthStubRequest) {
         <div class="flex items-center justify-between mb-6">
           <h2 class="text-lg font-semibold" style="color: var(--text-primary);">Time Entries</h2>
           <div id="summary-container" hx-get="/worker/time/summary?date=${selectedDate}" hx-swap="transition:true" hx-trigger="load, entries-changed from:body">
-            ${renderSummary(totalHours, monthlyTotalHours, requiredMonthlyHours, dailyWarning, monthlyWarning)}
+            ${renderSummary(totalHours, monthlyTotalHours, requiredMonthlyHours, monthlyWarning)}
           </div>
         </div>
         <div id="entries-container" hx-get="/worker/time/entries?date=${selectedDate}" hx-swap="transition:true" hx-trigger="load, entries-changed from:body">
@@ -115,7 +114,7 @@ function renderTimeTrackingPage(req: AuthStubRequest) {
   return renderBaseLayout(content, req, "worker");
 }
 
-function renderEntriesTable(entries: any[], projects: any[]): string {
+function renderEntriesTable(entries: TimeEntry[], projects: Project[]): string {
   if (entries.length === 0) {
     return `
       <div class="text-center py-12">
@@ -145,7 +144,7 @@ function renderEntriesTable(entries: any[], projects: any[]): string {
       </thead>
       <tbody>
         ${entries
-          .map((entry, index) => {
+          .map((entry) => {
             const tags = extractTags(entry.comment);
             const commentWithoutTags = entry.comment
               ? entry.comment.replace(/#\w+/g, "").trim()
@@ -183,7 +182,6 @@ function renderSummary(
   totalHours: number,
   monthlyTotalHours: number,
   requiredMonthlyHours: number,
-  dailyWarning: boolean,
   monthlyWarning: boolean
 ): string {
   // Determine daily status color
@@ -292,7 +290,6 @@ function renderWorkerReport(userId: number): string {
 
   const entries = timeEntryModel.getByUserId(userId);
   const projects = projectModel.getAll();
-  const projectMap = new Map(projects.map((p) => [p.id, p.name]));
 
   const grouped: Record<string, Record<number, number>> = {};
   entries.forEach((entry) => {
@@ -335,7 +332,7 @@ function renderWorkerReport(userId: number): string {
           <tbody>
   `;
 
-  dates.forEach((date, index) => {
+  dates.forEach((date) => {
     const dayTotal = Object.values(grouped[date]).reduce((sum, mins) => sum + mins, 0);
     html += `
       <tr id="report-row-${userId}-${date}">
@@ -384,7 +381,6 @@ function renderProjectReport(projectId: number): string {
 
   const entries = timeEntryModel.getByProjectId(projectId);
   const workers = userModel.getWorkers();
-  const workerMap = new Map(workers.map((w) => [w.id, w.email]));
 
   const grouped: Record<string, Record<number, number>> = {};
   entries.forEach((entry) => {
@@ -427,7 +423,7 @@ function renderProjectReport(projectId: number): string {
           <tbody>
   `;
 
-  dates.forEach((date, index) => {
+  dates.forEach((date) => {
     const dayTotal = Object.values(grouped[date]).reduce((sum, mins) => sum + mins, 0);
     html += `
       <tr id="report-row-project-${projectId}-${date}">
@@ -509,7 +505,7 @@ function renderProjectsPage(req: AuthStubRequest) {
   return renderBaseLayout(content, req, "admin_projects");
 }
 
-function renderProjectsList(projects: any[]): string {
+function renderProjectsList(projects: Project[]): string {
   if (projects.length === 0) {
     return '<div class="card"><p style="color: var(--text-secondary);">No projects found.</p></div>';
   }
@@ -528,7 +524,7 @@ function renderProjectsList(projects: any[]): string {
         <tbody>
           ${projects
             .map(
-              (project, index) => `
+              (project) => `
             <tr id="project-${project.id}" style="${project.suppressed ? "opacity: 0.6;" : ""}">
               <td style="color: var(--text-tertiary); font-size: 13px;">#${project.id}</td>
               <td style="font-weight: 500;">${project.name}</td>
@@ -559,7 +555,6 @@ function renderProjectsList(projects: any[]): string {
 // Admin users-projects helper functions
 function renderUsersProjectsPage(req: AuthStubRequest) {
   const projects = projectModel.getAll();
-  const workers = userModel.getWorkers();
 
   const content = `
     <div class="space-y-8">
@@ -648,7 +643,7 @@ function renderProjectWorkers(projectId: number): string {
             </thead>
             <tbody>
               ${projectUsers
-                .map((pu, index) => {
+                .map((pu) => {
                   const worker = userModel.getById(pu.user_id);
                   return `
                   <tr id="project-user-${pu.id}" style="${pu.suppressed ? "opacity: 0.6;" : ""}">
@@ -736,7 +731,7 @@ function renderSystemReports(): string {
           </thead>
           <tbody>
             ${workers
-              .map((w, index) => {
+              .map((w) => {
                 const hours = minutesToHours(workerTotals[w.id] || 0);
                 return `
                 <tr id="system-worker-${w.id}">
@@ -761,7 +756,7 @@ function renderSystemReports(): string {
           </thead>
           <tbody>
             ${projects
-              .map((p, index) => {
+              .map((p) => {
                 const hours = minutesToHours(projectTotals[p.id] || 0);
                 return `
                 <tr id="system-project-${p.id}">
@@ -817,7 +812,7 @@ export const router = s.router(apiContract, {
     };
   },
 
-  setRole: async ({ body, req }) => {
+  setRole: async ({ body, req, res }) => {
     const authReq = req as unknown as AuthStubRequest;
     const role = body.role;
     if (role && ["worker", "office-manager", "admin"].includes(role)) {
@@ -851,7 +846,7 @@ export const router = s.router(apiContract, {
   },
 
   // Root redirect
-  root: async ({ req }) => {
+  root: async ({ req, res }) => {
     const authReq = req as unknown as AuthStubRequest;
     const currentUser = authReq.currentUser;
     if (currentUser) {
@@ -883,7 +878,7 @@ export const router = s.router(apiContract, {
   },
 
   // Worker time routes
-  workerTime: async ({ query, req }) => {
+  workerTime: async ({ req }) => {
     const authReq = req as unknown as AuthStubRequest;
 
     if (!authReq.currentUser) {
@@ -1086,16 +1081,9 @@ export const router = s.router(apiContract, {
     const workingDays = getWorkingDaysInMonth(dateObj.getFullYear(), dateObj.getMonth() + 1);
     const requiredMonthlyHours = workingDays * 8;
 
-    const dailyWarning = totalHours < 8;
     const monthlyWarning = monthlyTotalHours < requiredMonthlyHours;
 
-    const html = renderSummary(
-      totalHours,
-      monthlyTotalHours,
-      requiredMonthlyHours,
-      dailyWarning,
-      monthlyWarning
-    );
+    const html = renderSummary(totalHours, monthlyTotalHours, requiredMonthlyHours, monthlyWarning);
     return {
       status: 200,
       body: html,
@@ -1252,8 +1240,8 @@ export const router = s.router(apiContract, {
         status: 200,
         body: html,
       };
-    } catch (error: any) {
-      if (error.message.includes("UNIQUE constraint")) {
+    } catch (error) {
+      if (error instanceof Error && error.message.includes("UNIQUE constraint")) {
         return {
           status: 400,
           body: { body: "Project name already exists" },
@@ -1380,8 +1368,8 @@ export const router = s.router(apiContract, {
         status: 200,
         body: html,
       };
-    } catch (error: any) {
-      if (error.message.includes("UNIQUE constraint")) {
+    } catch (error) {
+      if (error instanceof Error && error.message.includes("UNIQUE constraint")) {
         return {
           status: 400,
           body: { body: "Worker already assigned to this project" },
@@ -1413,7 +1401,7 @@ export const router = s.router(apiContract, {
     const id = parseInt(params.id);
 
     const allProjects = projectModel.getAll(true);
-    let projectUser: any = null;
+    let projectUser: ProjectUser | null = null;
     for (const project of allProjects) {
       const projectUsers = projectUserModel.getByProjectId(project.id, true);
       const found = projectUsers.find((pu) => pu.id === id);

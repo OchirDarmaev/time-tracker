@@ -20,7 +20,7 @@ function parseUser(row: UserRow): User {
   let roles: UserRole[] = [];
   try {
     roles = JSON.parse(row.roles);
-  } catch (e) {
+  } catch {
     // Fallback: if roles is a single string (old format), convert it
     if (typeof row.roles === "string" && !row.roles.startsWith("[")) {
       roles = [row.roles as UserRole];

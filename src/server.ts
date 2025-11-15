@@ -3,11 +3,23 @@ import session from "express-session";
 import cookieParser from "cookie-parser";
 import { initializeDatabase } from "./config/database.js";
 import { authStubMiddleware } from "./middleware/auth_stub.js";
-import { router } from "./router.js";
-import { apiContract } from "./contracts/api.js";
 import { createExpressEndpoints } from "@ts-rest/express";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
+import { authStubContract } from "./contracts/auth_stub_contract.js";
+import { authStubRouter } from "./routes/auth_stub_router.js";
+import { rootContract } from "./contracts/root_contract.js";
+import { rootRouter } from "./routes/root_router.js";
+import { workerContract } from "./contracts/worker_contract.js";
+import { workerRouter } from "./routes/worker_router.js";
+import { managerContract } from "./contracts/manager_contract.js";
+import { managerRouter } from "./routes/manager_router.js";
+import { adminProjectsContract } from "./contracts/admin_projects_contract.js";
+import { adminProjectsRouter } from "./routes/admin_projects_router.js";
+import { adminUsersProjectsContract } from "./contracts/admin_users_projects_contract.js";
+import { adminUsersProjectsRouter } from "./routes/admin_users_projects_router.js";
+import { adminSystemReportsContract } from "./contracts/admin_system_reports_contract.js";
+import { adminSystemReportsRouter } from "./routes/admin_system_reports_router.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -43,7 +55,37 @@ const componentsPath = join(process.cwd(), "dist/views/components");
 app.use("/components", express.static(componentsPath, { extensions: ["js"] }));
 console.log(`Serving components from: ${componentsPath}`);
 
-createExpressEndpoints(apiContract, router, app, {
+createExpressEndpoints(authStubContract, authStubRouter, app, {
+  responseValidation: false,
+  jsonQuery: true,
+});
+
+createExpressEndpoints(rootContract, rootRouter, app, {
+  responseValidation: false,
+  jsonQuery: true,
+});
+
+createExpressEndpoints(workerContract, workerRouter, app, {
+  responseValidation: false,
+  jsonQuery: true,
+});
+
+createExpressEndpoints(managerContract, managerRouter, app, {
+  responseValidation: false,
+  jsonQuery: true,
+});
+
+createExpressEndpoints(adminProjectsContract, adminProjectsRouter, app, {
+  responseValidation: false,
+  jsonQuery: true,
+});
+
+createExpressEndpoints(adminUsersProjectsContract, adminUsersProjectsRouter, app, {
+  responseValidation: false,
+  jsonQuery: true,
+});
+
+createExpressEndpoints(adminSystemReportsContract, adminSystemReportsRouter, app, {
   responseValidation: false,
   jsonQuery: true,
 });

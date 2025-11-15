@@ -17,7 +17,7 @@ import { renderBaseLayout, renderNavBar } from "./utils/layout.js";
 import { readFileSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
-
+import { html } from "./html.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -54,14 +54,14 @@ function renderTimeTrackingPage(req: AuthStubRequest, includeLayout: boolean = t
   );
   const segmentsJson = JSON.stringify(segments);
 
-  const content = `
+  const content = html`
     <div class="space-y-8">
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-3xl font-bold mb-2 text-gray-900 dark:text-gray-100">Time Tracking</h1>
           <p class="text-sm text-gray-600 dark:text-gray-400">Track your daily work hours</p>
         </div>
-        <date-picker 
+        <date-picker
           value="${selectedDate}"
           hx-get="/worker/time"
           hx-target="main"
@@ -70,22 +70,22 @@ function renderTimeTrackingPage(req: AuthStubRequest, includeLayout: boolean = t
           label="Date"
         ></date-picker>
       </div>
-      
-      <time-slider 
+
+      <time-slider
         total-hours="${sliderTotalHours}"
         segments="${segmentsJson.replace(/"/g, "&quot;")}"
         projects="${projectsJson.replace(/"/g, "&quot;")}"
         date="${selectedDate}"
         sync-url="/worker/time/sync"
       ></time-slider>
-      
-      <time-summary 
+
+      <time-summary
         date="${selectedDate}"
         data-hx-get="/worker/time/summary"
         data-hx-trigger="load, entries-changed from:body"
       ></time-summary>
     </div>
-    
+
     <!-- Load TimeSlider class definition -->
     ${timeSliderHtml}
   `;
@@ -115,14 +115,32 @@ function renderEntriesTable(entries: TimeEntry[], projects: Project[]): string {
     return matches || [];
   };
 
-  return `
-    <table class="w-full border-separate border-spacing-0 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden shadow-sm">
+  return html`
+    <table
+      class="w-full border-separate border-spacing-0 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden shadow-sm"
+    >
       <thead class="bg-gray-200 dark:bg-gray-700">
         <tr>
-          <th class="px-5 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600">Project</th>
-          <th class="px-5 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600">Hours</th>
-          <th class="px-5 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600">Comment</th>
-          <th class="px-5 py-4 text-right text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600">Actions</th>
+          <th
+            class="px-5 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600"
+          >
+            Project
+          </th>
+          <th
+            class="px-5 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600"
+          >
+            Hours
+          </th>
+          <th
+            class="px-5 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600"
+          >
+            Comment
+          </th>
+          <th
+            class="px-5 py-4 text-right text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600"
+          >
+            Actions
+          </th>
         </tr>
       </thead>
       <tbody>
@@ -185,25 +203,36 @@ function renderSummary(
     badgeClass = "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400";
   }
 
+  console.log(dailyStatus, dailyColorClass, badgeClass);
+
   const dailyPercentage = Math.min((totalHours / 8) * 100, 100);
 
-  return `
+  return html`
     <div class="flex items-center gap-6">
       <div class="min-w-[140px]">
         <div class="flex items-center gap-2 mb-1">
           <span class="text-xs font-medium text-gray-600 dark:text-gray-400">Daily</span>
-          <span class="inline-flex items-center px-2 py-1 rounded-md text-[11px] font-medium ${badgeClass}">${totalHours.toFixed(1)}h</span>
+          <span
+            class="inline-flex items-center px-2 py-1 rounded-md text-[11px] font-medium ${badgeClass}"
+            >${totalHours.toFixed(1)}h</span
+          >
         </div>
         <div class="w-full h-1 bg-gray-200 dark:bg-gray-700 rounded-sm overflow-hidden">
           <div class="h-full ${dailyColorClass}" style="width: ${dailyPercentage}%;"></div>
         </div>
       </div>
-      <div class="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm p-3 min-w-[200px]">
+      <div
+        class="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm p-3 min-w-[200px]"
+      >
         <div class="text-xs font-medium mb-1 text-gray-600 dark:text-gray-400">Monthly</div>
         <div class="flex items-baseline gap-2">
-          <span class="text-lg font-bold text-gray-900 dark:text-gray-100">${monthlyTotalHours.toFixed(1)}</span>
+          <span class="text-lg font-bold text-gray-900 dark:text-gray-100"
+            >${monthlyTotalHours.toFixed(1)}</span
+          >
           <span class="text-sm text-gray-500 dark:text-gray-400">/ ${requiredMonthlyHours}h</span>
-          ${monthlyWarning ? '<span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400 ml-auto">Below target</span>' : '<span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 ml-auto">On track</span>'}
+          ${monthlyWarning
+            ? '<span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400 ml-auto">Below target</span>'
+            : '<span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 ml-auto">On track</span>'}
         </div>
       </div>
     </div>
@@ -215,17 +244,23 @@ function renderReportsPage(req: AuthStubRequest) {
   const workers = userModel.getWorkers();
   const projects = projectModel.getAll();
 
-  const content = `
+  const content = html`
     <div class="space-y-8">
       <div>
         <h1 class="text-3xl font-bold mb-2 text-gray-900 dark:text-gray-100">Reports</h1>
-        <p class="text-sm text-gray-600 dark:text-gray-400">View time tracking reports by worker or project</p>
+        <p class="text-sm text-gray-600 dark:text-gray-400">
+          View time tracking reports by worker or project
+        </p>
       </div>
-      
+
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-5 shadow-sm">
-          <h2 class="text-base font-semibold mb-4 text-gray-900 dark:text-gray-100">View by Worker</h2>
-          <select 
+        <div
+          class="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-5 shadow-sm"
+        >
+          <h2 class="text-base font-semibold mb-4 text-gray-900 dark:text-gray-100">
+            View by Worker
+          </h2>
+          <select
             id="worker-select"
             hx-get="/manager/reports/worker"
             hx-target="#report-content"
@@ -239,10 +274,14 @@ function renderReportsPage(req: AuthStubRequest) {
             ${workers.map((w) => `<option value="${w.id}">${w.email}</option>`).join("")}
           </select>
         </div>
-        
-        <div class="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-5 shadow-sm">
-          <h2 class="text-base font-semibold mb-4 text-gray-900 dark:text-gray-100">View by Project</h2>
-          <select 
+
+        <div
+          class="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-5 shadow-sm"
+        >
+          <h2 class="text-base font-semibold mb-4 text-gray-900 dark:text-gray-100">
+            View by Project
+          </h2>
+          <select
             id="project-select"
             hx-get="/manager/reports/project"
             hx-target="#report-content"
@@ -257,10 +296,12 @@ function renderReportsPage(req: AuthStubRequest) {
           </select>
         </div>
       </div>
-      
+
       <div id="report-content">
         <div class="text-center py-12">
-          <p class="text-gray-600 dark:text-gray-400 text-sm">Select a worker or project to view reports.</p>
+          <p class="text-gray-600 dark:text-gray-400 text-sm">
+            Select a worker or project to view reports.
+          </p>
         </div>
       </div>
     </div>
@@ -301,27 +342,53 @@ function renderWorkerReport(userId: number): string {
     grandTotal += dayTotal;
   });
 
-  let html = `
-    <div class="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-5 shadow-sm">
+  let html2 = html`
+    <div
+      class="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-5 shadow-sm"
+    >
       <div class="flex items-center justify-between mb-6">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Report for ${user.email}</h3>
-        <div class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400">${minutesToHours(grandTotal).toFixed(1)}h total</div>
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
+          Report for ${user.email}
+        </h3>
+        <div
+          class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400"
+        >
+          ${minutesToHours(grandTotal).toFixed(1)}h total
+        </div>
       </div>
       <div class="overflow-x-scroll overflow-y-visible">
-        <table class="w-full border-separate border-spacing-0 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden shadow-sm">
+        <table
+          class="w-full border-separate border-spacing-0 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden shadow-sm"
+        >
           <thead class="bg-gray-200 dark:bg-gray-700">
             <tr>
-              <th class="px-5 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600">Date</th>
-              ${projects.map((p) => `<th class="px-5 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600">${p.name}</th>`).join("")}
-              <th class="px-5 py-4 text-right text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600">Total</th>
+              <th
+                class="px-5 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600"
+              >
+                Date
+              </th>
+              ${projects
+                .map(
+                  (p) =>
+                    `<th class="px-5 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600">${p.name}</th>`
+                )
+                .join("")}
+              <th
+                class="px-5 py-4 text-right text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600"
+              >
+                Total
+              </th>
             </tr>
           </thead>
-          <tbody>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
   `;
 
   dates.forEach((date) => {
     const dayTotal = Object.values(grouped[date]).reduce((sum, mins) => sum + mins, 0);
-    html += `
+    html2 += html`
       <tr id="report-row-${userId}-${date}" class="hover:bg-gray-200 dark:hover:bg-gray-700">
         <td class="px-5 py-4 font-medium text-gray-900 dark:text-gray-100 text-sm">${date}</td>
         ${projects
@@ -330,12 +397,14 @@ function renderWorkerReport(userId: number): string {
             return `<td class="px-5 py-4 text-sm ${minutes > 0 ? "text-gray-900 dark:text-gray-100" : "text-gray-500 dark:text-gray-400"}">${minutesToHours(minutes).toFixed(1)}</td>`;
           })
           .join("")}
-        <td class="px-5 py-4 text-right font-semibold text-indigo-600 dark:text-indigo-400 text-sm">${minutesToHours(dayTotal).toFixed(1)}h</td>
+        <td class="px-5 py-4 text-right font-semibold text-indigo-600 dark:text-indigo-400 text-sm">
+          ${minutesToHours(dayTotal).toFixed(1)}h
+        </td>
       </tr>
     `;
   });
 
-  html += `
+  html2 += html`
           </tbody>
           <tfoot>
             <tr class="bg-gray-200 dark:bg-gray-700">
@@ -357,7 +426,7 @@ function renderWorkerReport(userId: number): string {
     </div>
   `;
 
-  return html;
+  return html2;
 }
 
 function renderProjectReport(projectId: number): string {
@@ -392,28 +461,57 @@ function renderProjectReport(projectId: number): string {
     grandTotal += dayTotal;
   });
 
-  let html = `
-    <div class="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-5 shadow-sm">
+  let html2 = html`
+    <div
+      class="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-5 shadow-sm"
+    >
       <div class="flex items-center justify-between mb-6">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Report for ${project.name}</h3>
-        <div class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400">${minutesToHours(grandTotal).toFixed(1)}h total</div>
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
+          Report for ${project.name}
+        </h3>
+        <div
+          class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400"
+        >
+          ${minutesToHours(grandTotal).toFixed(1)}h total
+        </div>
       </div>
       <div class="overflow-x-scroll overflow-y-visible">
-        <table class="w-full border-separate border-spacing-0 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden shadow-sm">
+        <table
+          class="w-full border-separate border-spacing-0 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden shadow-sm"
+        >
           <thead class="bg-gray-200 dark:bg-gray-700">
             <tr>
-              <th class="px-5 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600">Date</th>
-              ${workers.map((w) => `<th class="px-5 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600">${w.email}</th>`).join("")}
-              <th class="px-5 py-4 text-right text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600">Total</th>
+              <th
+                class="px-5 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600"
+              >
+                Date
+              </th>
+              ${workers
+                .map(
+                  (w) =>
+                    `<th class="px-5 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600">${w.email}</th>`
+                )
+                .join("")}
+              <th
+                class="px-5 py-4 text-right text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600"
+              >
+                Total
+              </th>
             </tr>
           </thead>
-          <tbody>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
   `;
 
   dates.forEach((date) => {
     const dayTotal = Object.values(grouped[date]).reduce((sum, mins) => sum + mins, 0);
-    html += `
-      <tr id="report-row-project-${projectId}-${date}" class="hover:bg-gray-200 dark:hover:bg-gray-700">
+    html2 += html`
+      <tr
+        id="report-row-project-${projectId}-${date}"
+        class="hover:bg-gray-200 dark:hover:bg-gray-700"
+      >
         <td class="px-5 py-4 font-medium text-gray-900 dark:text-gray-100 text-sm">${date}</td>
         ${workers
           .map((w) => {
@@ -421,12 +519,14 @@ function renderProjectReport(projectId: number): string {
             return `<td class="px-5 py-4 text-sm ${minutes > 0 ? "text-gray-900 dark:text-gray-100" : "text-gray-500 dark:text-gray-400"}">${minutesToHours(minutes).toFixed(1)}</td>`;
           })
           .join("")}
-        <td class="px-5 py-4 text-right font-semibold text-indigo-600 dark:text-indigo-400 text-sm">${minutesToHours(dayTotal).toFixed(1)}h</td>
+        <td class="px-5 py-4 text-right font-semibold text-indigo-600 dark:text-indigo-400 text-sm">
+          ${minutesToHours(dayTotal).toFixed(1)}h
+        </td>
       </tr>
     `;
   });
 
-  html += `
+  html2 += html`
           </tbody>
           <tfoot>
             <tr class="bg-gray-200 dark:bg-gray-700">
@@ -448,7 +548,7 @@ function renderProjectReport(projectId: number): string {
     </div>
   `;
 
-  return html;
+  return html2;
 }
 
 // Admin projects helper functions
@@ -458,16 +558,18 @@ function renderProjectsPage(req: AuthStubRequest) {
     projects.map((p) => ({ id: p.id, name: p.name, suppressed: p.suppressed || false }))
   );
 
-  const content = `
+  const content = html`
     <div class="space-y-8">
       <div>
         <h1 class="text-3xl font-bold mb-2 text-gray-900 dark:text-gray-100">Projects</h1>
         <p class="text-sm text-gray-600 dark:text-gray-400">Manage all projects in the system</p>
       </div>
-      
-      <div class="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-5 shadow-sm">
+
+      <div
+        class="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-5 shadow-sm"
+      >
         <h2 class="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">Add New Project</h2>
-        <form 
+        <form
           hx-post="/admin/projects"
           hx-target="project-list"
           hx-swap="outerHTML"
@@ -475,20 +577,23 @@ function renderProjectsPage(req: AuthStubRequest) {
           hx-on::after-request="this.reset()"
           class="flex gap-4"
         >
-          <input 
-            type="text" 
-            name="name" 
-            placeholder="Project name" 
-            required 
+          <input
+            type="text"
+            name="name"
+            placeholder="Project name"
+            required
             class="bg-gray-200 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-lg px-3.5 py-2.5 text-sm w-full focus:outline-none focus:border-indigo-500 focus:ring-3 focus:ring-indigo-500/10 focus:bg-gray-100 dark:focus:bg-gray-600 placeholder:text-gray-500 dark:placeholder:text-gray-400 flex-1"
           />
-          <button type="submit" class="bg-gradient-to-br from-indigo-500 to-indigo-600 text-white border-none rounded-lg px-5 py-2.5 text-sm font-medium cursor-pointer shadow-sm hover:shadow-md">Add Project</button>
+          <button
+            type="submit"
+            class="bg-gradient-to-br from-indigo-500 to-indigo-600 text-white border-none rounded-lg px-5 py-2.5 text-sm font-medium cursor-pointer shadow-sm hover:shadow-md"
+          >
+            Add Project
+          </button>
         </form>
       </div>
-      
-      <project-list 
-        projects="${projectsJson.replace(/"/g, "&quot;")}"
-      ></project-list>
+
+      <project-list projects="${projectsJson.replace(/"/g, "&quot;")}"></project-list>
     </div>
   `;
 
@@ -499,16 +604,24 @@ function renderProjectsPage(req: AuthStubRequest) {
 function renderUsersProjectsPage(req: AuthStubRequest) {
   const projects = projectModel.getAll();
 
-  const content = `
+  const content = html`
     <div class="space-y-8">
       <div>
         <h1 class="text-3xl font-bold mb-2 text-gray-900 dark:text-gray-100">Assign Workers</h1>
-        <p class="text-sm text-gray-600 dark:text-gray-400">Manage worker assignments to projects</p>
+        <p class="text-sm text-gray-600 dark:text-gray-400">
+          Manage worker assignments to projects
+        </p>
       </div>
-      
-      <div class="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-5 shadow-sm">
-        <label for="project-select" class="block text-sm font-medium mb-3 text-gray-900 dark:text-gray-100">Select Project</label>
-        <select 
+
+      <div
+        class="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-5 shadow-sm"
+      >
+        <label
+          for="project-select"
+          class="block text-sm font-medium mb-3 text-gray-900 dark:text-gray-100"
+          >Select Project</label
+        >
+        <select
           id="project-select"
           hx-get="/admin/users-projects/project"
           hx-target="#project-workers"
@@ -522,10 +635,14 @@ function renderUsersProjectsPage(req: AuthStubRequest) {
           ${projects.map((p) => `<option value="${p.id}">${p.name}</option>`).join("")}
         </select>
       </div>
-      
+
       <div id="project-workers">
-        <div class="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-5 shadow-sm">
-          <p class="text-gray-600 dark:text-gray-400 text-center py-6">Select a project to manage workers.</p>
+        <div
+          class="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-5 shadow-sm"
+        >
+          <p class="text-gray-600 dark:text-gray-400 text-center py-6">
+            Select a project to manage workers.
+          </p>
         </div>
       </div>
     </div>
@@ -545,14 +662,18 @@ function renderProjectWorkers(projectId: number): string {
   const assignedWorkerIds = new Set(projectUsers.map((pu) => pu.user_id));
   const availableWorkers = allWorkers.filter((w) => !assignedWorkerIds.has(w.id));
 
-  return `
+  return html`
     <div class="space-y-6">
-      <div class="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-5 shadow-sm">
-        <h2 class="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">Workers assigned to ${project.name}</h2>
-        
+      <div
+        class="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-5 shadow-sm"
+      >
+        <h2 class="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">
+          Workers assigned to ${project.name}
+        </h2>
+
         <div class="mb-6">
           <h3 class="text-sm font-medium mb-3 text-gray-600 dark:text-gray-400">Add Worker</h3>
-          <form 
+          <form
             hx-post="/admin/users-projects"
             hx-target="#project-workers"
             hx-swap="transition:true"
@@ -561,21 +682,33 @@ function renderProjectWorkers(projectId: number): string {
             class="flex gap-4"
           >
             <input type="hidden" name="project_id" value="${projectId}" />
-            <select name="user_id" required class="bg-gray-200 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-lg px-3 py-2 text-sm cursor-pointer hover:border-indigo-500 dark:hover:border-indigo-500 hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:border-indigo-500 focus:ring-3 focus:ring-indigo-500/10 flex-1">
+            <select
+              name="user_id"
+              required
+              class="bg-gray-200 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-lg px-3 py-2 text-sm cursor-pointer hover:border-indigo-500 dark:hover:border-indigo-500 hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:border-indigo-500 focus:ring-3 focus:ring-indigo-500/10 flex-1"
+            >
               <option value="">Select worker</option>
               ${availableWorkers.map((w) => `<option value="${w.id}">${w.email}</option>`).join("")}
             </select>
-            <button type="submit" class="bg-gradient-to-br from-indigo-500 to-indigo-600 text-white border-none rounded-lg px-5 py-2.5 text-sm font-medium cursor-pointer shadow-sm hover:shadow-md">Add Worker</button>
+            <button
+              type="submit"
+              class="bg-gradient-to-br from-indigo-500 to-indigo-600 text-white border-none rounded-lg px-5 py-2.5 text-sm font-medium cursor-pointer shadow-sm hover:shadow-md"
+            >
+              Add Worker
+            </button>
           </form>
         </div>
       </div>
-      
-      <div class="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-5 shadow-sm">
-        <h3 class="text-base font-semibold mb-4 text-gray-900 dark:text-gray-100">Assigned Workers</h3>
-        ${
-          projectUsers.length === 0
-            ? '<p class="text-gray-600 dark:text-gray-400 text-center py-6">No workers assigned to this project.</p>'
-            : `
+
+      <div
+        class="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-5 shadow-sm"
+      >
+        <h3 class="text-base font-semibold mb-4 text-gray-900 dark:text-gray-100">
+          Assigned Workers
+        </h3>
+        ${projectUsers.length === 0
+          ? '<p class="text-gray-600 dark:text-gray-400 text-center py-6">No workers assigned to this project.</p>'
+          : `
           <table class="w-full border-separate border-spacing-0 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden shadow-sm">
             <thead class="bg-gray-200 dark:bg-gray-700">
               <tr>
@@ -611,8 +744,7 @@ function renderProjectWorkers(projectId: number): string {
                 .join("")}
             </tbody>
           </table>
-        `
-        }
+        `}
       </div>
     </div>
   `;
@@ -620,14 +752,19 @@ function renderProjectWorkers(projectId: number): string {
 
 // Admin system reports helper functions
 function renderSystemReportsPage(req: AuthStubRequest) {
-  const content = `
+  const content = html`
     <div class="space-y-8">
       <div>
         <h1 class="text-3xl font-bold mb-2 text-gray-900 dark:text-gray-100">System Reports</h1>
         <p class="text-sm text-gray-600 dark:text-gray-400">Overview of all time tracking data</p>
       </div>
-      
-      <div id="reports-data" hx-get="/admin/system-reports/data" hx-swap="transition:true" hx-trigger="load">
+
+      <div
+        id="reports-data"
+        hx-get="/admin/system-reports/data"
+        hx-swap="transition:true"
+        hx-trigger="load"
+      >
         ${renderSystemReports()}
       </div>
     </div>
@@ -655,21 +792,39 @@ function renderSystemReports(): string {
 
   const totalSystemHours = minutesToHours(allEntries.reduce((sum, e) => sum + e.minutes, 0));
 
-  return `
+  return html`
     <div class="space-y-6">
-      <div class="bg-gradient-to-br from-indigo-50 to-indigo-100/50 dark:from-indigo-900/20 dark:to-indigo-800/10 border border-indigo-500 dark:border-indigo-400 rounded-lg p-5 shadow-sm">
-        <div class="text-sm font-medium mb-2 text-gray-600 dark:text-gray-400">Total System Hours</div>
-        <div class="text-4xl font-bold text-indigo-600 dark:text-indigo-400">${totalSystemHours.toFixed(1)}</div>
+      <div
+        class="bg-gradient-to-br from-indigo-50 to-indigo-100/50 dark:from-indigo-900/20 dark:to-indigo-800/10 border border-indigo-500 dark:border-indigo-400 rounded-lg p-5 shadow-sm"
+      >
+        <div class="text-sm font-medium mb-2 text-gray-600 dark:text-gray-400">
+          Total System Hours
+        </div>
+        <div class="text-4xl font-bold text-indigo-600 dark:text-indigo-400">
+          ${totalSystemHours.toFixed(1)}
+        </div>
         <div class="text-sm mt-1 text-gray-500 dark:text-gray-400">hours tracked</div>
       </div>
-      
-      <div class="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-5 shadow-sm">
+
+      <div
+        class="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-5 shadow-sm"
+      >
         <h2 class="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">Hours by Worker</h2>
-        <table class="w-full border-separate border-spacing-0 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden shadow-sm">
+        <table
+          class="w-full border-separate border-spacing-0 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden shadow-sm"
+        >
           <thead class="bg-gray-200 dark:bg-gray-700">
             <tr>
-              <th class="px-5 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600">Worker</th>
-              <th class="px-5 py-4 text-right text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600">Total Hours</th>
+              <th
+                class="px-5 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600"
+              >
+                Worker
+              </th>
+              <th
+                class="px-5 py-4 text-right text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600"
+              >
+                Total Hours
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -687,14 +842,28 @@ function renderSystemReports(): string {
           </tbody>
         </table>
       </div>
-      
-      <div class="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-5 shadow-sm">
-        <h2 class="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">Hours by Project</h2>
-        <table class="w-full border-separate border-spacing-0 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden shadow-sm">
+
+      <div
+        class="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-5 shadow-sm"
+      >
+        <h2 class="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">
+          Hours by Project
+        </h2>
+        <table
+          class="w-full border-separate border-spacing-0 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden shadow-sm"
+        >
           <thead class="bg-gray-200 dark:bg-gray-700">
             <tr>
-              <th class="px-5 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600">Project</th>
-              <th class="px-5 py-4 text-right text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600">Total Hours</th>
+              <th
+                class="px-5 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600"
+              >
+                Project
+              </th>
+              <th
+                class="px-5 py-4 text-right text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600"
+              >
+                Total Hours
+              </th>
             </tr>
           </thead>
           <tbody>

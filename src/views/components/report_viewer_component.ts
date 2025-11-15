@@ -261,4 +261,3 @@ class ReportViewerComponent extends HTMLElement {
 if (!customElements.get("report-viewer")) {
   customElements.define("report-viewer", ReportViewerComponent);
 }
-

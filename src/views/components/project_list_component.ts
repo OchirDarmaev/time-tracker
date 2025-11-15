@@ -105,4 +105,3 @@ class ProjectListComponent extends HTMLElement {
 if (!customElements.get("project-list")) {
   customElements.define("project-list", ProjectListComponent);
 }
-

@@ -5,6 +5,7 @@ import { userModel } from "../../models/user.js";
 import { projectModel } from "../../models/project.js";
 import { minutesToHours } from "../../utils/date_utils.js";
 import { renderBaseLayout } from "../../utils/layout.js";
+import { html } from "../../html.js";
 
 const router = Router();
 
@@ -86,25 +87,29 @@ function renderWorkerReport(userId: number): string {
     return `<p class="text-gray-500">No time entries for ${user.email}.</p>`;
   }
 
-  let html = `
+  let html2 = html`
     <div class="mt-4">
       <h3 class="text-lg font-semibold mb-4">Report for ${user.email}</h3>
       <table class="w-full border-collapse border border-gray-300">
         <thead>
           <tr class="bg-gray-100">
             <th class="border border-gray-300 px-4 py-2">Date</th>
-            ${projects.map((p) => `<th class="border border-gray-300 px-4 py-2">${p.name}</th>`).join("")}
+            ${projects
+              .map((p) => `<th class="border border-gray-300 px-4 py-2">${p.name}</th>`)
+              .join("")}
             <th class="border border-gray-300 px-4 py-2">Total</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody></tbody>
+      </table>
+    </div>
   `;
 
   let grandTotal = 0;
   dates.forEach((date) => {
     const dayTotal = Object.values(grouped[date]).reduce((sum, mins) => sum + mins, 0);
     grandTotal += dayTotal;
-    html += `
+    html2 += `
       <tr>
         <td class="border border-gray-300 px-4 py-2">${date}</td>
         ${projects
@@ -118,7 +123,7 @@ function renderWorkerReport(userId: number): string {
     `;
   });
 
-  html += `
+  html2 += `
         </tbody>
         <tfoot>
           <tr class="bg-gray-100 font-semibold">
@@ -139,7 +144,7 @@ function renderWorkerReport(userId: number): string {
     </div>
   `;
 
-  return html;
+  return html2;
 }
 
 function renderProjectReport(projectId: number): string {
@@ -169,25 +174,29 @@ function renderProjectReport(projectId: number): string {
     return `<p class="text-gray-500">No time entries for project ${project.name}.</p>`;
   }
 
-  let html = `
+  let html2 = html`
     <div class="mt-4">
       <h3 class="text-lg font-semibold mb-4">Report for ${project.name}</h3>
       <table class="w-full border-collapse border border-gray-300">
         <thead>
           <tr class="bg-gray-100">
             <th class="border border-gray-300 px-4 py-2">Date</th>
-            ${workers.map((w) => `<th class="border border-gray-300 px-4 py-2">${w.email}</th>`).join("")}
+            ${workers
+              .map((w) => `<th class="border border-gray-300 px-4 py-2">${w.email}</th>`)
+              .join("")}
             <th class="border border-gray-300 px-4 py-2">Total</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody></tbody>
+      </table>
+    </div>
   `;
 
   let grandTotal = 0;
   dates.forEach((date) => {
     const dayTotal = Object.values(grouped[date]).reduce((sum, mins) => sum + mins, 0);
     grandTotal += dayTotal;
-    html += `
+    html2 += `
       <tr>
         <td class="border border-gray-300 px-4 py-2">${date}</td>
         ${workers
@@ -201,7 +210,7 @@ function renderProjectReport(projectId: number): string {
     `;
   });
 
-  html += `
+  html2 += `
         </tbody>
         <tfoot>
           <tr class="bg-gray-100 font-semibold">
@@ -222,7 +231,7 @@ function renderProjectReport(projectId: number): string {
     </div>
   `;
 
-  return html;
+  return html2;
 }
 
 router.get("/", requireRole("office-manager", "admin"), (req: AuthStubRequest, res: Response) => {

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Tracking Tool</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+</head>
+<body class="bg-gray-50">
+    <!-- DATA Stub Panel -->
+    <div class="bg-gray-800 text-white p-4 mb-4">
+        <div class="container mx-auto">
+            <h2 class="text-lg font-semibold mb-3">DATA Stub Panel</h2>
+            <div class="grid grid-cols-3 gap-4">
+                <div>
+                    <label for="user-select" class="block text-sm font-medium mb-1">Current User</label>
+                    <select 
+                        id="user-select"
+                        hx-post="/auth-stub/set-user"
+                        hx-target="body"
+                        hx-trigger="change"
+                        hx-include="[name='user_id']"
+                        name="user_id"
+                        class="w-full bg-gray-700 text-white border border-gray-600 rounded px-3 py-2"
+                    >
+                        {{user_options}}
+                    </select>
+                </div>
+                <div>
+                    <label for="role-select" class="block text-sm font-medium mb-1">Current Role</label>
+                    <select 
+                        id="role-select"
+                        hx-post="/auth-stub/set-role"
+                        hx-target="body"
+                        hx-trigger="change"
+                        hx-include="[name='role']"
+                        class="w-full bg-gray-700 text-white border border-gray-600 rounded px-3 py-2"
+                        name="role"
+                    >
+                        <option value="worker" {{worker_selected}}>Worker</option>
+                        <option value="office-manager" {{manager_selected}}>Office Manager</option>
+                        <option value="admin" {{admin_selected}}>Admin</option>
+                    </select>
+                </div>
+                <div class="flex items-end">
+                    <div class="text-sm">
+                        <div>Current: <span class="font-semibold">{{current_user_email}}</span></div>
+                        <div>Role: <span class="font-semibold">{{current_role}}</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="bg-white border-b border-gray-200 mb-4">
+        <div class="container mx-auto px-4">
+            <div class="flex space-x-4 py-3">
+                <a href="/worker/time" class="text-blue-600 hover:text-blue-800 {{worker_nav_active}}">My Time</a>
+                <a href="/manager/reports" class="text-blue-600 hover:text-blue-800 {{manager_nav_active}}">Reports</a>
+                <a href="/admin/projects" class="text-blue-600 hover:text-blue-800 {{admin_projects_nav_active}}">Projects</a>
+                <a href="/admin/users-projects" class="text-blue-600 hover:text-blue-800 {{admin_users_nav_active}}">Assign Workers</a>
+                <a href="/admin/system-reports" class="text-blue-600 hover:text-blue-800 {{admin_reports_nav_active}}">System Reports</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Content -->
+    {{content}}
+</body>
+</html>
+

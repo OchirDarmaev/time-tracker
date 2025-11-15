@@ -21,6 +21,14 @@ export const apiContract = c.router({
       302: z.any(),
     },
   },
+  getNavBar: {
+    method: 'GET',
+    path: '/auth-stub/nav-bar',
+    query: c.type<{ active_nav?: string }>(),
+    responses: {
+      200: z.any(),
+    },
+  },
   
   // Root redirect
   root: {

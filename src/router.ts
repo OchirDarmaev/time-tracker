@@ -7,7 +7,7 @@ import { projectModel } from './models/project.js';
 import { projectUserModel } from './models/project_user.js';
 import { formatDate, getMonthFromDate, minutesToHours, getWorkingDaysInMonth, parseDate } from './utils/date_utils.js';
 import { validateDate, validateMinutes, validateProjectName } from './utils/validation.js';
-import { renderBaseLayout } from './utils/layout.js';
+import { renderBaseLayout, renderNavBar } from './utils/layout.js';
 
 // Worker time helper functions
 function renderTimeTrackingPage(req: AuthStubRequest) {
@@ -32,41 +32,55 @@ function renderTimeTrackingPage(req: AuthStubRequest) {
   const monthlyWarning = monthlyTotalHours < requiredMonthlyHours;
   
   const content = `
-    <div class="container mx-auto px-4 py-8">
-      <h1 class="text-3xl font-bold mb-6">My Time Tracking</h1>
-      
-      <div class="mb-6">
-        <label for="date-picker" class="block text-sm font-medium mb-2">Date</label>
-        <input 
-          type="date" 
-          id="date-picker" 
-          value="${selectedDate}"
-          hx-get="/worker/time"
-          hx-target="body"
-          hx-trigger="change"
-          hx-include="this"
-          name="date"
-          class="border rounded px-3 py-2"
-        />
+    <div class="space-y-8">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold mb-2" style="color: var(--text-primary);">Time Tracking</h1>
+          <p class="text-sm" style="color: var(--text-secondary);">Track your daily work hours</p>
+        </div>
+        <div>
+          <label for="date-picker" class="block text-xs font-medium mb-2" style="color: var(--text-secondary);">Date</label>
+          <input 
+            type="date" 
+            id="date-picker" 
+            value="${selectedDate}"
+            hx-get="/worker/time"
+            hx-target="body"
+            hx-swap="transition:true"
+            hx-trigger="change"
+            hx-include="this"
+            name="date"
+            class="input-modern"
+            style="width: auto; min-width: 160px;"
+          />
+        </div>
       </div>
       
-      <div id="entries-container" hx-get="/worker/time/entries?date=${selectedDate}" hx-trigger="load, entries-changed from:body">
-        ${renderEntriesTable(entries, projects)}
+      <div class="card">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-lg font-semibold" style="color: var(--text-primary);">Time Entries</h2>
+          <div id="summary-container" hx-get="/worker/time/summary?date=${selectedDate}" hx-swap="transition:true" hx-trigger="load, entries-changed from:body">
+            ${renderSummary(totalHours, monthlyTotalHours, requiredMonthlyHours, dailyWarning, monthlyWarning)}
+          </div>
+        </div>
+        <div id="entries-container" hx-get="/worker/time/entries?date=${selectedDate}" hx-swap="transition:true" hx-trigger="load, entries-changed from:body">
+          ${renderEntriesTable(entries, projects)}
+        </div>
       </div>
       
-      <div class="mt-6">
-        <h2 class="text-xl font-semibold mb-4">Add Entry</h2>
+      <div class="card">
+        <h2 class="text-lg font-semibold mb-4" style="color: var(--text-primary);">Add Time Entry</h2>
         <form 
           hx-post="/worker/time/entries"
           hx-target="#entries-container"
-          hx-swap="innerHTML"
+          hx-swap="transition:true"
           hx-trigger="submit"
           hx-on::after-request="document.getElementById('add-entry-form').reset(); htmx.trigger('body', 'entries-changed')"
           id="add-entry-form"
-          class="grid grid-cols-4 gap-4"
+          class="grid grid-cols-1 md:grid-cols-4 gap-4"
         >
           <input type="hidden" name="date" value="${selectedDate}" />
-          <select name="project_id" required class="border rounded px-3 py-2">
+          <select name="project_id" required class="select-modern">
             <option value="">Select Project</option>
             ${projects.map(p => `<option value="${p.id}">${p.name}</option>`).join('')}
           </select>
@@ -78,23 +92,16 @@ function renderTimeTrackingPage(req: AuthStubRequest) {
             max="24" 
             placeholder="Hours" 
             required 
-            class="border rounded px-3 py-2"
+            class="input-modern"
           />
           <input 
             type="text" 
             name="comment" 
             placeholder="Comment (e.g., #meeting #setup)" 
-            class="border rounded px-3 py-2"
+            class="input-modern"
           />
-          <button type="submit" class="bg-blue-500 text-white rounded px-4 py-2 hover:bg-blue-600">Add Entry</button>
+          <button type="submit" class="btn-primary">Add Entry</button>
         </form>
-      </div>
-      
-      <div class="mt-8">
-        <h2 class="text-xl font-semibold mb-4">Summary</h2>
-        <div id="summary-container" hx-get="/worker/time/summary?date=${selectedDate}" hx-trigger="load, entries-changed from:body">
-          ${renderSummary(totalHours, monthlyTotalHours, requiredMonthlyHours, dailyWarning, monthlyWarning)}
-        </div>
       </div>
     </div>
   `;
@@ -104,59 +111,98 @@ function renderTimeTrackingPage(req: AuthStubRequest) {
 
 function renderEntriesTable(entries: any[], projects: any[]): string {
   if (entries.length === 0) {
-    return '<p class="text-gray-500">No entries for this date.</p>';
+    return `
+      <div class="text-center py-12">
+        <p style="color: var(--text-secondary); font-size: 14px;">No entries for this date.</p>
+      </div>
+    `;
   }
   
   const projectMap = new Map(projects.map(p => [p.id, p.name]));
   
+  // Extract tags from comments (words starting with #)
+  const extractTags = (comment: string | null): string[] => {
+    if (!comment) return [];
+    const matches = comment.match(/#\w+/g);
+    return matches || [];
+  };
+  
   return `
-    <table class="w-full border-collapse border border-gray-300">
+    <table class="table-modern">
       <thead>
-        <tr class="bg-gray-100">
-          <th class="border border-gray-300 px-4 py-2">Project</th>
-          <th class="border border-gray-300 px-4 py-2">Hours</th>
-          <th class="border border-gray-300 px-4 py-2">Comment</th>
-          <th class="border border-gray-300 px-4 py-2">Actions</th>
+        <tr>
+          <th>Project</th>
+          <th>Hours</th>
+          <th>Comment</th>
+          <th style="text-align: right;">Actions</th>
         </tr>
       </thead>
       <tbody>
-        ${entries.map(entry => `
-          <tr>
-            <td class="border border-gray-300 px-4 py-2">${projectMap.get(entry.project_id) || 'Unknown'}</td>
-            <td class="border border-gray-300 px-4 py-2">${minutesToHours(entry.minutes).toFixed(1)}</td>
-            <td class="border border-gray-300 px-4 py-2">${entry.comment || ''}</td>
-            <td class="border border-gray-300 px-4 py-2">
+        ${entries.map((entry, index) => {
+          const tags = extractTags(entry.comment);
+          const commentWithoutTags = entry.comment ? entry.comment.replace(/#\w+/g, '').trim() : '';
+          return `
+          <tr id="entry-${entry.id}">
+            <td style="font-weight: 500;">${projectMap.get(entry.project_id) || 'Unknown'}</td>
+            <td style="font-weight: 600; color: var(--accent);">${minutesToHours(entry.minutes).toFixed(1)}h</td>
+            <td>
+              ${commentWithoutTags ? `<span style="color: var(--text-primary);">${commentWithoutTags}</span>` : ''}
+              ${tags.length > 0 ? tags.map(tag => `<span class="tag" style="margin-left: 6px;">${tag}</span>`).join('') : ''}
+            </td>
+            <td style="text-align: right;">
               <button 
                 hx-delete="/worker/time/entries/${entry.id}"
                 hx-target="#entries-container"
-                hx-swap="innerHTML"
+                hx-swap="transition:true"
                 hx-confirm="Delete this entry?"
                 hx-on::after-request="htmx.trigger('body', 'entries-changed')"
-                class="text-red-500 hover:text-red-700"
+                class="btn-danger"
               >
                 Delete
               </button>
             </td>
           </tr>
-        `).join('')}
+        `;
+        }).join('')}
       </tbody>
     </table>
   `;
 }
 
 function renderSummary(totalHours: number, monthlyTotalHours: number, requiredMonthlyHours: number, dailyWarning: boolean, monthlyWarning: boolean): string {
+  // Determine daily status color
+  let dailyStatus = 'success';
+  let dailyColor = 'var(--success)';
+  if (totalHours < 4) {
+    dailyStatus = 'error';
+    dailyColor = 'var(--error)';
+  } else if (totalHours < 6) {
+    dailyStatus = 'error';
+    dailyColor = 'var(--error)';
+  } else if (totalHours < 8) {
+    dailyStatus = 'warning';
+    dailyColor = 'var(--warning)';
+  }
+  
+  const dailyPercentage = Math.min((totalHours / 8) * 100, 100);
+  
   return `
-    <div class="space-y-4">
-      <div class="p-4 border rounded ${dailyWarning ? 'bg-red-50 border-red-300' : 'bg-green-50 border-green-300'}">
-        <div class="flex items-center justify-between">
-          <span class="font-semibold">Daily Total: ${totalHours.toFixed(1)} hours</span>
-          ${dailyWarning ? '<span class="text-red-600">❗ Less than 8 hours</span>' : '<span class="text-green-600">✓ Complete</span>'}
+    <div class="flex items-center gap-6">
+      <div style="min-width: 140px;">
+        <div class="flex items-center gap-2 mb-1">
+          <span class="text-xs font-medium" style="color: var(--text-secondary);">Daily</span>
+          <span class="badge badge-${dailyStatus}" style="font-size: 11px;">${totalHours.toFixed(1)}h</span>
+        </div>
+        <div style="width: 100%; height: 4px; background-color: var(--bg-tertiary); border-radius: 2px; overflow: hidden;">
+          <div style="width: ${dailyPercentage}%; height: 100%; background-color: ${dailyColor};"></div>
         </div>
       </div>
-      <div class="p-4 border rounded ${monthlyWarning ? 'bg-yellow-50 border-yellow-300' : 'bg-green-50 border-green-300'}">
-        <div class="flex items-center justify-between">
-          <span class="font-semibold">Monthly Total: ${monthlyTotalHours.toFixed(1)} / ${requiredMonthlyHours} hours</span>
-          ${monthlyWarning ? '<span class="text-yellow-600">⚠️ Below target</span>' : '<span class="text-green-600">✓ On track</span>'}
+      <div class="card" style="padding: 12px 16px; min-width: 200px;">
+        <div class="text-xs font-medium mb-1" style="color: var(--text-secondary);">Monthly</div>
+        <div class="flex items-baseline gap-2">
+          <span class="text-lg font-bold" style="color: var(--text-primary);">${monthlyTotalHours.toFixed(1)}</span>
+          <span class="text-sm" style="color: var(--text-tertiary);">/ ${requiredMonthlyHours}h</span>
+          ${monthlyWarning ? '<span class="badge badge-warning" style="margin-left: auto;">Below target</span>' : '<span class="badge badge-success" style="margin-left: auto;">On track</span>'}
         </div>
       </div>
     </div>
@@ -169,36 +215,41 @@ function renderReportsPage(req: AuthStubRequest) {
   const projects = projectModel.getAll();
   
   const content = `
-    <div class="container mx-auto px-4 py-8">
-      <h1 class="text-3xl font-bold mb-6">Reports</h1>
+    <div class="space-y-8">
+      <div>
+        <h1 class="text-3xl font-bold mb-2" style="color: var(--text-primary);">Reports</h1>
+        <p class="text-sm" style="color: var(--text-secondary);">View time tracking reports by worker or project</p>
+      </div>
       
-      <div class="grid grid-cols-2 gap-8">
-        <div>
-          <h2 class="text-xl font-semibold mb-4">View by Worker</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="card">
+          <h2 class="text-base font-semibold mb-4" style="color: var(--text-primary);">View by Worker</h2>
           <select 
             id="worker-select"
             hx-get="/manager/reports/worker"
             hx-target="#report-content"
+            hx-swap="transition:true"
             hx-trigger="change"
             hx-include="[name='worker_id']"
             name="worker_id"
-            class="w-full border rounded px-3 py-2 mb-4"
+            class="select-modern w-full"
           >
             <option value="">Select Worker</option>
             ${workers.map(w => `<option value="${w.id}">${w.email}</option>`).join('')}
           </select>
         </div>
         
-        <div>
-          <h2 class="text-xl font-semibold mb-4">View by Project</h2>
+        <div class="card">
+          <h2 class="text-base font-semibold mb-4" style="color: var(--text-primary);">View by Project</h2>
           <select 
             id="project-select"
             hx-get="/manager/reports/project"
             hx-target="#report-content"
+            hx-swap="transition:true"
             hx-trigger="change"
             hx-include="[name='project_id']"
             name="project_id"
-            class="w-full border rounded px-3 py-2 mb-4"
+            class="select-modern w-full"
           >
             <option value="">Select Project</option>
             ${projects.map(p => `<option value="${p.id}">${p.name}</option>`).join('')}
@@ -206,8 +257,10 @@ function renderReportsPage(req: AuthStubRequest) {
         </div>
       </div>
       
-      <div id="report-content" class="mt-8">
-        <p class="text-gray-500">Select a worker or project to view reports.</p>
+      <div id="report-content">
+        <div class="text-center py-12">
+          <p style="color: var(--text-secondary); font-size: 14px;">Select a worker or project to view reports.</p>
+        </div>
       </div>
     </div>
   `;
@@ -218,7 +271,7 @@ function renderReportsPage(req: AuthStubRequest) {
 function renderWorkerReport(userId: number): string {
   const user = userModel.getById(userId);
   if (!user) {
-    return '<p class="text-red-500">Worker not found.</p>';
+    return '<div class="card"><p style="color: var(--error);">Worker not found.</p></div>';
   }
   
   const entries = timeEntryModel.getByUserId(userId);
@@ -239,52 +292,61 @@ function renderWorkerReport(userId: number): string {
   const dates = Object.keys(grouped).sort();
   
   if (dates.length === 0) {
-    return `<p class="text-gray-500">No time entries for ${user.email}.</p>`;
+    return `<div class="card"><p style="color: var(--text-secondary);">No time entries for ${user.email}.</p></div>`;
   }
-  
-  let html = `
-    <div class="mt-4">
-      <h3 class="text-lg font-semibold mb-4">Report for ${user.email}</h3>
-      <table class="w-full border-collapse border border-gray-300">
-        <thead>
-          <tr class="bg-gray-100">
-            <th class="border border-gray-300 px-4 py-2">Date</th>
-            ${projects.map(p => `<th class="border border-gray-300 px-4 py-2">${p.name}</th>`).join('')}
-            <th class="border border-gray-300 px-4 py-2">Total</th>
-          </tr>
-        </thead>
-        <tbody>
-  `;
   
   let grandTotal = 0;
   dates.forEach(date => {
     const dayTotal = Object.values(grouped[date]).reduce((sum, mins) => sum + mins, 0);
     grandTotal += dayTotal;
+  });
+  
+  let html = `
+    <div class="card">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-lg font-semibold" style="color: var(--text-primary);">Report for ${user.email}</h3>
+        <div class="badge badge-neutral">${minutesToHours(grandTotal).toFixed(1)}h total</div>
+      </div>
+      <div style="overflow-x: scroll; overflow-y: visible;">
+        <table class="table-modern">
+          <thead>
+            <tr>
+              <th>Date</th>
+              ${projects.map(p => `<th>${p.name}</th>`).join('')}
+              <th style="text-align: right;">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+  `;
+  
+  dates.forEach((date, index) => {
+    const dayTotal = Object.values(grouped[date]).reduce((sum, mins) => sum + mins, 0);
     html += `
-      <tr>
-        <td class="border border-gray-300 px-4 py-2">${date}</td>
+      <tr id="report-row-${userId}-${date}">
+        <td style="font-weight: 500;">${date}</td>
         ${projects.map(p => {
           const minutes = grouped[date][p.id] || 0;
-          return `<td class="border border-gray-300 px-4 py-2">${minutesToHours(minutes).toFixed(1)}</td>`;
+          return `<td style="color: ${minutes > 0 ? 'var(--text-primary)' : 'var(--text-tertiary)'};">${minutesToHours(minutes).toFixed(1)}</td>`;
         }).join('')}
-        <td class="border border-gray-300 px-4 py-2 font-semibold">${minutesToHours(dayTotal).toFixed(1)}</td>
+        <td style="text-align: right; font-weight: 600; color: var(--accent);">${minutesToHours(dayTotal).toFixed(1)}h</td>
       </tr>
     `;
   });
   
   html += `
-        </tbody>
-        <tfoot>
-          <tr class="bg-gray-100 font-semibold">
-            <td class="border border-gray-300 px-4 py-2">Total</td>
-            ${projects.map(p => {
-              const projectTotal = dates.reduce((sum, date) => sum + (grouped[date][p.id] || 0), 0);
-              return `<td class="border border-gray-300 px-4 py-2">${minutesToHours(projectTotal).toFixed(1)}</td>`;
-            }).join('')}
-            <td class="border border-gray-300 px-4 py-2">${minutesToHours(grandTotal).toFixed(1)}</td>
-          </tr>
-        </tfoot>
-      </table>
+          </tbody>
+          <tfoot>
+            <tr style="background-color: var(--bg-tertiary);">
+              <td style="font-weight: 600;">Total</td>
+              ${projects.map(p => {
+                const projectTotal = dates.reduce((sum, date) => sum + (grouped[date][p.id] || 0), 0);
+                return `<td style="font-weight: 600; color: var(--accent);">${minutesToHours(projectTotal).toFixed(1)}h</td>`;
+              }).join('')}
+              <td style="text-align: right; font-weight: 700; color: var(--accent);">${minutesToHours(grandTotal).toFixed(1)}h</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
     </div>
   `;
   
@@ -294,7 +356,7 @@ function renderWorkerReport(userId: number): string {
 function renderProjectReport(projectId: number): string {
   const project = projectModel.getById(projectId);
   if (!project) {
-    return '<p class="text-red-500">Project not found.</p>';
+    return '<div class="card"><p style="color: var(--error);">Project not found.</p></div>';
   }
   
   const entries = timeEntryModel.getByProjectId(projectId);
@@ -315,52 +377,61 @@ function renderProjectReport(projectId: number): string {
   const dates = Object.keys(grouped).sort();
   
   if (dates.length === 0) {
-    return `<p class="text-gray-500">No time entries for project ${project.name}.</p>`;
+    return `<div class="card"><p style="color: var(--text-secondary);">No time entries for project ${project.name}.</p></div>`;
   }
-  
-  let html = `
-    <div class="mt-4">
-      <h3 class="text-lg font-semibold mb-4">Report for ${project.name}</h3>
-      <table class="w-full border-collapse border border-gray-300">
-        <thead>
-          <tr class="bg-gray-100">
-            <th class="border border-gray-300 px-4 py-2">Date</th>
-            ${workers.map(w => `<th class="border border-gray-300 px-4 py-2">${w.email}</th>`).join('')}
-            <th class="border border-gray-300 px-4 py-2">Total</th>
-          </tr>
-        </thead>
-        <tbody>
-  `;
   
   let grandTotal = 0;
   dates.forEach(date => {
     const dayTotal = Object.values(grouped[date]).reduce((sum, mins) => sum + mins, 0);
     grandTotal += dayTotal;
+  });
+  
+  let html = `
+    <div class="card">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-lg font-semibold" style="color: var(--text-primary);">Report for ${project.name}</h3>
+        <div class="badge badge-neutral">${minutesToHours(grandTotal).toFixed(1)}h total</div>
+      </div>
+      <div style="overflow-x: scroll; overflow-y: visible;">
+        <table class="table-modern">
+          <thead>
+            <tr>
+              <th>Date</th>
+              ${workers.map(w => `<th>${w.email}</th>`).join('')}
+              <th style="text-align: right;">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+  `;
+  
+  dates.forEach((date, index) => {
+    const dayTotal = Object.values(grouped[date]).reduce((sum, mins) => sum + mins, 0);
     html += `
-      <tr>
-        <td class="border border-gray-300 px-4 py-2">${date}</td>
+      <tr id="report-row-project-${projectId}-${date}">
+        <td style="font-weight: 500;">${date}</td>
         ${workers.map(w => {
           const minutes = grouped[date][w.id] || 0;
-          return `<td class="border border-gray-300 px-4 py-2">${minutesToHours(minutes).toFixed(1)}</td>`;
+          return `<td style="color: ${minutes > 0 ? 'var(--text-primary)' : 'var(--text-tertiary)'};">${minutesToHours(minutes).toFixed(1)}</td>`;
         }).join('')}
-        <td class="border border-gray-300 px-4 py-2 font-semibold">${minutesToHours(dayTotal).toFixed(1)}</td>
+        <td style="text-align: right; font-weight: 600; color: var(--accent);">${minutesToHours(dayTotal).toFixed(1)}h</td>
       </tr>
     `;
   });
   
   html += `
-        </tbody>
-        <tfoot>
-          <tr class="bg-gray-100 font-semibold">
-            <td class="border border-gray-300 px-4 py-2">Total</td>
-            ${workers.map(w => {
-              const workerTotal = dates.reduce((sum, date) => sum + (grouped[date][w.id] || 0), 0);
-              return `<td class="border border-gray-300 px-4 py-2">${minutesToHours(workerTotal).toFixed(1)}</td>`;
-            }).join('')}
-            <td class="border border-gray-300 px-4 py-2">${minutesToHours(grandTotal).toFixed(1)}</td>
-          </tr>
-        </tfoot>
-      </table>
+          </tbody>
+          <tfoot>
+            <tr style="background-color: var(--bg-tertiary);">
+              <td style="font-weight: 600;">Total</td>
+              ${workers.map(w => {
+                const workerTotal = dates.reduce((sum, date) => sum + (grouped[date][w.id] || 0), 0);
+                return `<td style="font-weight: 600; color: var(--accent);">${minutesToHours(workerTotal).toFixed(1)}h</td>`;
+              }).join('')}
+              <td style="text-align: right; font-weight: 700; color: var(--accent);">${minutesToHours(grandTotal).toFixed(1)}h</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
     </div>
   `;
   
@@ -372,15 +443,18 @@ function renderProjectsPage(req: AuthStubRequest) {
   const projects = projectModel.getAll(true);
   
   const content = `
-    <div class="container mx-auto px-4 py-8">
-      <h1 class="text-3xl font-bold mb-6">Manage Projects</h1>
+    <div class="space-y-8">
+      <div>
+        <h1 class="text-3xl font-bold mb-2" style="color: var(--text-primary);">Projects</h1>
+        <p class="text-sm" style="color: var(--text-secondary);">Manage all projects in the system</p>
+      </div>
       
-      <div class="mb-6">
-        <h2 class="text-xl font-semibold mb-4">Add New Project</h2>
+      <div class="card">
+        <h2 class="text-lg font-semibold mb-4" style="color: var(--text-primary);">Add New Project</h2>
         <form 
           hx-post="/admin/projects"
           hx-target="#projects-list"
-          hx-swap="innerHTML"
+          hx-swap="transition:true"
           hx-trigger="submit"
           hx-on::after-request="this.reset()"
           class="flex gap-4"
@@ -390,9 +464,9 @@ function renderProjectsPage(req: AuthStubRequest) {
             name="name" 
             placeholder="Project name" 
             required 
-            class="border rounded px-3 py-2 flex-1"
+            class="input-modern flex-1"
           />
-          <button type="submit" class="bg-blue-500 text-white rounded px-4 py-2 hover:bg-blue-600">Add Project</button>
+          <button type="submit" class="btn-primary">Add Project</button>
         </form>
       </div>
       
@@ -407,41 +481,44 @@ function renderProjectsPage(req: AuthStubRequest) {
 
 function renderProjectsList(projects: any[]): string {
   if (projects.length === 0) {
-    return '<p class="text-gray-500">No projects found.</p>';
+    return '<div class="card"><p style="color: var(--text-secondary);">No projects found.</p></div>';
   }
   
   return `
-    <table class="w-full border-collapse border border-gray-300">
-      <thead>
-        <tr class="bg-gray-100">
-          <th class="border border-gray-300 px-4 py-2">ID</th>
-          <th class="border border-gray-300 px-4 py-2">Name</th>
-          <th class="border border-gray-300 px-4 py-2">Status</th>
-          <th class="border border-gray-300 px-4 py-2">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${projects.map(project => `
-          <tr class="${project.suppressed ? 'bg-gray-50' : ''}">
-            <td class="border border-gray-300 px-4 py-2">${project.id}</td>
-            <td class="border border-gray-300 px-4 py-2">${project.name}</td>
-            <td class="border border-gray-300 px-4 py-2">
-              ${project.suppressed ? '<span class="text-gray-500">Suppressed</span>' : '<span class="text-green-600">Active</span>'}
-            </td>
-            <td class="border border-gray-300 px-4 py-2">
-              <button 
-                hx-patch="/admin/projects/${project.id}/suppress"
-                hx-target="#projects-list"
-                hx-swap="innerHTML"
-                class="text-blue-500 hover:text-blue-700 mr-2"
-              >
-                ${project.suppressed ? 'Activate' : 'Suppress'}
-              </button>
-            </td>
+    <div class="card">
+      <table class="table-modern">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Status</th>
+            <th style="text-align: right;">Actions</th>
           </tr>
-        `).join('')}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          ${projects.map((project, index) => `
+            <tr id="project-${project.id}" style="${project.suppressed ? 'opacity: 0.6;' : ''}">
+              <td style="color: var(--text-tertiary); font-size: 13px;">#${project.id}</td>
+              <td style="font-weight: 500;">${project.name}</td>
+              <td>
+                ${project.suppressed ? '<span class="badge badge-neutral">Suppressed</span>' : '<span class="badge badge-success">Active</span>'}
+              </td>
+              <td style="text-align: right;">
+                <button 
+                  hx-patch="/admin/projects/${project.id}/suppress"
+                  hx-target="#projects-list"
+                  hx-swap="transition:true"
+                  class="btn-secondary"
+                  style="font-size: 13px; padding: 6px 12px;"
+                >
+                  ${project.suppressed ? 'Activate' : 'Suppress'}
+                </button>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
   `;
 }
 
@@ -451,19 +528,23 @@ function renderUsersProjectsPage(req: AuthStubRequest) {
   const workers = userModel.getWorkers();
   
   const content = `
-    <div class="container mx-auto px-4 py-8">
-      <h1 class="text-3xl font-bold mb-6">Manage Workers in Projects</h1>
+    <div class="space-y-8">
+      <div>
+        <h1 class="text-3xl font-bold mb-2" style="color: var(--text-primary);">Assign Workers</h1>
+        <p class="text-sm" style="color: var(--text-secondary);">Manage worker assignments to projects</p>
+      </div>
       
-      <div class="mb-6">
-        <label for="project-select" class="block text-sm font-medium mb-2">Select Project</label>
+      <div class="card">
+        <label for="project-select" class="block text-sm font-medium mb-3" style="color: var(--text-primary);">Select Project</label>
         <select 
           id="project-select"
           hx-get="/admin/users-projects/project"
           hx-target="#project-workers"
+          hx-swap="transition:true"
           hx-trigger="change"
           hx-include="[name='project_id']"
           name="project_id"
-          class="w-full border rounded px-3 py-2"
+          class="select-modern w-full"
         >
           <option value="">Select a project</option>
           ${projects.map(p => `<option value="${p.id}">${p.name}</option>`).join('')}
@@ -471,7 +552,9 @@ function renderUsersProjectsPage(req: AuthStubRequest) {
       </div>
       
       <div id="project-workers">
-        <p class="text-gray-500">Select a project to manage workers.</p>
+        <div class="card">
+          <p style="color: var(--text-secondary); text-align: center; padding: 24px;">Select a project to manage workers.</p>
+        </div>
       </div>
     </div>
   `;
@@ -491,55 +574,57 @@ function renderProjectWorkers(projectId: number): string {
   const availableWorkers = allWorkers.filter(w => !assignedWorkerIds.has(w.id));
   
   return `
-    <div class="mt-4">
-      <h2 class="text-xl font-semibold mb-4">Workers assigned to ${project.name}</h2>
-      
-      <div class="mb-6">
-        <h3 class="text-lg font-semibold mb-2">Add Worker</h3>
-        <form 
-          hx-post="/admin/users-projects"
-          hx-target="#project-workers"
-          hx-swap="innerHTML"
-          hx-trigger="submit"
-          hx-on::after-request="this.reset()"
-          class="flex gap-4"
-        >
-          <input type="hidden" name="project_id" value="${projectId}" />
-          <select name="user_id" required class="border rounded px-3 py-2 flex-1">
-            <option value="">Select worker</option>
-            ${availableWorkers.map(w => `<option value="${w.id}">${w.email}</option>`).join('')}
-          </select>
-          <button type="submit" class="bg-blue-500 text-white rounded px-4 py-2 hover:bg-blue-600">Add Worker</button>
-        </form>
+    <div class="space-y-6">
+      <div class="card">
+        <h2 class="text-lg font-semibold mb-4" style="color: var(--text-primary);">Workers assigned to ${project.name}</h2>
+        
+        <div class="mb-6">
+          <h3 class="text-sm font-medium mb-3" style="color: var(--text-secondary);">Add Worker</h3>
+          <form 
+            hx-post="/admin/users-projects"
+            hx-target="#project-workers"
+            hx-swap="transition:true"
+            hx-trigger="submit"
+            hx-on::after-request="this.reset()"
+            class="flex gap-4"
+          >
+            <input type="hidden" name="project_id" value="${projectId}" />
+            <select name="user_id" required class="select-modern flex-1">
+              <option value="">Select worker</option>
+              ${availableWorkers.map(w => `<option value="${w.id}">${w.email}</option>`).join('')}
+            </select>
+            <button type="submit" class="btn-primary">Add Worker</button>
+          </form>
+        </div>
       </div>
       
-      <div>
-        <h3 class="text-lg font-semibold mb-2">Assigned Workers</h3>
-        ${projectUsers.length === 0 ? '<p class="text-gray-500">No workers assigned to this project.</p>' : `
-          <table class="w-full border-collapse border border-gray-300">
+      <div class="card">
+        <h3 class="text-base font-semibold mb-4" style="color: var(--text-primary);">Assigned Workers</h3>
+        ${projectUsers.length === 0 ? '<p style="color: var(--text-secondary); text-align: center; padding: 24px;">No workers assigned to this project.</p>' : `
+          <table class="table-modern">
             <thead>
-              <tr class="bg-gray-100">
-                <th class="border border-gray-300 px-4 py-2">Worker Email</th>
-                <th class="border border-gray-300 px-4 py-2">Status</th>
-                <th class="border border-gray-300 px-4 py-2">Actions</th>
+              <tr>
+                <th>Worker Email</th>
+                <th>Status</th>
+                <th style="text-align: right;">Actions</th>
               </tr>
             </thead>
             <tbody>
-              ${projectUsers.map(pu => {
+              ${projectUsers.map((pu, index) => {
                 const worker = userModel.getById(pu.user_id);
                 return `
-                  <tr class="${pu.suppressed ? 'bg-gray-50' : ''}">
-                    <td class="border border-gray-300 px-4 py-2">${worker?.email || 'Unknown'}</td>
-                    <td class="border border-gray-300 px-4 py-2">
-                      ${pu.suppressed ? '<span class="text-gray-500">Suppressed</span>' : '<span class="text-green-600">Active</span>'}
+                  <tr id="project-user-${pu.id}" style="${pu.suppressed ? 'opacity: 0.6;' : ''}">
+                    <td style="font-weight: 500;">${worker?.email || 'Unknown'}</td>
+                    <td>
+                      ${pu.suppressed ? '<span class="badge badge-neutral">Suppressed</span>' : '<span class="badge badge-success">Active</span>'}
                     </td>
-                    <td class="border border-gray-300 px-4 py-2">
+                    <td style="text-align: right;">
                       <button 
                         hx-delete="/admin/users-projects/${pu.id}"
                         hx-target="#project-workers"
-                        hx-swap="innerHTML"
+                        hx-swap="transition:true"
                         hx-confirm="Remove this worker from the project?"
-                        class="text-red-500 hover:text-red-700"
+                        class="btn-danger"
                       >
                         Remove
                       </button>
@@ -558,10 +643,13 @@ function renderProjectWorkers(projectId: number): string {
 // Admin system reports helper functions
 function renderSystemReportsPage(req: AuthStubRequest) {
   const content = `
-    <div class="container mx-auto px-4 py-8">
-      <h1 class="text-3xl font-bold mb-6">System Reports</h1>
+    <div class="space-y-8">
+      <div>
+        <h1 class="text-3xl font-bold mb-2" style="color: var(--text-primary);">System Reports</h1>
+        <p class="text-sm" style="color: var(--text-secondary);">Overview of all time tracking data</p>
+      </div>
       
-      <div id="reports-data" hx-get="/admin/system-reports/data" hx-trigger="load">
+      <div id="reports-data" hx-get="/admin/system-reports/data" hx-swap="transition:true" hx-trigger="load">
         ${renderSystemReports()}
       </div>
     </div>
@@ -590,28 +678,29 @@ function renderSystemReports(): string {
   const totalSystemHours = minutesToHours(allEntries.reduce((sum, e) => sum + e.minutes, 0));
   
   return `
-    <div class="space-y-8">
-      <div class="p-4 bg-blue-50 border border-blue-200 rounded">
-        <h2 class="text-xl font-semibold mb-2">Total System Hours</h2>
-        <p class="text-2xl font-bold">${totalSystemHours.toFixed(1)} hours</p>
+    <div class="space-y-6">
+      <div class="card" style="background: linear-gradient(135deg, rgba(107, 117, 216, 0.08) 0%, rgba(107, 117, 216, 0.04) 100%); border-color: var(--accent);">
+        <div class="text-sm font-medium mb-2" style="color: var(--text-secondary);">Total System Hours</div>
+        <div class="text-4xl font-bold" style="color: var(--accent);">${totalSystemHours.toFixed(1)}</div>
+        <div class="text-sm mt-1" style="color: var(--text-tertiary);">hours tracked</div>
       </div>
       
-      <div>
-        <h2 class="text-xl font-semibold mb-4">Hours by Worker</h2>
-        <table class="w-full border-collapse border border-gray-300">
+      <div class="card">
+        <h2 class="text-lg font-semibold mb-4" style="color: var(--text-primary);">Hours by Worker</h2>
+        <table class="table-modern">
           <thead>
-            <tr class="bg-gray-100">
-              <th class="border border-gray-300 px-4 py-2">Worker</th>
-              <th class="border border-gray-300 px-4 py-2">Total Hours</th>
+            <tr>
+              <th>Worker</th>
+              <th style="text-align: right;">Total Hours</th>
             </tr>
           </thead>
           <tbody>
-            ${workers.map(w => {
+            ${workers.map((w, index) => {
               const hours = minutesToHours(workerTotals[w.id] || 0);
               return `
-                <tr>
-                  <td class="border border-gray-300 px-4 py-2">${w.email}</td>
-                  <td class="border border-gray-300 px-4 py-2">${hours.toFixed(1)}</td>
+                <tr id="system-worker-${w.id}">
+                  <td style="font-weight: 500;">${w.email}</td>
+                  <td style="text-align: right; font-weight: 600; color: var(--accent);">${hours.toFixed(1)}h</td>
                 </tr>
               `;
             }).join('')}
@@ -619,22 +708,22 @@ function renderSystemReports(): string {
         </table>
       </div>
       
-      <div>
-        <h2 class="text-xl font-semibold mb-4">Hours by Project</h2>
-        <table class="w-full border-collapse border border-gray-300">
+      <div class="card">
+        <h2 class="text-lg font-semibold mb-4" style="color: var(--text-primary);">Hours by Project</h2>
+        <table class="table-modern">
           <thead>
-            <tr class="bg-gray-100">
-              <th class="border border-gray-300 px-4 py-2">Project</th>
-              <th class="border border-gray-300 px-4 py-2">Total Hours</th>
+            <tr>
+              <th>Project</th>
+              <th style="text-align: right;">Total Hours</th>
             </tr>
           </thead>
           <tbody>
-            ${projects.map(p => {
+            ${projects.map((p, index) => {
               const hours = minutesToHours(projectTotals[p.id] || 0);
               return `
-                <tr>
-                  <td class="border border-gray-300 px-4 py-2">${p.name}</td>
-                  <td class="border border-gray-300 px-4 py-2">${hours.toFixed(1)}</td>
+                <tr id="system-project-${p.id}">
+                  <td style="font-weight: 500;">${p.name}</td>
+                  <td style="text-align: right; font-weight: 600; color: var(--accent);">${hours.toFixed(1)}h</td>
                 </tr>
               `;
             }).join('')}
@@ -663,6 +752,17 @@ export const router = s.router(apiContract, {
           authReq.session!.userRole = user.roles[0];
         }
       }
+      // Save session explicitly to ensure it's persisted
+      return new Promise((resolve) => {
+        authReq.session!.save(() => {
+          const referer = authReq.get('Referer') || '/';
+          res.redirect(referer);
+          resolve({
+            status: 302,
+            body: undefined,
+          });
+        });
+      });
     }
     const referer = authReq.get('Referer') || '/';
     res.redirect(referer);
@@ -692,6 +792,17 @@ export const router = s.router(apiContract, {
     res.redirect(referer);
       return {
       status: 302,
+      body: undefined,
+    };
+  },
+  
+  getNavBar: async ({ query, req, res }) => {
+    const authReq = req as unknown as AuthStubRequest;
+    const activeNav = (query?.active_nav as string) || '';
+    const html = renderNavBar(authReq, activeNav);
+    res.status(200).send(html);
+    return {
+      status: 200,
       body: undefined,
     };
   },

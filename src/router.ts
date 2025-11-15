@@ -1,7 +1,7 @@
 import { initServer } from '@ts-rest/express';
 import { apiContract } from './contracts/api.js';
 import { AuthStubRequest } from './middleware/auth_stub.js';
-import { userModel } from './models/user.js';
+import { userModel, UserRole } from './models/user.js';
 import { timeEntryModel } from './models/time_entry.js';
 import { projectModel } from './models/project.js';
 import { projectUserModel } from './models/project_user.js';
@@ -656,7 +656,7 @@ export const router = s.router(apiContract, {
       const user = userModel.getById(userId);
       if (user && user.roles.length > 0) {
         // Set to the first role, or keep current role if user has it
-        const currentRole = authReq.session!.userRole;
+        const currentRole = authReq.session!.userRole as UserRole | undefined;
         if (currentRole && user.roles.includes(currentRole)) {
           authReq.session!.userRole = currentRole;
         } else {
@@ -681,11 +681,11 @@ export const router = s.router(apiContract, {
       if (userId) {
         const user = userModel.getById(userId);
         // Only set role if user has this role
-        if (user && user.roles.includes(role)) {
-          authReq.session!.userRole = role;
+        if (user && user.roles.includes(role as UserRole)) {
+          authReq.session!.userRole = role as UserRole;
         }
       } else {
-        authReq.session!.userRole = role;
+        authReq.session!.userRole = role as UserRole;
       }
     }
     const referer = authReq.get('Referer') || '/';
@@ -701,14 +701,20 @@ export const router = s.router(apiContract, {
     const authReq = req as unknown as AuthStubRequest;
     const currentUser = authReq.currentUser;
     if (currentUser) {
-      if (currentUser.role === 'worker') {
-        res.redirect('/worker/time');
+      if (currentUser.roles.includes('admin')) {
+        res.redirect('/admin/projects');
         return {
           status: 302,
           body: undefined,
         };
-      } else if (currentUser.role === 'office-manager' || currentUser.role === 'admin') {
+      } else if (currentUser.roles.includes('office-manager')) {
         res.redirect('/manager/reports');
+        return {
+          status: 302,
+          body: undefined,
+        };
+      } else if (currentUser.roles.includes('worker')) {
+        res.redirect('/worker/time');
         return {
           status: 302,
           body: undefined,
@@ -733,7 +739,7 @@ export const router = s.router(apiContract, {
         body: { body: 'Unauthorized' },
       };
     }
-    if (authReq.currentUser.role !== 'worker') {
+    if (!authReq.currentUser.roles.includes('worker')) {
       res.status(403).send('Forbidden');
       return {
         status: 403,
@@ -759,7 +765,7 @@ export const router = s.router(apiContract, {
         body: { body: 'Unauthorized' },
       };
     }
-    if (authReq.currentUser.role !== 'worker') {
+    if (!authReq.currentUser.roles.includes('worker')) {
       res.status(403).send('Forbidden');
       return {
         status: 403,
@@ -798,7 +804,7 @@ export const router = s.router(apiContract, {
         body: { body: 'Unauthorized' },
       };
     }
-    if (authReq.currentUser.role !== 'worker') {
+    if (!authReq.currentUser.roles.includes('worker')) {
       res.status(403).send('Forbidden');
       return {
         status: 403,
@@ -866,7 +872,7 @@ export const router = s.router(apiContract, {
         body: { body: 'Unauthorized' },
       };
     }
-    if (authReq.currentUser.role !== 'worker') {
+    if (!authReq.currentUser.roles.includes('worker')) {
       res.status(403).send('Forbidden');
       return {
         status: 403,
@@ -917,7 +923,7 @@ export const router = s.router(apiContract, {
         body: { body: 'Unauthorized' },
       };
     }
-    if (authReq.currentUser.role !== 'worker') {
+    if (!authReq.currentUser.roles.includes('worker')) {
       res.status(403).send('Forbidden');
       return {
         status: 403,
@@ -969,7 +975,7 @@ export const router = s.router(apiContract, {
         body: undefined,
       };
     }
-    if (authReq.currentUser.role !== 'office-manager' && authReq.currentUser.role !== 'admin') {
+    if (!authReq.currentUser.roles.includes('office-manager') && !authReq.currentUser.roles.includes('admin')) {
       res.status(403).send('Forbidden');
       return {
         status: 403,
@@ -995,7 +1001,7 @@ export const router = s.router(apiContract, {
         body: undefined,
       };
     }
-    if (authReq.currentUser.role !== 'office-manager' && authReq.currentUser.role !== 'admin') {
+    if (!authReq.currentUser.roles.includes('office-manager') && !authReq.currentUser.roles.includes('admin')) {
       res.status(403).send('Forbidden');
       return {
         status: 403,
@@ -1029,7 +1035,7 @@ export const router = s.router(apiContract, {
         body: undefined,
       };
     }
-    if (authReq.currentUser.role !== 'office-manager' && authReq.currentUser.role !== 'admin') {
+    if (!authReq.currentUser.roles.includes('office-manager') && !authReq.currentUser.roles.includes('admin')) {
       res.status(403).send('Forbidden');
       return {
         status: 403,
@@ -1064,7 +1070,7 @@ export const router = s.router(apiContract, {
         body: undefined,
       };
     }
-    if (authReq.currentUser.role !== 'admin') {
+    if (!authReq.currentUser.roles.includes('admin')) {
       res.status(403).send('Forbidden');
       return {
         status: 403,
@@ -1090,7 +1096,7 @@ export const router = s.router(apiContract, {
         body: undefined,
       };
     }
-    if (authReq.currentUser.role !== 'admin') {
+    if (!authReq.currentUser.roles.includes('admin')) {
       res.status(403).send('Forbidden');
       return {
         status: 403,
@@ -1143,7 +1149,7 @@ export const router = s.router(apiContract, {
         body: undefined,
       };
     }
-    if (authReq.currentUser.role !== 'admin') {
+    if (!authReq.currentUser.roles.includes('admin')) {
       res.status(403).send('Forbidden');
       return {
         status: 403,
@@ -1173,7 +1179,7 @@ export const router = s.router(apiContract, {
         body: undefined,
       };
     }
-    if (authReq.currentUser.role !== 'admin') {
+    if (!authReq.currentUser.roles.includes('admin')) {
       res.status(403).send('Forbidden');
       return {
         status: 403,
@@ -1199,7 +1205,7 @@ export const router = s.router(apiContract, {
         body: undefined,
       };
     }
-    if (authReq.currentUser.role !== 'admin') {
+    if (!authReq.currentUser.roles.includes('admin')) {
       res.status(403).send('Forbidden');
       return {
         status: 403,
@@ -1233,7 +1239,7 @@ export const router = s.router(apiContract, {
         body: undefined,
       };
     }
-    if (authReq.currentUser.role !== 'admin') {
+    if (!authReq.currentUser.roles.includes('admin')) {
       res.status(403).send('Forbidden');
       return {
         status: 403,
@@ -1287,7 +1293,7 @@ export const router = s.router(apiContract, {
         body: undefined,
       };
     }
-    if (authReq.currentUser.role !== 'admin') {
+    if (!authReq.currentUser.roles.includes('admin')) {
       res.status(403).send('Forbidden');
       return {
         status: 403,
@@ -1336,7 +1342,7 @@ export const router = s.router(apiContract, {
         body: undefined,
       };
     }
-    if (authReq.currentUser.role !== 'admin') {
+    if (!authReq.currentUser.roles.includes('admin')) {
       res.status(403).send('Forbidden');
       return {
         status: 403,
@@ -1362,7 +1368,7 @@ export const router = s.router(apiContract, {
         body: undefined,
       };
     }
-    if (authReq.currentUser.role !== 'admin') {
+    if (!authReq.currentUser.roles.includes('admin')) {
       res.status(403).send('Forbidden');
       return {
         status: 403,

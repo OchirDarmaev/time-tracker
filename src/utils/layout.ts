@@ -19,26 +19,10 @@ export function renderBaseLayout(content: string, req: AuthStubRequest, activeNa
     return `<option value="${u.id}" data-roles='${rolesJson}' ${selected}>${u.email}</option>`;
   }).join('');
   
-  // Generate role options based on current user's roles
+  // Get available roles for current user
   const currentUserId = 'id' in currentUser ? currentUser.id : undefined;
   const currentUserObj = currentUserId ? users.find(u => u.id === currentUserId) : null;
   const availableRoles: string[] = currentUserObj?.roles || currentUser.roles || ['worker'];
-  const roleOptions = [
-    { value: 'worker', label: 'Worker', selected: currentUser.role === 'worker' && availableRoles.includes('worker') },
-    { value: 'office-manager', label: 'Office Manager', selected: currentUser.role === 'office-manager' && availableRoles.includes('office-manager') },
-    { value: 'admin', label: 'Admin', selected: currentUser.role === 'admin' && availableRoles.includes('admin') },
-  ]
-    .filter(opt => availableRoles.includes(opt.value))
-    .map(opt => `<option value="${opt.value}" ${opt.selected ? 'selected' : ''}>${opt.label}</option>`)
-    .join('');
-  
-  const navActive = {
-    worker: activeNav === 'worker' ? 'font-bold' : '',
-    manager: activeNav === 'manager' ? 'font-bold' : '',
-    admin_projects: activeNav === 'admin_projects' ? 'font-bold' : '',
-    admin_users: activeNav === 'admin_users' ? 'font-bold' : '',
-    admin_reports: activeNav === 'admin_reports' ? 'font-bold' : '',
-  };
   
   // Format all roles for display
   const roleLabels: Record<string, string> = {
@@ -48,17 +32,58 @@ export function renderBaseLayout(content: string, req: AuthStubRequest, activeNa
   };
   const allRolesDisplay = availableRoles.map(role => roleLabels[role] || role).join(', ') || 'None';
   
+  // Generate navigation buttons based on available roles
+  const navItems = [
+    {
+      href: '/worker/time',
+      label: 'My Time',
+      requiredRoles: ['worker'],
+      activeNav: 'worker'
+    },
+    {
+      href: '/manager/reports',
+      label: 'Reports',
+      requiredRoles: ['office-manager', 'admin'],
+      activeNav: 'manager'
+    },
+    {
+      href: '/admin/projects',
+      label: 'Projects',
+      requiredRoles: ['admin'],
+      activeNav: 'admin_projects'
+    },
+    {
+      href: '/admin/users-projects',
+      label: 'Assign Workers',
+      requiredRoles: ['admin'],
+      activeNav: 'admin_users'
+    },
+    {
+      href: '/admin/system-reports',
+      label: 'System Reports',
+      requiredRoles: ['admin'],
+      activeNav: 'admin_reports'
+    }
+  ];
+  
+  const navButtons = navItems.map(item => {
+    const hasAccess = item.requiredRoles.some(role => availableRoles.includes(role));
+    const isActive = activeNav === item.activeNav;
+    const activeClass = isActive ? 'font-bold' : '';
+    
+    if (hasAccess) {
+      return `<a href="${item.href}" class="text-blue-600 hover:text-blue-800 ${activeClass}">${item.label}</a>`;
+    } else {
+      const requiredRolesText = item.requiredRoles.map(r => roleLabels[r] || r).join(' or ');
+      return `<span class="text-gray-400 cursor-not-allowed" title="Requires ${requiredRolesText} role">${item.label}</span>`;
+    }
+  }).join('');
+  
   // Replace all placeholders
   layout = layout.replace(/\{\{user_options\}\}/g, userOptions || '');
-  layout = layout.replace(/\{\{role_options\}\}/g, roleOptions || '');
   layout = layout.replace(/\{\{current_user_email\}\}/g, currentUser.email || 'Unknown');
-  layout = layout.replace(/\{\{current_role\}\}/g, currentUser.role || 'worker');
   layout = layout.replace(/\{\{all_roles\}\}/g, allRolesDisplay);
-  layout = layout.replace('{{worker_nav_active}}', navActive.worker);
-  layout = layout.replace('{{manager_nav_active}}', navActive.manager);
-  layout = layout.replace('{{admin_projects_nav_active}}', navActive.admin_projects);
-  layout = layout.replace('{{admin_users_nav_active}}', navActive.admin_users);
-  layout = layout.replace('{{admin_reports_nav_active}}', navActive.admin_reports);
+  layout = layout.replace('{{nav_buttons}}', navButtons);
   layout = layout.replace('{{content}}', content);
   
   return layout;

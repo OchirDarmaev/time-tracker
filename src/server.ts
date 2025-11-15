@@ -6,6 +6,11 @@ import { authStubMiddleware } from "./middleware/auth_stub.js";
 import { router } from "./router.js";
 import { apiContract } from "./contracts/api.js";
 import { createExpressEndpoints } from "@ts-rest/express";
+import { join, dirname } from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3002;
@@ -30,6 +35,9 @@ app.use(
 );
 
 app.use(authStubMiddleware);
+
+// Serve static component files
+app.use("/components", express.static(join(__dirname, "../views/components")));
 
 createExpressEndpoints(apiContract, router, app, {
   responseValidation: false,

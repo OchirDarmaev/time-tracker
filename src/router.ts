@@ -32,15 +32,7 @@ function renderTimeTrackingPage(req: AuthStubRequest) {
   const totalMinutes = timeEntryModel.getTotalMinutesByUserAndDate(currentUser.id, selectedDate);
   const totalHours = minutesToHours(totalMinutes);
 
-  const month = getMonthFromDate(selectedDate);
-  const monthlyTotalMinutes = timeEntryModel.getTotalMinutesByUserAndMonth(currentUser.id, month);
-  const monthlyTotalHours = minutesToHours(monthlyTotalMinutes);
-
-  const dateObj = parseDate(selectedDate);
-  const workingDays = getWorkingDaysInMonth(dateObj.getFullYear(), dateObj.getMonth() + 1);
-  const requiredMonthlyHours = workingDays * 8;
-
-  const monthlyWarning = monthlyTotalHours < requiredMonthlyHours;
+  // Monthly totals are now handled by time-summary component
 
   // Convert entries to segments format for the time slider
   const segments = entries.map((entry) => ({
@@ -52,13 +44,14 @@ function renderTimeTrackingPage(req: AuthStubRequest) {
   // Calculate total hours from entries, default to 8 if no entries
   const sliderTotalHours = totalHours > 0 ? Math.max(totalHours, 8) : 8;
 
-  // Read time slider component
-  // __dirname in compiled code is dist/, so we need to go to src/views
+  // Read time slider HTML template (still needed for TimeSlider class definition)
   const timeSliderPath = join(process.cwd(), "src/views/components/time_slider.html");
   const timeSliderHtml = readFileSync(timeSliderPath, "utf-8");
 
   // Prepare projects data for JavaScript
-  const projectsJson = JSON.stringify(projects.map((p) => ({ id: p.id, name: p.name })));
+  const projectsJson = JSON.stringify(
+    projects.map((p) => ({ id: p.id, name: p.name, suppressed: p.suppressed || false }))
+  );
   const segmentsJson = JSON.stringify(segments);
 
   const content = `
@@ -68,115 +61,33 @@ function renderTimeTrackingPage(req: AuthStubRequest) {
           <h1 class="text-3xl font-bold mb-2" style="color: var(--text-primary);">Time Tracking</h1>
           <p class="text-sm" style="color: var(--text-secondary);">Track your daily work hours</p>
         </div>
-        <div>
-          <label for="date-picker" class="block text-xs font-medium mb-2" style="color: var(--text-secondary);">Date</label>
-          <input 
-            type="date" 
-            id="date-picker" 
-            value="${selectedDate}"
-            hx-get="/worker/time"
-            hx-target="body"
-            hx-swap="transition:true"
-            hx-trigger="change"
-            hx-include="this"
-            name="date"
-            class="input-modern"
-            style="width: auto; min-width: 160px;"
-          />
-        </div>
+        <date-picker 
+          value="${selectedDate}"
+          hx-get="/worker/time"
+          hx-target="body"
+          hx-swap="transition:true"
+          hx-trigger="change"
+          label="Date"
+        ></date-picker>
       </div>
       
-      ${timeSliderHtml}
+      <time-slider 
+        total-hours="${sliderTotalHours}"
+        segments="${segmentsJson.replace(/"/g, "&quot;")}"
+        projects="${projectsJson.replace(/"/g, "&quot;")}"
+        date="${selectedDate}"
+        sync-url="/worker/time/sync"
+      ></time-slider>
       
-      <div class="card">
-        <h2 class="text-lg font-semibold mb-4" style="color: var(--text-primary);">Summary</h2>
-        <div id="summary-container" hx-get="/worker/time/summary?date=${selectedDate}" hx-swap="transition:true" hx-trigger="load, entries-changed from:body">
-          ${renderSummary(totalHours, monthlyTotalHours, requiredMonthlyHours, monthlyWarning)}
-        </div>
-      </div>
+      <time-summary 
+        date="${selectedDate}"
+        hx-get="/worker/time/summary"
+        hx-trigger="load, entries-changed from:body"
+      ></time-summary>
     </div>
-    <script>
-      function initTimeSlider() {
-        const container = document.getElementById('time-slider-container');
-        if (!container) {
-          console.warn('Time slider container not found');
-          return;
-        }
-        
-        // Wait for TimeSlider class to be available
-        function tryInit() {
-          if (window.TimeSlider) {
-            // Destroy existing instance if it exists
-            if (window.timeSliderInstance) {
-              // Clean up existing instance
-              if (window.timeSliderInstance.syncTimeout) {
-                clearTimeout(window.timeSliderInstance.syncTimeout);
-              }
-            }
-            
-            const projects = ${projectsJson};
-            const segments = ${segmentsJson};
-            const totalHours = ${sliderTotalHours};
-            
-            try {
-              window.timeSliderInstance = new window.TimeSlider('time-slider-container', {
-                totalHours: totalHours,
-                segments: segments,
-                projects: projects,
-                date: '${selectedDate}',
-                onChange: function(data) {
-                  // Sync time entries to backend
-                  fetch('/worker/time/sync', {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                      date: data.date,
-                      segments: data.segments,
-                    }),
-                  })
-                  .then(response => response.json())
-                  .then(result => {
-                    if (result.success) {
-                      // Trigger summary update
-                      htmx.trigger('body', 'entries-changed');
-                    }
-                  })
-                  .catch(error => {
-                    console.error('Sync error:', error);
-                  });
-                }
-              });
-            } catch (error) {
-              console.error('Error initializing TimeSlider:', error);
-            }
-          } else {
-            // TimeSlider not loaded yet, try again in 50ms
-            setTimeout(tryInit, 50);
-          }
-        }
-        
-        tryInit();
-      }
-      
-      // Initialize immediately (for HTMX swaps) or on DOMContentLoaded
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function() {
-          setTimeout(initTimeSlider, 100);
-        });
-      } else {
-        // DOM already loaded (e.g., HTMX swap)
-        setTimeout(initTimeSlider, 100);
-      }
-      
-      // Also initialize after HTMX swaps content
-      document.body.addEventListener('htmx:afterSwap', function(event) {
-        if (event.detail.target === document.body || event.detail.target.querySelector('#time-slider-container')) {
-          setTimeout(initTimeSlider, 100);
-        }
-      });
-    </script>
+    
+    <!-- Load TimeSlider class definition -->
+    ${timeSliderHtml}
   `;
 
   return renderBaseLayout(content, req, "worker");
@@ -535,6 +446,9 @@ function renderProjectReport(projectId: number): string {
 // Admin projects helper functions
 function renderProjectsPage(req: AuthStubRequest) {
   const projects = projectModel.getAll(true);
+  const projectsJson = JSON.stringify(
+    projects.map((p) => ({ id: p.id, name: p.name, suppressed: p.suppressed || false }))
+  );
 
   const content = `
     <div class="space-y-8">
@@ -547,8 +461,8 @@ function renderProjectsPage(req: AuthStubRequest) {
         <h2 class="text-lg font-semibold mb-4" style="color: var(--text-primary);">Add New Project</h2>
         <form 
           hx-post="/admin/projects"
-          hx-target="#projects-list"
-          hx-swap="transition:true"
+          hx-target="project-list"
+          hx-swap="outerHTML"
           hx-trigger="submit"
           hx-on::after-request="this.reset()"
           class="flex gap-4"
@@ -564,60 +478,13 @@ function renderProjectsPage(req: AuthStubRequest) {
         </form>
       </div>
       
-      <div id="projects-list">
-        ${renderProjectsList(projects)}
-      </div>
+      <project-list 
+        projects="${projectsJson.replace(/"/g, "&quot;")}"
+      ></project-list>
     </div>
   `;
 
   return renderBaseLayout(content, req, "admin_projects");
-}
-
-function renderProjectsList(projects: Project[]): string {
-  if (projects.length === 0) {
-    return '<div class="card"><p style="color: var(--text-secondary);">No projects found.</p></div>';
-  }
-
-  return `
-    <div class="card">
-      <table class="table-modern">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Status</th>
-            <th style="text-align: right;">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${projects
-            .map(
-              (project) => `
-            <tr id="project-${project.id}" style="${project.suppressed ? "opacity: 0.6;" : ""}">
-              <td style="color: var(--text-tertiary); font-size: 13px;">#${project.id}</td>
-              <td style="font-weight: 500;">${project.name}</td>
-              <td>
-                ${project.suppressed ? '<span class="badge badge-neutral">Suppressed</span>' : '<span class="badge badge-success">Active</span>'}
-              </td>
-              <td style="text-align: right;">
-                <button 
-                  hx-patch="/admin/projects/${project.id}/suppress"
-                  hx-target="#projects-list"
-                  hx-swap="transition:true"
-                  class="btn-secondary"
-                  style="font-size: 13px; padding: 6px 12px;"
-                >
-                  ${project.suppressed ? "Activate" : "Suppress"}
-                </button>
-              </td>
-            </tr>
-          `
-            )
-            .join("")}
-        </tbody>
-      </table>
-    </div>
-  `;
 }
 
 // Admin users-projects helper functions
@@ -1141,7 +1008,7 @@ export const router = s.router(apiContract, {
     // Verify user has access to all projects
     const userProjects = projectModel.getByUserId(currentUser.id);
     const projectIds = new Set(userProjects.map((p) => p.id));
-    
+
     for (const segment of segments) {
       if (!projectIds.has(segment.project_id)) {
         return {
@@ -1371,7 +1238,10 @@ export const router = s.router(apiContract, {
     try {
       projectModel.create(name.trim());
       const projects = projectModel.getAll(true);
-      const html = renderProjectsList(projects);
+      const projectsJson = JSON.stringify(
+        projects.map((p) => ({ id: p.id, name: p.name, suppressed: p.suppressed || false }))
+      );
+      const html = `<project-list projects="${projectsJson.replace(/"/g, "&quot;")}"></project-list>`;
       return {
         status: 200,
         body: html,
@@ -1409,7 +1279,10 @@ export const router = s.router(apiContract, {
     const id = parseInt(params.id);
     projectModel.toggleSuppress(id);
     const projects = projectModel.getAll(true);
-    const html = renderProjectsList(projects);
+    const projectsJson = JSON.stringify(
+      projects.map((p) => ({ id: p.id, name: p.name, suppressed: p.suppressed || false }))
+    );
+    const html = `<project-list projects="${projectsJson.replace(/"/g, "&quot;")}"></project-list>`;
     return {
       status: 200,
       body: html,

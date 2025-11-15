@@ -248,6 +248,35 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ts-rest/core@npm:^3.52.1":
+  version: 3.52.1
+  resolution: "@ts-rest/core@npm:3.52.1"
+  peerDependencies:
+    "@types/node": ^18.18.7 || >=20.8.4
+    zod: ^3.22.3
+  peerDependenciesMeta:
+    "@types/node":
+      optional: true
+    zod:
+      optional: true
+  checksum: 10c0/c5c44a02b0ba3e049a4c170b89c63f4be9623d42f363a05fa9874a77b44d9103e3a4892f22eb9c6c5f7e1165549faec914bad85ab6e51011ebc446cdfa1ddc7f
+  languageName: node
+  linkType: hard
+
+"@ts-rest/express@npm:^3.52.1":
+  version: 3.52.1
+  resolution: "@ts-rest/express@npm:3.52.1"
+  peerDependencies:
+    "@ts-rest/core": ~3.52.0
+    express: ^4.0.0
+    zod: ^3.22.3
+  peerDependenciesMeta:
+    zod:
+      optional: true
+  checksum: 10c0/9d80ae9047b976acfe281817215f2e577cc7406455974c768b63f137f040d2fb736f402b946335fe481d9edf1c000fe94f539960b30e8cf75e18456d4508ea7e
+  languageName: node
+  linkType: hard
+
 "@types/better-sqlite3@npm:^7.6.8":
   version: 7.6.13
   resolution: "@types/better-sqlite3@npm:7.6.13"
@@ -2149,6 +2178,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "timetrack@workspace:."
   dependencies:
+    "@ts-rest/core": "npm:^3.52.1"
+    "@ts-rest/express": "npm:^3.52.1"
     "@types/better-sqlite3": "npm:^7.6.8"
     "@types/cookie-parser": "npm:^1.4.6"
     "@types/express": "npm:^4.17.21"
@@ -2160,6 +2191,7 @@ __metadata:
     express-session: "npm:^1.17.3"
     tsx: "npm:^4.7.0"
     typescript: "npm:^5.3.3"
+    zod: "npm:3.22.3"
   languageName: unknown
   linkType: soft
 
@@ -2366,5 +2398,12 @@ __metadata:
   version: 5.0.0
   resolution: "yallist@npm:5.0.0"
   checksum: 10c0/a499c81ce6d4a1d260d4ea0f6d49ab4da09681e32c3f0472dee16667ed69d01dae63a3b81745a24bd78476ec4fcf856114cb4896ace738e01da34b2c42235416
+  languageName: node
+  linkType: hard
+
+"zod@npm:3.22.3":
+  version: 3.22.3
+  resolution: "zod@npm:3.22.3"
+  checksum: 10c0/cb4b24aed7dec98552eb9042e88cbd645455bf2830e5704174d2da96f554dabad4630e3b4f6623e1b6562b9eaa43535a37b7f2011f29b8d8e9eabe1ddf3b656b
   languageName: node
   linkType: hard

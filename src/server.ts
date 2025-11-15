@@ -2,14 +2,11 @@ import express from 'express';
 import session from 'express-session';
 import cookieParser from 'cookie-parser';
 import { initializeDatabase } from './config/database.js';
-import { authStubMiddleware, AuthStubRequest } from './middleware/auth_stub.js';
-import { userModel } from './models/user.js';
-
-import workerTimeRoutes from './routes/worker/time.js';
-import managerReportsRoutes from './routes/manager/reports.js';
-import adminProjectsRoutes from './routes/admin/projects.js';
-import adminUsersProjectsRoutes from './routes/admin/users_projects.js';
-import adminSystemReportsRoutes from './routes/admin/system_reports.js';
+import { authStubMiddleware } from './middleware/auth_stub.js';
+import { router } from './handlers/index.js';
+import { apiContract } from './contracts/api.js';
+import { createExpressEndpoints } from '@ts-rest/express';
+import type { Request, RequestHandler, Response } from 'express';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -26,6 +23,7 @@ try {
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
+// @ts-expect-error - Express session middleware type issue
 app.use(session({
   secret: 'timetrack-secret-key-change-in-production',
   resave: false,
@@ -33,63 +31,35 @@ app.use(session({
   cookie: { secure: false }
 }));
 
-// Auth stub routes (for DATA panel)
-app.post('/auth-stub/set-user', (req: AuthStubRequest, res) => {
-  const userId = parseInt(req.body.user_id);
-  if (userId) {
-    req.session!.userId = userId;
-    const user = userModel.getById(userId);
-    if (user) {
-      req.session!.userRole = user.role;
-    }
-  }
-  const referer = req.get('Referer') || '/';
-  res.redirect(referer);
-});
-
-app.post('/auth-stub/set-role', (req: AuthStubRequest, res) => {
-  const role = req.body.role;
-  if (role && ['worker', 'office-manager', 'admin'].includes(role)) {
-    req.session!.userRole = role;
-    // Update user to match role if needed
-    const userId = req.session!.userId as number | undefined;
-    if (userId) {
-      const user = userModel.getById(userId);
-      if (user && user.role !== role) {
-        // Find a user with the selected role
-        const users = userModel.getAll();
-        const userWithRole = users.find(u => u.role === role);
-        if (userWithRole) {
-          req.session!.userId = userWithRole.id;
-        }
-      }
-    }
-  }
-  const referer = req.get('Referer') || '/';
-  res.redirect(referer);
-});
-
-// Apply auth stub middleware
 app.use(authStubMiddleware);
 
-// Routes
-app.use('/worker/time', workerTimeRoutes);
-app.use('/manager/reports', managerReportsRoutes);
-app.use('/admin/projects', adminProjectsRoutes);
-app.use('/admin/users-projects', adminUsersProjectsRoutes);
-app.use('/admin/system-reports', adminSystemReportsRoutes);
-
-// Root redirect
-app.get('/', (req: AuthStubRequest, res) => {
-  const currentUser = req.currentUser;
-  if (currentUser) {
-    if (currentUser.role === 'worker') {
-      return res.redirect('/worker/time');
-    } else if (currentUser.role === 'office-manager' || currentUser.role === 'admin') {
-      return res.redirect('/manager/reports');
+// Middleware to handle ts-rest responses
+app.use((req: Request, res: Response, next) => {
+  const originalJson = res.json.bind(res);
+  const originalSend = res.send.bind(res);
+  
+  // Overriding res.json to handle custom response formats (redirects and HTML)
+  res.json = function(body: any): Response {
+    // Handle HTML responses with nested body structure
+    if (body && typeof body === 'object' && 'body' in body && typeof body.body === 'string') {
+      return originalSend(body.body);
     }
-  }
-  res.redirect('/worker/time');
+    
+    return originalJson(body);
+  };
+  
+  next();
+});
+
+// Create ts-rest endpoints
+// @ts-expect-error - ts-rest type inference issue with Express app
+createExpressEndpoints(apiContract, router, app, {
+  responseValidation: false,
+  jsonQuery: true,
+  onError: (err: any, req: Request, res: Response) => {
+    console.error('ts-rest error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  },
 });
 
 app.listen(PORT, () => {

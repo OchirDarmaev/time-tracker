@@ -1,11 +1,14 @@
 import { readFileSync } from "fs";
 import { join } from "path/posix";
-import { html } from "./html";
+import { html } from "./utils/html";
 import { AuthStubRequest } from "./middleware/auth_stub";
 import { projectModel } from "./models/project";
 import { timeEntryModel } from "./models/time_entry";
 import { formatDate, minutesToHours } from "./utils/date_utils";
 import { renderBaseLayout } from "./utils/layout";
+import { renderDatePicker } from "./views/components/date_picker_component";
+import { renderTimeSlider } from "./views/components/time_slider_component";
+import { renderTimeSummary } from "./views/components/time_summary_component";
 
 // Worker time helper functions
 
@@ -47,29 +50,32 @@ export function renderTimeTrackingPage(req: AuthStubRequest, includeLayout: bool
           <h1 class="text-3xl font-bold mb-2 text-gray-900 dark:text-gray-100">Time Tracking</h1>
           <p class="text-sm text-gray-600 dark:text-gray-400">Track your daily work hours</p>
         </div>
-        <date-picker
-          value="${selectedDate}"
-          hx-get="/worker/time"
-          hx-target="main"
-          hx-swap="innerHTML"
-          hx-trigger="change"
-          label="Date"
-        ></date-picker>
+        ${renderDatePicker({
+          value: selectedDate,
+          hxGet: "/worker/time",
+          hxTarget: "main",
+          hxTrigger: "change",
+          label: "Date",
+        })}
       </div>
 
-      <time-slider
-        total-hours="${sliderTotalHours}"
-        segments="${segmentsJson.replace(/"/g, "&quot;")}"
-        projects="${projectsJson.replace(/"/g, "&quot;")}"
-        date="${selectedDate}"
-        sync-url="/worker/time/sync"
-      ></time-slider>
+      ${renderTimeSlider({
+        totalHours: sliderTotalHours,
+        segments: segments,
+        projects: projects.map((p) => ({
+          id: p.id,
+          name: p.name,
+          suppressed: p.suppressed || false,
+        })),
+        date: selectedDate,
+        syncUrl: "/worker/time/sync",
+      })}
 
-      <time-summary
-        date="${selectedDate}"
-        data-hx-get="/worker/time/summary"
-        data-hx-trigger="load, entries-changed from:body"
-      ></time-summary>
+      ${renderTimeSummary({
+        date: selectedDate,
+        hxGet: "/worker/time/summary",
+        hxTrigger: "load, entries-changed from:body",
+      })}
     </div>
 
     <!-- Load TimeSlider class definition -->

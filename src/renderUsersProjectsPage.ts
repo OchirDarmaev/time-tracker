@@ -1,4 +1,4 @@
-import { html } from "./html";
+import { html } from "./utils/html";
 import { AuthStubRequest } from "./middleware/auth_stub";
 import { projectModel } from "./models/project";
 import { renderBaseLayout } from "./utils/layout";

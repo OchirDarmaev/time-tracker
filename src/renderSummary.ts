@@ -1,4 +1,4 @@
-import { html } from "./html";
+import { html } from "./utils/html";
 
 export function renderSummary(
   totalHours: number,

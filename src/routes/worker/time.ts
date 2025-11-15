@@ -14,7 +14,7 @@ import { renderBaseLayout } from "../../utils/layout.js";
 import { readFileSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
-import { html } from "../../html.js";
+import { html } from "../../utils/html.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

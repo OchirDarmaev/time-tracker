@@ -1,4 +1,4 @@
-import { html } from "./html";
+import { html } from "./utils/html";
 import { Project } from "./models/project";
 import { TimeEntry } from "./models/time_entry";
 import { minutesToHours } from "./utils/date_utils";

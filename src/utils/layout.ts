@@ -4,7 +4,7 @@ import { fileURLToPath } from "url";
 import { AuthStubRequest } from "../middleware/auth_stub.js";
 import { userModel } from "../models/user.js";
 import { projectModel } from "../models/project.js";
-import { html } from "../html.js";
+import { html } from "./html.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

@@ -1,4 +1,4 @@
-import { html } from "./html";
+import { html } from "./utils/html";
 import { projectModel } from "./models/project";
 import { projectUserModel } from "./models/project_user";
 import { userModel } from "./models/user";

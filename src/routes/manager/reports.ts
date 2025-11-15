@@ -5,7 +5,7 @@ import { userModel } from "../../models/user.js";
 import { projectModel } from "../../models/project.js";
 import { minutesToHours } from "../../utils/date_utils.js";
 import { renderBaseLayout } from "../../utils/layout.js";
-import { html } from "../../html.js";
+import { html } from "../../utils/html.js";
 
 const router = Router();
 

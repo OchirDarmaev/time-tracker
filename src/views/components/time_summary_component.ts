@@ -1,117 +1,39 @@
-// Time Summary Web Component
+import { html } from "../../utils/html";
 
-import { html } from "../../html";
-
-// Uses light DOM (no shadow) for simpler HTMX integration and CSS class access
-interface HtmxInstance {
-  process: (element: ShadowRoot | HTMLElement) => void;
-  ajax: (
-    method: string,
-    url: string,
-    options: { target: HTMLElement | null; swap: string }
-  ) => void;
+export interface TimeSummaryProps {
+  date?: string;
+  hxGet?: string;
+  hxTrigger?: string;
 }
 
-class TimeSummaryComponent extends HTMLElement {
-  static get observedAttributes(): string[] {
-    return ["date", "hx-get", "hx-trigger", "data-hx-get", "data-hx-trigger"];
-  }
+export function renderTimeSummary(props: TimeSummaryProps = {}): string {
+  const date = props.date || "";
+  const hxGet = props.hxGet || "";
+  const hxTrigger = props.hxTrigger || "load";
 
-  constructor() {
-    super();
-    this.className = "block w-full max-w-full box-border";
-  }
+  // Build the URL with date parameter if provided
+  const url = hxGet ? (hxGet.includes("?") ? `${hxGet}&date=${date}` : `${hxGet}?date=${date}`) : "";
 
-  connectedCallback(): void {
-    this.render();
-
-    // Wait for DOM to be ready before loading summary
-    requestAnimationFrame(() => {
-      // Get hx-get from data-hx-get attribute (to prevent HTMX from processing it automatically)
-      const hxGet = this.getAttribute("data-hx-get") || this.getAttribute("hx-get");
-      const htmx = (window as Window & { htmx?: HtmxInstance }).htmx;
-      if (hxGet) {
-        const date = this.getAttribute("date") || "";
-        const url = hxGet.includes("?") ? `${hxGet}&date=${date}` : `${hxGet}?date=${date}`;
-        const contentDiv = this.querySelector("#summary-content") as HTMLElement;
-        if (contentDiv) {
-          // Use fetch directly to avoid HTMX body replacement issues
-          fetch(url)
-            .then((response) => response.text())
-            .then((html) => {
-              if (contentDiv && contentDiv.parentElement) {
-                contentDiv.innerHTML = html;
-              }
-            })
-            .catch((error) => {
-              console.error("Error loading summary:", error);
-            });
-        }
-      }
-
-      // Process HTMX for future updates (entries-changed trigger)
-      setTimeout(() => {
-        if (htmx) {
-          const contentDiv = this.querySelector("#summary-content") as HTMLElement;
-          if (contentDiv) {
-            // Set up HTMX for entries-changed trigger
-            const trigger = this.getAttribute("data-hx-trigger") || this.getAttribute("hx-trigger");
-            if (trigger && trigger.includes("entries-changed")) {
-              contentDiv.setAttribute("hx-get", hxGet || "");
-              contentDiv.setAttribute("hx-target", "this");
-              contentDiv.setAttribute("hx-swap", "innerHTML");
-              contentDiv.setAttribute("hx-trigger", "entries-changed from:body");
-              htmx.process(contentDiv);
-            }
-          }
-        }
-      }, 100);
-    });
-  }
-
-  attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {
-    if (oldValue !== newValue && name === "date") {
-      // Reload summary when date changes
-      const hxGet = this.getAttribute("data-hx-get") || this.getAttribute("hx-get");
-      if (hxGet) {
-        const date = newValue || "";
-        const url = hxGet.includes("?") ? `${hxGet}&date=${date}` : `${hxGet}?date=${date}`;
-        const contentDiv = this.querySelector("#summary-content") as HTMLElement;
-        if (contentDiv) {
-          fetch(url)
-            .then((response) => response.text())
-            .then((html) => {
-              if (contentDiv && contentDiv.parentElement) {
-                contentDiv.innerHTML = html;
-              }
-            })
-            .catch((error) => {
-              console.error("Error loading summary:", error);
-            });
-        }
-      }
+  // Determine the trigger attribute
+  let triggerAttr = "";
+  if (hxGet && hxTrigger) {
+    if (hxTrigger.includes("entries-changed")) {
+      triggerAttr = `hx-trigger="entries-changed from:body"`;
+    } else {
+      triggerAttr = `hx-trigger="${hxTrigger}"`;
     }
   }
 
-  private render(): void {
-    const hxGet = this.getAttribute("data-hx-get") || this.getAttribute("hx-get") || "";
-    const hxTrigger =
-      this.getAttribute("data-hx-trigger") || this.getAttribute("hx-trigger") || "load";
-
-    this.innerHTML = html`
-      <div
-        id="summary-content"
-        class="block w-full max-w-full box-border min-h-[60px]"
-        ${hxGet && hxTrigger.includes("entries-changed")
-          ? `hx-get="${hxGet}" hx-target="this" hx-swap="innerHTML" hx-trigger="entries-changed from:body"`
-          : ""}
-      >
-        <div class="text-gray-500 dark:text-gray-400 text-center py-5">Loading...</div>
-      </div>
-    `;
-  }
-}
-
-if (!customElements.get("time-summary")) {
-  customElements.define("time-summary", TimeSummaryComponent);
+  return html`
+    <div
+      id="summary-content"
+      class="block w-full max-w-full box-border min-h-[60px]"
+      ${url ? `hx-get="${url}"` : ""}
+      ${url ? `hx-target="this"` : ""}
+      ${url ? `hx-swap="innerHTML"` : ""}
+      ${triggerAttr}
+    >
+      <div class="text-gray-500 dark:text-gray-400 text-center py-5">Loading...</div>
+    </div>
+  `;
 }

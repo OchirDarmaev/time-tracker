@@ -1,7 +1,8 @@
-import { html } from "./html";
+import { html } from "./utils/html";
 import { AuthStubRequest } from "./middleware/auth_stub";
 import { projectModel } from "./models/project";
 import { renderBaseLayout } from "./utils/layout";
+import { renderProjectList } from "./views/components/project_list_component";
 
 // Admin projects helper functions
 
@@ -24,7 +25,7 @@ export function renderProjectsPage(req: AuthStubRequest) {
         <h2 class="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">Add New Project</h2>
         <form
           hx-post="/admin/projects"
-          hx-target="project-list"
+          hx-target="#projects-list"
           hx-swap="outerHTML"
           hx-trigger="submit"
           hx-on::after-request="this.reset()"
@@ -46,7 +47,13 @@ export function renderProjectsPage(req: AuthStubRequest) {
         </form>
       </div>
 
-      <project-list projects="${projectsJson.replace(/"/g, "&quot;")}"></project-list>
+      ${renderProjectList({
+        projects: projects.map((p) => ({
+          id: p.id,
+          name: p.name,
+          suppressed: p.suppressed || false,
+        })),
+      })}
     </div>
   `;
 

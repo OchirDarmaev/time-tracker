@@ -27,6 +27,7 @@ import { renderReportsPage } from "./renderReportsPage.js";
 import { renderSummary } from "./renderSummary.js";
 import { renderEntriesTable } from "./renderEntriesTable.js";
 import { renderTimeTrackingPage } from "./renderTimeTrackingPage.js";
+import { renderProjectList } from "./views/components/project_list_component.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -572,10 +573,13 @@ export const router = s.router(apiContract, {
     try {
       projectModel.create(name.trim());
       const projects = projectModel.getAll(true);
-      const projectsJson = JSON.stringify(
-        projects.map((p) => ({ id: p.id, name: p.name, suppressed: p.suppressed || false }))
-      );
-      const html = `<project-list projects="${projectsJson.replace(/"/g, "&quot;")}"></project-list>`;
+      const html = renderProjectList({
+        projects: projects.map((p) => ({
+          id: p.id,
+          name: p.name,
+          suppressed: p.suppressed || false,
+        })),
+      });
       return {
         status: 200,
         body: html,
@@ -613,10 +617,13 @@ export const router = s.router(apiContract, {
     const id = parseInt(params.id);
     projectModel.toggleSuppress(id);
     const projects = projectModel.getAll(true);
-    const projectsJson = JSON.stringify(
-      projects.map((p) => ({ id: p.id, name: p.name, suppressed: p.suppressed || false }))
-    );
-    const html = `<project-list projects="${projectsJson.replace(/"/g, "&quot;")}"></project-list>`;
+    const html = renderProjectList({
+      projects: projects.map((p) => ({
+        id: p.id,
+        name: p.name,
+        suppressed: p.suppressed || false,
+      })),
+    });
     return {
       status: 200,
       body: html,

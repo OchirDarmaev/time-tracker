@@ -1,65 +1,24 @@
-// Project List Web Component
-// Uses light DOM (no shadow) for simpler HTMX integration
+import { html } from "../../utils/html";
 
-import { html } from "../../html";
-
-interface Project {
+export interface Project {
   id: number;
   name: string;
   suppressed?: boolean;
 }
 
-interface HtmxInstance {
-  process: (element: ShadowRoot | HTMLElement) => void;
+export interface ProjectListProps {
+  projects: Project[];
 }
 
-class ProjectListComponent extends HTMLElement {
-  static get observedAttributes(): string[] {
-    return ["projects"];
+export function renderProjectList(props: ProjectListProps): string {
+  const projects = props.projects || [];
+
+  if (projects.length === 0) {
+    return '<p class="text-gray-600 dark:text-gray-400">No projects found.</p>';
   }
 
-  constructor() {
-    super();
-    this.className = "block";
-  }
-
-  connectedCallback(): void {
-    this.render();
-
-    // Process HTMX
-    const htmx = (window as Window & { htmx?: HtmxInstance }).htmx;
-    if (htmx) {
-      htmx.process(this);
-    }
-  }
-
-  attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {
-    if (oldValue !== newValue) {
-      this.render();
-      const htmx = (window as Window & { htmx?: HtmxInstance }).htmx;
-      if (htmx) {
-        htmx.process(this);
-      }
-    }
-  }
-
-  private render(): void {
-    const projectsJson = this.getAttribute("projects") || "[]";
-    const projects: Project[] = JSON.parse(projectsJson);
-
-    this.innerHTML = `
-      <div class="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-5 shadow-sm" id="projects-list">
-        ${this.renderProjectsList(projects)}
-      </div>
-    `;
-  }
-
-  private renderProjectsList(projects: Project[]): string {
-    if (projects.length === 0) {
-      return '<p class="text-gray-600 dark:text-gray-400">No projects found.</p>';
-    }
-
-    return html`
+  return html`
+    <div class="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-5 shadow-sm" id="projects-list">
       <table
         class="w-full border-separate border-spacing-0 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden shadow-sm"
       >
@@ -100,8 +59,8 @@ class ProjectListComponent extends HTMLElement {
               <td class="px-5 py-4 text-right">
                 <button 
                   hx-patch="/admin/projects/${project.id}/suppress"
-                  hx-target="closest project-list"
-                  hx-swap="outerHTML"
+                  hx-target="#projects-list"
+                  hx-swap="innerHTML transition:true"
                   class="bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-xs font-medium cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-600 hover:border-indigo-500 dark:hover:border-indigo-500"
                 >
                   ${project.suppressed ? "Activate" : "Suppress"}
@@ -113,15 +72,6 @@ class ProjectListComponent extends HTMLElement {
             .join("")}
         </tbody>
       </table>
-    `;
-  }
-
-  // Public method to update projects
-  public updateProjects(projects: Project[]): void {
-    this.setAttribute("projects", JSON.stringify(projects));
-  }
-}
-
-if (!customElements.get("project-list")) {
-  customElements.define("project-list", ProjectListComponent);
+    </div>
+  `;
 }

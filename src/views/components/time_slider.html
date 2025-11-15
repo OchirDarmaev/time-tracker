@@ -2,6 +2,7 @@
   <div class="time-slider-header">
     <h3 class="time-slider-title">Daily Time Allocation</h3>
     <div class="time-slider-controls">
+      <span id="time-slider-sync-icon" class="time-slider-sync-icon time-slider-sync-default" style="font-size: 18px; cursor: default; margin-right: 12px;" title="Auto-sync enabled">💾</span>
       <label class="time-slider-total-label">
         Total Hours:
         <input 
@@ -88,7 +89,6 @@
     padding: 6px 10px;
     font-size: 14px;
     width: 70px;
-    transition: all 0.2s ease;
   }
 
   .time-slider-total-input:focus {
@@ -132,7 +132,7 @@
     top: 0;
     height: 100%;
     border-radius: 8px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: left 0.2s ease, width 0.2s ease;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -182,7 +182,7 @@
     align-items: center;
     justify-content: center;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    transition: all 0.2s ease;
+    transition: left 0.2s ease;
   }
 
   .time-slider-handle:hover {
@@ -251,7 +251,6 @@
     font-size: 13px;
     font-weight: 500;
     cursor: pointer;
-    transition: all 0.2s ease;
     border: 1px solid var(--border);
     background-color: var(--bg-tertiary);
     color: var(--text-primary);
@@ -292,7 +291,6 @@
     border-radius: 8px;
     margin-bottom: 8px;
     border: 1px solid var(--border);
-    transition: all 0.2s ease;
   }
 
   .time-slider-segment-item:hover {
@@ -352,20 +350,6 @@
     margin-bottom: 16px;
   }
 
-  @keyframes slideIn {
-    from {
-      opacity: 0;
-      transform: translateY(-8px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  .time-slider-segment {
-    animation: slideIn 0.3s ease;
-  }
 </style>
 
 <script>
@@ -382,6 +366,9 @@
       this.projects = options.projects || [];
       this.onChange = options.onChange || (() => {});
       this.date = options.date || new Date().toISOString().split('T')[0];
+      this.editingNoteIndex = null;
+      this.syncTimeout = null;
+      this.isSyncing = false;
 
       this.activeHandle = null;
       this.dragStartX = 0;
@@ -423,7 +410,7 @@
         totalInput.addEventListener('change', (e) => {
           this.totalHours = parseFloat(e.target.value) || 8;
           this.render();
-          this.onChange(this.getSegmentsData());
+          this.scheduleSync();
         });
       }
     }
@@ -609,7 +596,7 @@
         this.activeHandle = null;
         // Full re-render only when drag is complete
         this.render();
-        this.onChange(this.getSegmentsData());
+        this.scheduleSync();
       }
 
       document.removeEventListener('mousemove', this.handleDrag);
@@ -778,6 +765,7 @@
         this.segments.push({
           project_id: projectId,
           minutes: this.snapToIncrement(totalMinutes),
+          comment: null,
         });
       } else {
         // When adding a new project, redistribute time among all segments (including new one)
@@ -798,11 +786,73 @@
         this.segments.push({
           project_id: projectId,
           minutes: this.snapToIncrement(minutesPerSegment + remainder),
+          comment: null,
         });
       }
 
       this.render();
+      this.scheduleSync();
+    }
+
+    scheduleSync() {
+      // Clear existing timeout
+      if (this.syncTimeout) {
+        clearTimeout(this.syncTimeout);
+      }
+      
+      // Schedule sync after 3 seconds
+      this.syncTimeout = setTimeout(() => {
+        this.sync();
+      }, 3000);
+      
+      // Update sync icon to show pending
+      this.updateSyncIcon('pending');
+    }
+
+    sync() {
+      if (this.isSyncing) return;
+      
+      this.isSyncing = true;
+      this.updateSyncIcon('syncing');
+      
+      // Call onChange callback which should handle the sync
       this.onChange(this.getSegmentsData());
+      
+      // Reset sync state after a delay
+      setTimeout(() => {
+        this.isSyncing = false;
+        this.updateSyncIcon('synced');
+        
+        // Reset to default after 2 seconds
+        setTimeout(() => {
+          this.updateSyncIcon('default');
+        }, 2000);
+      }, 500);
+    }
+
+    updateSyncIcon(state) {
+      const syncIcon = document.getElementById('time-slider-sync-icon');
+      if (!syncIcon) return;
+      
+      syncIcon.className = `time-slider-sync-icon time-slider-sync-${state}`;
+      
+      switch(state) {
+        case 'pending':
+          syncIcon.innerHTML = '⏳';
+          syncIcon.title = 'Changes pending sync...';
+          break;
+        case 'syncing':
+          syncIcon.innerHTML = '🔄';
+          syncIcon.title = 'Syncing...';
+          break;
+        case 'synced':
+          syncIcon.innerHTML = '✓';
+          syncIcon.title = 'Synced';
+          break;
+        default:
+          syncIcon.innerHTML = '💾';
+          syncIcon.title = 'Auto-sync enabled';
+      }
     }
 
     removeSegment(index) {
@@ -825,7 +875,7 @@
       }
       
       this.render();
-      this.onChange(this.getSegmentsData());
+      this.scheduleSync();
     }
 
     renderSegmentsInfo() {
@@ -849,14 +899,70 @@
         const color = this.getProjectColor(segment.project_id);
         const hours = this.minutesToHours(segment.minutes);
 
+        const isEditingNote = this.editingNoteIndex === index;
+        const hasNote = segment.comment && segment.comment.trim();
+        
         html += `
-          <div class="time-slider-segment-item">
-            <div class="time-slider-segment-item-info">
+          <div class="time-slider-segment-item" id="segment-item-${index}">
+            <div class="time-slider-segment-item-info" style="flex: 1;">
               <div class="time-slider-segment-item-color" style="background: ${color.solid};"></div>
-              <span class="time-slider-segment-item-name">${project ? project.name : 'Unknown'}</span>
+              <div style="flex: 1;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                  <span class="time-slider-segment-item-name">${project ? project.name : 'Unknown'}</span>
+                  <span class="time-slider-segment-item-duration">${hours.toFixed(1)}h</span>
+                </div>
+                <div class="time-slider-segment-note-container" style="margin-top: 6px;">
+                  ${isEditingNote ? `
+                    <div style="display: flex; gap: 8px; align-items: flex-start; width: 100%;">
+                      <input 
+                        type="text" 
+                        class="time-slider-note-input"
+                        id="note-input-${index}"
+                        value="${(segment.comment || '').replace(/"/g, '&quot;')}"
+                        placeholder="Add note about activity..."
+                        style="flex: 1; padding: 6px 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-primary); color: var(--text-primary); font-size: 13px;"
+                      />
+                      <button 
+                        class="time-slider-note-save"
+                        id="note-save-${index}"
+                        style="padding: 6px 12px; background: #14b8a6; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500;"
+                      >
+                        Save
+                      </button>
+                      <button 
+                        class="time-slider-note-cancel"
+                        id="note-cancel-${index}"
+                        style="padding: 6px 12px; background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500;"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ` : `
+                    ${hasNote ? `
+                      <div style="font-size: 12px; color: var(--text-secondary); padding: 4px 0;">
+                        <span style="font-style: italic;">${segment.comment.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>
+                        <button 
+                          class="time-slider-edit-note"
+                          data-note-index="${index}"
+                          style="margin-left: 8px; background: none; border: none; color: var(--accent); cursor: pointer; font-size: 11px; text-decoration: underline;"
+                        >
+                          Edit
+                        </button>
+                      </div>
+                    ` : `
+                      <button 
+                        class="time-slider-add-note"
+                        data-note-index="${index}"
+                        style="background: none; border: none; color: var(--text-tertiary); cursor: pointer; font-size: 11px; text-decoration: underline; padding: 0;"
+                      >
+                        + Add note
+                      </button>
+                    `}
+                  `}
+                </div>
+              </div>
             </div>
             <div style="display: flex; align-items: center; gap: 16px;">
-              <span class="time-slider-segment-item-duration">${hours.toFixed(1)}h</span>
               <button class="time-slider-segment-item-remove" onclick="window.timeSliderInstance.removeSegment(${index})">
                 Remove
               </button>
@@ -866,6 +972,67 @@
       });
 
       infoContainer.innerHTML = html;
+
+      // Attach event listeners for note editing
+      this.segments.forEach((segment, index) => {
+        const addNoteBtn = infoContainer.querySelector(`[data-note-index="${index}"].time-slider-add-note`);
+        const editNoteBtn = infoContainer.querySelector(`[data-note-index="${index}"].time-slider-edit-note`);
+        const saveBtn = infoContainer.querySelector(`#note-save-${index}`);
+        const cancelBtn = infoContainer.querySelector(`#note-cancel-${index}`);
+        const input = infoContainer.querySelector(`#note-input-${index}`);
+        
+        if (addNoteBtn) {
+          addNoteBtn.addEventListener('click', () => this.editNote(index));
+        }
+        if (editNoteBtn) {
+          editNoteBtn.addEventListener('click', () => this.editNote(index));
+        }
+        if (saveBtn) {
+          saveBtn.addEventListener('click', () => this.saveNote(index));
+        }
+        if (cancelBtn) {
+          cancelBtn.addEventListener('click', () => this.cancelEditNote());
+        }
+        if (input) {
+          input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              this.saveNote(index);
+            } else if (e.key === 'Escape') {
+              e.preventDefault();
+              this.cancelEditNote();
+            }
+          });
+        }
+      });
+    }
+
+    editNote(index) {
+      this.editingNoteIndex = index;
+      this.render();
+      // Focus input after render
+      setTimeout(() => {
+        const input = document.getElementById(`note-input-${index}`);
+        if (input) {
+          input.focus();
+          input.select();
+        }
+      }, 0);
+    }
+
+    saveNote(index) {
+      const input = document.getElementById(`note-input-${index}`);
+      if (input && this.segments[index]) {
+        this.segments[index].comment = input.value.trim() || null;
+      }
+      this.editingNoteIndex = null;
+      this.render();
+      this.scheduleSync();
+    }
+
+    cancelEditNote() {
+      this.editingNoteIndex = null;
+      this.render();
     }
 
     getSegmentsData() {

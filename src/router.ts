@@ -46,6 +46,7 @@ function renderTimeTrackingPage(req: AuthStubRequest) {
   const segments = entries.map((entry) => ({
     project_id: entry.project_id,
     minutes: entry.minutes,
+    comment: entry.comment || null,
   }));
 
   // Calculate total hours from entries, default to 8 if no entries
@@ -95,22 +96,84 @@ function renderTimeTrackingPage(req: AuthStubRequest) {
       </div>
     </div>
     <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        if (window.TimeSlider) {
-          const projects = ${projectsJson};
-          const segments = ${segmentsJson};
-          const totalHours = ${sliderTotalHours};
-          
-          window.timeSliderInstance = new TimeSlider('time-slider-container', {
-            totalHours: totalHours,
-            segments: segments,
-            projects: projects,
-            date: '${selectedDate}',
-            onChange: function(data) {
-              // Handle time slider changes if needed
-              console.log('Time slider changed:', data);
+      function initTimeSlider() {
+        const container = document.getElementById('time-slider-container');
+        if (!container) {
+          console.warn('Time slider container not found');
+          return;
+        }
+        
+        // Wait for TimeSlider class to be available
+        function tryInit() {
+          if (window.TimeSlider) {
+            // Destroy existing instance if it exists
+            if (window.timeSliderInstance) {
+              // Clean up existing instance
+              if (window.timeSliderInstance.syncTimeout) {
+                clearTimeout(window.timeSliderInstance.syncTimeout);
+              }
             }
-          });
+            
+            const projects = ${projectsJson};
+            const segments = ${segmentsJson};
+            const totalHours = ${sliderTotalHours};
+            
+            try {
+              window.timeSliderInstance = new window.TimeSlider('time-slider-container', {
+                totalHours: totalHours,
+                segments: segments,
+                projects: projects,
+                date: '${selectedDate}',
+                onChange: function(data) {
+                  // Sync time entries to backend
+                  fetch('/worker/time/sync', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                      date: data.date,
+                      segments: data.segments,
+                    }),
+                  })
+                  .then(response => response.json())
+                  .then(result => {
+                    if (result.success) {
+                      // Trigger summary update
+                      htmx.trigger('body', 'entries-changed');
+                    }
+                  })
+                  .catch(error => {
+                    console.error('Sync error:', error);
+                  });
+                }
+              });
+            } catch (error) {
+              console.error('Error initializing TimeSlider:', error);
+            }
+          } else {
+            // TimeSlider not loaded yet, try again in 50ms
+            setTimeout(tryInit, 50);
+          }
+        }
+        
+        tryInit();
+      }
+      
+      // Initialize immediately (for HTMX swaps) or on DOMContentLoaded
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+          setTimeout(initTimeSlider, 100);
+        });
+      } else {
+        // DOM already loaded (e.g., HTMX swap)
+        setTimeout(initTimeSlider, 100);
+      }
+      
+      // Also initialize after HTMX swaps content
+      document.body.addEventListener('htmx:afterSwap', function(event) {
+        if (event.detail.target === document.body || event.detail.target.querySelector('#time-slider-container')) {
+          setTimeout(initTimeSlider, 100);
         }
       });
     </script>
@@ -1046,6 +1109,74 @@ export const router = s.router(apiContract, {
     return {
       status: 200,
       body: html,
+    };
+  },
+
+  syncTimeEntries: async ({ body, req }) => {
+    const authReq = req as unknown as AuthStubRequest;
+
+    if (!authReq.currentUser) {
+      return {
+        status: 401,
+        body: { success: false },
+      };
+    }
+    if (!authReq.currentUser.roles.includes("worker")) {
+      return {
+        status: 403,
+        body: { success: false },
+      };
+    }
+
+    const currentUser = authReq.currentUser;
+    const { date, segments } = body;
+
+    if (!validateDate(date)) {
+      return {
+        status: 400,
+        body: { success: false },
+      };
+    }
+
+    // Verify user has access to all projects
+    const userProjects = projectModel.getByUserId(currentUser.id);
+    const projectIds = new Set(userProjects.map((p) => p.id));
+    
+    for (const segment of segments) {
+      if (!projectIds.has(segment.project_id)) {
+        return {
+          status: 403,
+          body: { success: false },
+        };
+      }
+      if (!validateMinutes(segment.minutes)) {
+        return {
+          status: 400,
+          body: { success: false },
+        };
+      }
+    }
+
+    // Delete all existing entries for this date and user
+    const existingEntries = timeEntryModel.getByUserIdAndDate(currentUser.id, date);
+    for (const entry of existingEntries) {
+      timeEntryModel.delete(entry.id);
+    }
+
+    // Create new entries from segments
+    for (const segment of segments) {
+      timeEntryModel.create(
+        currentUser.id,
+        segment.project_id,
+        date,
+        segment.minutes,
+        segment.comment || null
+      );
+    }
+
+    return {
+      status: 200,
+      body: { success: true },
     };
   },
 

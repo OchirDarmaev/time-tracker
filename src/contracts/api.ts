@@ -86,6 +86,25 @@ export const apiContract = c.router({
       404: z.any(),
     },
   },
+  syncTimeEntries: {
+    method: "POST",
+    path: "/worker/time/sync",
+    body: z.object({
+      date: z.string(),
+      segments: z.array(
+        z.object({
+          project_id: z.number(),
+          minutes: z.number(),
+          comment: z.string().nullable().optional(),
+        })
+      ),
+    }),
+    responses: {
+      200: z.object({ success: z.boolean() }),
+      400: z.any(),
+      403: z.any(),
+    },
+  },
   workerTimeSummary: {
     method: "GET",
     path: "/worker/time/summary",

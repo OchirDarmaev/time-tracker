@@ -37,7 +37,11 @@ app.use(
 app.use(authStubMiddleware);
 
 // Serve static component files
-app.use("/components", express.static(join(__dirname, "../views/components")));
+// TypeScript components are compiled to dist/views/components/*.js
+// Always serve from dist/views/components (components must be compiled first)
+const componentsPath = join(process.cwd(), "dist/views/components");
+app.use("/components", express.static(componentsPath, { extensions: ["js"] }));
+console.log(`Serving components from: ${componentsPath}`);
 
 createExpressEndpoints(apiContract, router, app, {
   responseValidation: false,

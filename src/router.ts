@@ -22,7 +22,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // Worker time helper functions
-function renderTimeTrackingPage(req: AuthStubRequest) {
+function renderTimeTrackingPage(req: AuthStubRequest, includeLayout: boolean = true) {
   const currentUser = req.currentUser!;
   const today = formatDate(new Date());
   const selectedDate = (req.query.date as string) || today;
@@ -64,8 +64,8 @@ function renderTimeTrackingPage(req: AuthStubRequest) {
         <date-picker 
           value="${selectedDate}"
           hx-get="/worker/time"
-          hx-target="body"
-          hx-swap="transition:true"
+          hx-target="main"
+          hx-swap="innerHTML"
           hx-trigger="change"
           label="Date"
         ></date-picker>
@@ -81,8 +81,8 @@ function renderTimeTrackingPage(req: AuthStubRequest) {
       
       <time-summary 
         date="${selectedDate}"
-        hx-get="/worker/time/summary"
-        hx-trigger="load, entries-changed from:body"
+        data-hx-get="/worker/time/summary"
+        data-hx-trigger="load, entries-changed from:body"
       ></time-summary>
     </div>
     
@@ -90,7 +90,11 @@ function renderTimeTrackingPage(req: AuthStubRequest) {
     ${timeSliderHtml}
   `;
 
-  return renderBaseLayout(content, req, "worker");
+  if (includeLayout) {
+    return renderBaseLayout(content, req, "worker");
+  } else {
+    return content;
+  }
 }
 
 function renderEntriesTable(entries: TimeEntry[], projects: Project[]): string {
@@ -829,12 +833,24 @@ export const router = s.router(apiContract, {
       };
     }
 
-    const html = renderTimeTrackingPage(authReq);
+    // Check if this is an HTMX request - if so, return only the content
+    const isHtmxRequest = authReq.headers["hx-request"] === "true";
 
-    return {
-      status: 200,
-      body: html,
-    };
+    if (isHtmxRequest) {
+      // Return only the content for HTMX requests
+      const content = renderTimeTrackingPage(authReq, false);
+      return {
+        status: 200,
+        body: content,
+      };
+    } else {
+      // Return full page for regular requests
+      const html = renderTimeTrackingPage(authReq, true);
+      return {
+        status: 200,
+        body: html,
+      };
+    }
   },
 
   workerTimeEntries: async ({ query, req }) => {

@@ -1,8 +1,18 @@
-/* global HTMLElement, window, customElements */
 // Project List Web Component
 // Uses light DOM (no shadow) for simpler HTMX integration
+
+interface Project {
+  id: number;
+  name: string;
+  suppressed?: boolean;
+}
+
+interface HtmxInstance {
+  process: (element: ShadowRoot | HTMLElement) => void;
+}
+
 class ProjectListComponent extends HTMLElement {
-  static get observedAttributes() {
+  static get observedAttributes(): string[] {
     return ["projects"];
   }
 
@@ -10,27 +20,29 @@ class ProjectListComponent extends HTMLElement {
     super();
   }
 
-  connectedCallback() {
+  connectedCallback(): void {
     this.render();
 
     // Process HTMX
-    if (window.htmx) {
-      window.htmx.process(this);
+    const htmx = (window as Window & { htmx?: HtmxInstance }).htmx;
+    if (htmx) {
+      htmx.process(this);
     }
   }
 
-  attributeChangedCallback(name, oldValue, newValue) {
+  attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {
     if (oldValue !== newValue) {
       this.render();
-      if (window.htmx) {
-        window.htmx.process(this);
+      const htmx = (window as Window & { htmx?: HtmxInstance }).htmx;
+      if (htmx) {
+        htmx.process(this);
       }
     }
   }
 
-  render() {
+  private render(): void {
     const projectsJson = this.getAttribute("projects") || "[]";
-    const projects = JSON.parse(projectsJson);
+    const projects: Project[] = JSON.parse(projectsJson);
 
     this.innerHTML = `
       <style>
@@ -115,7 +127,7 @@ class ProjectListComponent extends HTMLElement {
     `;
   }
 
-  renderProjectsList(projects) {
+  private renderProjectsList(projects: Project[]): string {
     if (projects.length === 0) {
       return '<p style="color: var(--text-secondary);">No projects found.</p>';
     }
@@ -161,7 +173,7 @@ class ProjectListComponent extends HTMLElement {
   }
 
   // Public method to update projects
-  updateProjects(projects) {
+  public updateProjects(projects: Project[]): void {
     this.setAttribute("projects", JSON.stringify(projects));
   }
 }
@@ -169,3 +181,4 @@ class ProjectListComponent extends HTMLElement {
 if (!customElements.get("project-list")) {
   customElements.define("project-list", ProjectListComponent);
 }
+

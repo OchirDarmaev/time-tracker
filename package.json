@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "tsx src/server.ts",
-    "dev:watch": "tsx watch src/server.ts",
+    "dev": "tsc && tsx src/server.ts",
+    "dev:watch": "tsc --watch & tsx watch src/server.ts",
     "build": "tsc",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

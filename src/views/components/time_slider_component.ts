@@ -1,43 +1,84 @@
-/* global HTMLElement, window, clearTimeout, CustomEvent, fetch, console, setTimeout, customElements */
 // Time Slider Web Component
 // Wraps the existing TimeSlider class in a web component
 // Uses light DOM (no shadow) to work with existing TimeSlider class
 
+interface TimeSliderInstance {
+  totalHours: number;
+  setSegments: (segments: Segment[]) => void;
+  setProjects: (projects: Project[]) => void;
+  syncTimeout?: ReturnType<typeof setTimeout> | null;
+}
+
+interface Segment {
+  project_id: number;
+  minutes: number;
+  comment?: string | null;
+}
+
+interface Project {
+  id: number;
+  name: string;
+  suppressed?: boolean;
+}
+
+interface TimeSliderData {
+  segments: Segment[];
+  totalHours: number;
+  date: string;
+}
+
+interface TimeSliderOptions {
+  totalHours: number;
+  segments: Segment[];
+  projects: Project[];
+  date: string;
+  onChange: (data: TimeSliderData) => void;
+}
+
+interface WindowWithTimeSlider extends Window {
+  TimeSlider?: new (containerId: string, options: TimeSliderOptions) => TimeSliderInstance;
+  htmx?: {
+    process: (element: ShadowRoot | HTMLElement) => void;
+    trigger: (target: string | HTMLElement, event: string) => void;
+  };
+}
+
 class TimeSliderComponent extends HTMLElement {
-  static get observedAttributes() {
+  private timeSliderInstance: TimeSliderInstance | null = null;
+
+  static get observedAttributes(): string[] {
     return ["total-hours", "segments", "projects", "date", "sync-url"];
   }
 
   constructor() {
     super();
-    this.timeSliderInstance = null;
   }
 
-  connectedCallback() {
+  connectedCallback(): void {
     this.render();
     this.initializeTimeSlider();
 
     // Tell HTMX about this component
-    if (window.htmx) {
-      window.htmx.process(this);
+    const win = window as WindowWithTimeSlider;
+    if (win.htmx) {
+      win.htmx.process(this);
     }
   }
 
-  disconnectedCallback() {
-    if (this.timeSliderInstance && this.timeSliderInstance.syncTimeout) {
+  disconnectedCallback(): void {
+    if (this.timeSliderInstance?.syncTimeout) {
       clearTimeout(this.timeSliderInstance.syncTimeout);
     }
   }
 
-  attributeChangedCallback(name, oldValue, newValue) {
+  attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {
     if (oldValue !== newValue && this.timeSliderInstance) {
       this.updateFromAttributes();
     }
   }
 
-  render() {
+  private render(): void {
     const totalHours = this.getAttribute("total-hours") || "8";
-    // segments and projects are used in initializeTimeSlider, not here
 
     // Get styles from the original component
     const styles = this.getStyles();
@@ -92,29 +133,30 @@ class TimeSliderComponent extends HTMLElement {
     `;
   }
 
-  initializeTimeSlider() {
+  private initializeTimeSlider(): void {
     // Wait for TimeSlider class to be available
-    const tryInit = () => {
-      if (window.TimeSlider) {
+    const tryInit = (): void => {
+      const win = window as WindowWithTimeSlider;
+      if (win.TimeSlider) {
         try {
-          const totalHours = parseFloat(this.getAttribute("total-hours")) || 8;
-          const segments = JSON.parse(this.getAttribute("segments") || "[]");
-          const projects = JSON.parse(this.getAttribute("projects") || "[]");
+          const totalHours = parseFloat(this.getAttribute("total-hours") || "8");
+          const segments: Segment[] = JSON.parse(this.getAttribute("segments") || "[]");
+          const projects: Project[] = JSON.parse(this.getAttribute("projects") || "[]");
           const date = this.getAttribute("date") || new Date().toISOString().split("T")[0];
 
           const container = this.querySelector("#time-slider-container");
           if (!container) return;
 
           // Create unique ID for this instance
-          const uniqueId = `time-slider-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+          const uniqueId = `time-slider-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
           container.id = uniqueId;
 
-          this.timeSliderInstance = new window.TimeSlider(uniqueId, {
+          this.timeSliderInstance = new win.TimeSlider(uniqueId, {
             totalHours: totalHours,
             segments: segments,
             projects: projects,
             date: date,
-            onChange: (data) => {
+            onChange: (data: TimeSliderData) => {
               // Dispatch custom event for parent to handle
               this.dispatchEvent(
                 new CustomEvent("time-slider-change", {
@@ -138,12 +180,10 @@ class TimeSliderComponent extends HTMLElement {
                   }),
                 })
                   .then((response) => response.json())
-                  .then((result) => {
-                    if (result.success) {
+                  .then((result: { success?: boolean }) => {
+                    if (result.success && win.htmx) {
                       // Trigger summary update
-                      if (window.htmx) {
-                        window.htmx.trigger("body", "entries-changed");
-                      }
+                      win.htmx.trigger("body", "entries-changed");
                     }
                   })
                   .catch((error) => {
@@ -164,22 +204,25 @@ class TimeSliderComponent extends HTMLElement {
     tryInit();
   }
 
-  updateFromAttributes() {
+  private updateFromAttributes(): void {
     if (!this.timeSliderInstance) return;
 
-    const totalHours = parseFloat(this.getAttribute("total-hours")) || 8;
-    const segments = JSON.parse(this.getAttribute("segments") || "[]");
-    const projects = JSON.parse(this.getAttribute("projects") || "[]");
+    const totalHours = parseFloat(this.getAttribute("total-hours") || "8");
+    const segments: Segment[] = JSON.parse(this.getAttribute("segments") || "[]");
+    const projects: Project[] = JSON.parse(this.getAttribute("projects") || "[]");
 
     this.timeSliderInstance.totalHours = totalHours;
     this.timeSliderInstance.setSegments(segments);
     this.timeSliderInstance.setProjects(projects);
   }
 
-  getStyles() {
+  private getStyles(): string {
     return `
       :host {
         display: block;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
       }
       .time-slider-wrapper {
         background-color: var(--bg-secondary);
@@ -188,6 +231,9 @@ class TimeSliderComponent extends HTMLElement {
         padding: 24px;
         box-shadow: var(--shadow-sm);
         margin: 24px 0;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
       }
       .time-slider-header {
         display: flex;
@@ -470,7 +516,7 @@ class TimeSliderComponent extends HTMLElement {
   }
 
   // Public method to update data
-  updateData(data) {
+  public updateData(data: Partial<TimeSliderData & { projects: Project[] }>): void {
     if (data.totalHours !== undefined) {
       this.setAttribute("total-hours", data.totalHours.toString());
     }

@@ -1,7 +1,8 @@
-/* global HTMLElement, window, customElements */
 // Date Picker Web Component
 class DatePickerComponent extends HTMLElement {
-  static get observedAttributes() {
+  private shadow: ShadowRoot;
+
+  static get observedAttributes(): string[] {
     return ["value", "hx-get", "hx-target", "hx-trigger"];
   }
 
@@ -10,25 +11,31 @@ class DatePickerComponent extends HTMLElement {
     this.shadow = this.attachShadow({ mode: "open" });
   }
 
-  connectedCallback() {
+  connectedCallback(): void {
     this.render();
 
     // Process HTMX in shadow DOM
-    if (window.htmx) {
-      window.htmx.process(this.shadow);
+    const win = window as Window & {
+      htmx?: { process: (element: ShadowRoot | HTMLElement) => void };
+    };
+    if (win.htmx) {
+      win.htmx.process(this.shadow);
     }
   }
 
-  attributeChangedCallback(name, oldValue, newValue) {
+  attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {
     if (oldValue !== newValue) {
       this.render();
-      if (window.htmx) {
-        window.htmx.process(this.shadow);
+      const win = window as Window & {
+        htmx?: { process: (element: ShadowRoot | HTMLElement) => void };
+      };
+      if (win.htmx) {
+        win.htmx.process(this.shadow);
       }
     }
   }
 
-  render() {
+  private render(): void {
     const value = this.getAttribute("value") || "";
     const hxGet = this.getAttribute("hx-get") || "";
     const hxTarget = this.getAttribute("hx-target") || "body";
@@ -39,9 +46,15 @@ class DatePickerComponent extends HTMLElement {
       <style>
         :host {
           display: block;
+          width: 100%;
+          max-width: 100%;
+          box-sizing: border-box;
         }
         .date-picker-wrapper {
           margin-bottom: 24px;
+          width: 100%;
+          max-width: 100%;
+          box-sizing: border-box;
         }
         label {
           display: block;

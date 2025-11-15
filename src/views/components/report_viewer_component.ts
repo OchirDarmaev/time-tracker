@@ -1,7 +1,44 @@
-/* global HTMLElement, window, customElements */
 // Report Viewer Web Component
+
+interface HtmxInstance {
+  process: (element: ShadowRoot | HTMLElement) => void;
+}
+
+interface TimeEntry {
+  date: string;
+  project_id?: number;
+  user_id?: number;
+  minutes: number;
+}
+
+interface User {
+  id: number;
+  email: string;
+}
+
+interface Project {
+  id: number;
+  name: string;
+}
+
+interface WorkerReportData {
+  user: User;
+  entries: TimeEntry[];
+  projects: Project[];
+}
+
+interface ProjectReportData {
+  project: Project;
+  entries: TimeEntry[];
+  workers: User[];
+}
+
+type ReportData = WorkerReportData | ProjectReportData;
+
 class ReportViewerComponent extends HTMLElement {
-  static get observedAttributes() {
+  private shadow: ShadowRoot;
+
+  static get observedAttributes(): string[] {
     return ["type", "data"];
   }
 
@@ -10,28 +47,30 @@ class ReportViewerComponent extends HTMLElement {
     this.shadow = this.attachShadow({ mode: "open" });
   }
 
-  connectedCallback() {
+  connectedCallback(): void {
     this.render();
 
     // Process HTMX in shadow DOM
-    if (window.htmx) {
-      window.htmx.process(this.shadow);
+    const htmx = (window as Window & { htmx?: HtmxInstance }).htmx;
+    if (htmx) {
+      htmx.process(this.shadow);
     }
   }
 
-  attributeChangedCallback(name, oldValue, newValue) {
+  attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {
     if (oldValue !== newValue) {
       this.render();
-      if (window.htmx) {
-        window.htmx.process(this.shadow);
+      const htmx = (window as Window & { htmx?: HtmxInstance }).htmx;
+      if (htmx) {
+        htmx.process(this.shadow);
       }
     }
   }
 
-  render() {
+  private render(): void {
     const type = this.getAttribute("type") || "worker";
     const dataJson = this.getAttribute("data") || "{}";
-    const data = JSON.parse(dataJson);
+    const data: ReportData = JSON.parse(dataJson);
 
     this.shadow.innerHTML = `
       <style>
@@ -98,30 +137,32 @@ class ReportViewerComponent extends HTMLElement {
     `;
   }
 
-  renderReport(type, data) {
+  private renderReport(type: string, data: ReportData): string {
     if (type === "worker") {
-      return this.renderWorkerReport(data);
+      return this.renderWorkerReport(data as WorkerReportData);
     } else if (type === "project") {
-      return this.renderProjectReport(data);
+      return this.renderProjectReport(data as ProjectReportData);
     }
     return '<p style="color: var(--text-secondary);">Select a worker or project to view reports.</p>';
   }
 
-  renderWorkerReport(data) {
+  private renderWorkerReport(data: WorkerReportData): string {
     if (!data.user || !data.entries || data.entries.length === 0) {
       return `<p style="color: var(--text-secondary);">No time entries for ${data.user?.email || "this worker"}.</p>`;
     }
 
     // Group entries by date and project
-    const grouped = {};
+    const grouped: Record<string, Record<number, number>> = {};
     data.entries.forEach((entry) => {
       if (!grouped[entry.date]) {
         grouped[entry.date] = {};
       }
-      if (!grouped[entry.date][entry.project_id]) {
-        grouped[entry.date][entry.project_id] = 0;
+      if (entry.project_id !== undefined) {
+        if (!grouped[entry.date][entry.project_id]) {
+          grouped[entry.date][entry.project_id] = 0;
+        }
+        grouped[entry.date][entry.project_id] += entry.minutes;
       }
-      grouped[entry.date][entry.project_id] += entry.minutes;
     });
 
     const dates = Object.keys(grouped).sort();
@@ -186,21 +227,23 @@ class ReportViewerComponent extends HTMLElement {
     `;
   }
 
-  renderProjectReport(data) {
+  private renderProjectReport(data: ProjectReportData): string {
     if (!data.project || !data.entries || data.entries.length === 0) {
       return `<p style="color: var(--text-secondary);">No time entries for project ${data.project?.name || "this project"}.</p>`;
     }
 
     // Group entries by date and user
-    const grouped = {};
+    const grouped: Record<string, Record<number, number>> = {};
     data.entries.forEach((entry) => {
       if (!grouped[entry.date]) {
         grouped[entry.date] = {};
       }
-      if (!grouped[entry.date][entry.user_id]) {
-        grouped[entry.date][entry.user_id] = 0;
+      if (entry.user_id !== undefined) {
+        if (!grouped[entry.date][entry.user_id]) {
+          grouped[entry.date][entry.user_id] = 0;
+        }
+        grouped[entry.date][entry.user_id] += entry.minutes;
       }
-      grouped[entry.date][entry.user_id] += entry.minutes;
     });
 
     const dates = Object.keys(grouped).sort();
@@ -269,3 +312,4 @@ class ReportViewerComponent extends HTMLElement {
 if (!customElements.get("report-viewer")) {
   customElements.define("report-viewer", ReportViewerComponent);
 }
+

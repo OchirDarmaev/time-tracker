@@ -1,23 +1,23 @@
 import express from "express";
 import session from "express-session";
 import cookieParser from "cookie-parser";
-import { initializeDatabase } from "./config/database.js";
-import { authStubMiddleware } from "./middleware/auth_stub.js";
+import { initializeDatabase } from "./shared/config/database.js";
+import { authStubMiddleware } from "./shared/middleware/auth_stub.js";
 import { createExpressEndpoints } from "@ts-rest/express";
-import { authStubContract } from "./contracts/auth_stub_contract.js";
-import { authStubRouter } from "./routes/auth_stub_router.js";
-import { rootContract } from "./contracts/root_contract.js";
-import { rootRouter } from "./routes/root_router.js";
-import { workerContract } from "./contracts/worker_contract.js";
-import { workerRouter } from "./routes/worker_router.js";
-import { managerContract } from "./contracts/manager_contract.js";
-import { managerRouter } from "./routes/manager_router.js";
-import { adminProjectsContract } from "./contracts/admin_projects_contract.js";
-import { adminProjectsRouter } from "./routes/admin_projects_router.js";
-import { adminUsersProjectsContract } from "./contracts/admin_users_projects_contract.js";
-import { adminUsersProjectsRouter } from "./routes/admin_users_projects_router.js";
-import { adminSystemReportsContract } from "./contracts/admin_system_reports_contract.js";
-import { adminSystemReportsRouter } from "./routes/admin_system_reports_router.js";
+import { authContract } from "./features/auth/contract.js";
+import { authRouter } from "./features/auth/router.js";
+import { rootContract } from "./features/root/contract.js";
+import { rootRouter } from "./features/root/router.js";
+import { workerTimeContract } from "./features/worker/time/contract.js";
+import { workerTimeRouter } from "./features/worker/time/router.js";
+import { managerReportsContract } from "./features/manager/reports/contract.js";
+import { managerReportsRouter } from "./features/manager/reports/router.js";
+import { adminProjectsContract } from "./features/admin/projects/contract.js";
+import { adminProjectsRouter } from "./features/admin/projects/router.js";
+import { adminUsersProjectsContract } from "./features/admin/users_projects/contract.js";
+import { adminUsersProjectsRouter } from "./features/admin/users_projects/router.js";
+import { adminSystemReportsContract } from "./features/admin/system_reports/contract.js";
+import { adminSystemReportsRouter } from "./features/admin/system_reports/router.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -43,7 +43,7 @@ app.use(
 
 app.use(authStubMiddleware);
 
-createExpressEndpoints(authStubContract, authStubRouter, app, {
+createExpressEndpoints(authContract, authRouter, app, {
   responseValidation: false,
   jsonQuery: true,
 });
@@ -53,12 +53,12 @@ createExpressEndpoints(rootContract, rootRouter, app, {
   jsonQuery: true,
 });
 
-createExpressEndpoints(workerContract, workerRouter, app, {
+createExpressEndpoints(workerTimeContract, workerTimeRouter, app, {
   responseValidation: false,
   jsonQuery: true,
 });
 
-createExpressEndpoints(managerContract, managerRouter, app, {
+createExpressEndpoints(managerReportsContract, managerReportsRouter, app, {
   responseValidation: false,
   jsonQuery: true,
 });

@@ -1,10 +1,10 @@
 import { initContract } from "@ts-rest/core";
 import { z } from "zod";
-import { htmlResponse } from "./htmlResponse";
+import { htmlResponse } from "../../../shared/contracts/html_response.js";
 
 const c = initContract();
 
-export const workerContract = c.router({
+export const workerTimeContract = c.router({
   workerTime: {
     method: "GET",
     path: "/worker/time",

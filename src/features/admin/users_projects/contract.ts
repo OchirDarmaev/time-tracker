@@ -1,8 +1,9 @@
 import { initContract } from "@ts-rest/core";
 import { z } from "zod";
-import { htmlResponse } from "./htmlResponse";
+import { htmlResponse } from "../../../shared/contracts/html_response.js";
 
-export const c = initContract();
+const c = initContract();
+
 export const adminUsersProjectsContract = c.router({
   adminUsersProjects: {
     method: "GET",

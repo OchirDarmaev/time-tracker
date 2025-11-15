@@ -1,4 +1,6 @@
-import { c } from "./admin_users_projects_contract";
+import { initContract } from "@ts-rest/core";
+
+const c = initContract();
 
 export const htmlResponse = c.otherResponse({
   contentType: "text/html",

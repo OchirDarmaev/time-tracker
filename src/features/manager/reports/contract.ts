@@ -1,9 +1,10 @@
 import { initContract } from "@ts-rest/core";
 import { z } from "zod";
-import { htmlResponse } from "./htmlResponse";
+import { htmlResponse } from "../../../shared/contracts/html_response.js";
+
 const c = initContract();
 
-export const managerContract = c.router({
+export const managerReportsContract = c.router({
   managerReports: {
     method: "GET",
     path: "/manager/reports",

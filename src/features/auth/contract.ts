@@ -1,9 +1,10 @@
 import { initContract } from "@ts-rest/core";
 import { z } from "zod";
-import { htmlResponse } from "./htmlResponse";
+import { htmlResponse } from "../../shared/contracts/html_response.js";
+
 const c = initContract();
 
-export const authStubContract = c.router({
+export const authContract = c.router({
   setUser: {
     method: "POST",
     path: "/auth-stub/set-user",

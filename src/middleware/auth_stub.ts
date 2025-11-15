@@ -6,6 +6,7 @@ export interface AuthStubRequest extends Request {
     id: number;
     email: string;
     role: UserRole;
+    roles: UserRole[];
   };
 }
 
@@ -15,11 +16,12 @@ export function authStubMiddleware(req: AuthStubRequest, res: Response, next: Ne
 
   if (selectedUserId && selectedRole) {
     const user = userModel.getById(selectedUserId);
-    if (user && user.role === selectedRole) {
+    if (user && user.roles.includes(selectedRole)) {
       req.currentUser = {
         id: user.id,
         email: user.email,
-        role: user.role,
+        role: selectedRole,
+        roles: user.roles,
       };
     }
   }
@@ -28,10 +30,12 @@ export function authStubMiddleware(req: AuthStubRequest, res: Response, next: Ne
   if (!req.currentUser) {
     const workers = userModel.getWorkers();
     if (workers.length > 0) {
+      const worker = workers[0];
       req.currentUser = {
-        id: workers[0].id,
-        email: workers[0].email,
-        role: workers[0].role,
+        id: worker.id,
+        email: worker.email,
+        role: worker.roles[0] || 'worker',
+        roles: worker.roles,
       };
     }
   }
@@ -44,7 +48,9 @@ export function requireRole(...roles: UserRole[]) {
     if (!req.currentUser) {
       return res.status(401).send('Unauthorized');
     }
-    if (!roles.includes(req.currentUser.role)) {
+    // Check if user has any of the required roles
+    const hasRequiredRole = roles.some(role => req.currentUser!.roles.includes(role));
+    if (!hasRequiredRole) {
       return res.status(403).send('Forbidden');
     }
     next();

@@ -9,10 +9,32 @@
     <script>
         function updateRoleFromUser(selectElement) {
             const selectedOption = selectElement.options[selectElement.selectedIndex];
-            const userRole = selectedOption.getAttribute('data-role');
+            const rolesJson = selectedOption.getAttribute('data-roles');
             const roleSelect = document.getElementById('role-select');
-            if (roleSelect && userRole) {
-                roleSelect.value = userRole;
+            if (roleSelect && rolesJson) {
+                try {
+                    const roles = JSON.parse(rolesJson);
+                    // Clear existing options
+                    roleSelect.innerHTML = '';
+                    // Add options for each role the user has
+                    const roleLabels = {
+                        'worker': 'Worker',
+                        'office-manager': 'Office Manager',
+                        'admin': 'Admin'
+                    };
+                    roles.forEach(role => {
+                        const option = document.createElement('option');
+                        option.value = role;
+                        option.textContent = roleLabels[role] || role;
+                        roleSelect.appendChild(option);
+                    });
+                    // Set to first role
+                    if (roles.length > 0) {
+                        roleSelect.value = roles[0];
+                    }
+                } catch (e) {
+                    console.error('Error parsing roles:', e);
+                }
             }
         }
     </script>
@@ -22,7 +44,7 @@
     <div class="bg-gray-800 text-white p-4 mb-4">
         <div class="container mx-auto">
             <h2 class="text-lg font-semibold mb-3">DATA Stub Panel</h2>
-            <div class="grid grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                     <label for="user-select" class="block text-sm font-medium mb-1">Current User</label>
                     <select 
@@ -46,15 +68,14 @@
                         name="role"
                         disabled
                     >
-                        <option value="worker" {{worker_selected}}>Worker</option>
-                        <option value="office-manager" {{manager_selected}}>Office Manager</option>
-                        <option value="admin" {{admin_selected}}>Admin</option>
+                        {{role_options}}
                     </select>
                 </div>
                 <div class="flex items-end">
-                    <div class="text-sm">
-                        <div>Current: <span class="font-semibold">{{current_user_email}}</span></div>
-                        <div>Role: <span class="font-semibold">{{current_role}}</span></div>
+                    <div class="text-sm w-full">
+                        <div class="mb-1">Current: <span class="font-semibold">{{current_user_email}}</span></div>
+                        <div class="mb-1">Active Role: <span class="font-semibold">{{current_role}}</span></div>
+                        <div>All Roles: <span class="font-semibold">{{all_roles}}</span></div>
                     </div>
                 </div>
             </div>

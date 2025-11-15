@@ -2,7 +2,7 @@
 CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     email TEXT NOT NULL UNIQUE,
-    role TEXT NOT NULL CHECK(role IN ('worker', 'office-manager', 'admin')),
+    roles TEXT NOT NULL DEFAULT '["worker"]',
     active INTEGER NOT NULL DEFAULT 1
 );
 

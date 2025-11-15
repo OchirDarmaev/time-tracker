@@ -654,8 +654,14 @@ export const router = s.router(apiContract, {
     if (userId) {
       authReq.session!.userId = userId;
       const user = userModel.getById(userId);
-      if (user) {
-        authReq.session!.userRole = user.role;
+      if (user && user.roles.length > 0) {
+        // Set to the first role, or keep current role if user has it
+        const currentRole = authReq.session!.userRole;
+        if (currentRole && user.roles.includes(currentRole)) {
+          authReq.session!.userRole = currentRole;
+        } else {
+          authReq.session!.userRole = user.roles[0];
+        }
       }
     }
     const referer = authReq.get('Referer') || '/';
@@ -671,17 +677,15 @@ export const router = s.router(apiContract, {
     const authReq = req as unknown as AuthStubRequest;
     const role = body.role;
     if (role && ['worker', 'office-manager', 'admin'].includes(role)) {
-      authReq.session!.userRole = role;
       const userId = authReq.session!.userId as number | undefined;
       if (userId) {
         const user = userModel.getById(userId);
-        if (user && user.role !== role) {
-          const users = userModel.getAll();
-          const userWithRole = users.find(u => u.role === role);
-          if (userWithRole) {
-            authReq.session!.userId = userWithRole.id;
-          }
+        // Only set role if user has this role
+        if (user && user.roles.includes(role)) {
+          authReq.session!.userRole = role;
         }
+      } else {
+        authReq.session!.userRole = role;
       }
     }
     const referer = authReq.get('Referer') || '/';

@@ -11,6 +11,12 @@ import {
 } from "../../utils/date_utils.js";
 import { validateDate, validateMinutes } from "../../utils/validation.js";
 import { renderBaseLayout } from "../../utils/layout.js";
+import { readFileSync } from "fs";
+import { join, dirname } from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const router = Router();
 
@@ -35,6 +41,23 @@ function renderTimeTrackingPage(req: AuthStubRequest, res: Response) {
   const dailyWarning = totalHours < 8;
   const monthlyWarning = monthlyTotalHours < requiredMonthlyHours;
 
+  // Convert entries to segments format for the time slider
+  const segments = entries.map((entry) => ({
+    project_id: entry.project_id,
+    minutes: entry.minutes,
+  }));
+
+  // Calculate total hours from entries, default to 8 if no entries
+  const sliderTotalHours = totalHours > 0 ? Math.max(totalHours, 8) : 8;
+
+  // Read time slider component
+  const timeSliderPath = join(__dirname, "../../views/components/time_slider.html");
+  const timeSliderHtml = readFileSync(timeSliderPath, "utf-8");
+
+  // Prepare projects data for JavaScript
+  const projectsJson = JSON.stringify(projects.map((p) => ({ id: p.id, name: p.name })));
+  const segmentsJson = JSON.stringify(segments);
+
   const content = `
     <div class="container mx-auto px-4 py-8">
       <h1 class="text-3xl font-bold mb-6">My Time Tracking</h1>
@@ -54,45 +77,7 @@ function renderTimeTrackingPage(req: AuthStubRequest, res: Response) {
         />
       </div>
       
-      <div id="entries-container" hx-get="/worker/time/entries?date=${selectedDate}" hx-trigger="load, entries-changed from:body">
-        ${renderEntriesTable(entries, projects)}
-      </div>
-      
-      <div class="mt-6">
-        <h2 class="text-xl font-semibold mb-4">Add Entry</h2>
-        <form 
-          hx-post="/worker/time/entries"
-          hx-target="#entries-container"
-          hx-swap="innerHTML"
-          hx-trigger="submit"
-          hx-on::after-request="document.getElementById('add-entry-form').reset(); htmx.trigger('body', 'entries-changed')"
-          id="add-entry-form"
-          class="grid grid-cols-4 gap-4"
-        >
-          <input type="hidden" name="date" value="${selectedDate}" />
-          <select name="project_id" required class="border rounded px-3 py-2">
-            <option value="">Select Project</option>
-            ${projects.map((p) => `<option value="${p.id}">${p.name}</option>`).join("")}
-          </select>
-          <input 
-            type="number" 
-            name="hours" 
-            step="0.5" 
-            min="0.5" 
-            max="24" 
-            placeholder="Hours" 
-            required 
-            class="border rounded px-3 py-2"
-          />
-          <input 
-            type="text" 
-            name="comment" 
-            placeholder="Comment (e.g., #meeting #setup)" 
-            class="border rounded px-3 py-2"
-          />
-          <button type="submit" class="bg-blue-500 text-white rounded px-4 py-2 hover:bg-blue-600">Add Entry</button>
-        </form>
-      </div>
+      ${timeSliderHtml}
       
       <div class="mt-8">
         <h2 class="text-xl font-semibold mb-4">Summary</h2>
@@ -101,6 +86,26 @@ function renderTimeTrackingPage(req: AuthStubRequest, res: Response) {
         </div>
       </div>
     </div>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        if (window.TimeSlider) {
+          const projects = ${projectsJson};
+          const segments = ${segmentsJson};
+          const totalHours = ${sliderTotalHours};
+          
+          window.timeSliderInstance = new TimeSlider('time-slider-container', {
+            totalHours: totalHours,
+            segments: segments,
+            projects: projects,
+            date: '${selectedDate}',
+            onChange: function(data) {
+              // Handle time slider changes if needed
+              console.log('Time slider changed:', data);
+            }
+          });
+        }
+      });
+    </script>
   `;
 
   res.send(renderBaseLayout(content, req, "worker"));

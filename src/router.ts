@@ -14,6 +14,12 @@ import {
 } from "./utils/date_utils.js";
 import { validateDate, validateMinutes, validateProjectName } from "./utils/validation.js";
 import { renderBaseLayout, renderNavBar } from "./utils/layout.js";
+import { readFileSync } from "fs";
+import { join, dirname } from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // Worker time helper functions
 function renderTimeTrackingPage(req: AuthStubRequest) {
@@ -35,6 +41,24 @@ function renderTimeTrackingPage(req: AuthStubRequest) {
   const requiredMonthlyHours = workingDays * 8;
 
   const monthlyWarning = monthlyTotalHours < requiredMonthlyHours;
+
+  // Convert entries to segments format for the time slider
+  const segments = entries.map((entry) => ({
+    project_id: entry.project_id,
+    minutes: entry.minutes,
+  }));
+
+  // Calculate total hours from entries, default to 8 if no entries
+  const sliderTotalHours = totalHours > 0 ? Math.max(totalHours, 8) : 8;
+
+  // Read time slider component
+  // __dirname in compiled code is dist/, so we need to go to src/views
+  const timeSliderPath = join(process.cwd(), "src/views/components/time_slider.html");
+  const timeSliderHtml = readFileSync(timeSliderPath, "utf-8");
+
+  // Prepare projects data for JavaScript
+  const projectsJson = JSON.stringify(projects.map((p) => ({ id: p.id, name: p.name })));
+  const segmentsJson = JSON.stringify(segments);
 
   const content = `
     <div class="space-y-8">
@@ -61,54 +85,35 @@ function renderTimeTrackingPage(req: AuthStubRequest) {
         </div>
       </div>
       
-      <div class="card">
-        <div class="flex items-center justify-between mb-6">
-          <h2 class="text-lg font-semibold" style="color: var(--text-primary);">Time Entries</h2>
-          <div id="summary-container" hx-get="/worker/time/summary?date=${selectedDate}" hx-swap="transition:true" hx-trigger="load, entries-changed from:body">
-            ${renderSummary(totalHours, monthlyTotalHours, requiredMonthlyHours, monthlyWarning)}
-          </div>
-        </div>
-        <div id="entries-container" hx-get="/worker/time/entries?date=${selectedDate}" hx-swap="transition:true" hx-trigger="load, entries-changed from:body">
-          ${renderEntriesTable(entries, projects)}
-        </div>
-      </div>
+      ${timeSliderHtml}
       
       <div class="card">
-        <h2 class="text-lg font-semibold mb-4" style="color: var(--text-primary);">Add Time Entry</h2>
-        <form 
-          hx-post="/worker/time/entries"
-          hx-target="#entries-container"
-          hx-swap="transition:true"
-          hx-trigger="submit"
-          hx-on::after-request="document.getElementById('add-entry-form').reset(); htmx.trigger('body', 'entries-changed')"
-          id="add-entry-form"
-          class="grid grid-cols-1 md:grid-cols-4 gap-4"
-        >
-          <input type="hidden" name="date" value="${selectedDate}" />
-          <select name="project_id" required class="select-modern">
-            <option value="">Select Project</option>
-            ${projects.map((p) => `<option value="${p.id}">${p.name}</option>`).join("")}
-          </select>
-          <input 
-            type="number" 
-            name="hours" 
-            step="0.5" 
-            min="0.5" 
-            max="24" 
-            placeholder="Hours" 
-            required 
-            class="input-modern"
-          />
-          <input 
-            type="text" 
-            name="comment" 
-            placeholder="Comment (e.g., #meeting #setup)" 
-            class="input-modern"
-          />
-          <button type="submit" class="btn-primary">Add Entry</button>
-        </form>
+        <h2 class="text-lg font-semibold mb-4" style="color: var(--text-primary);">Summary</h2>
+        <div id="summary-container" hx-get="/worker/time/summary?date=${selectedDate}" hx-swap="transition:true" hx-trigger="load, entries-changed from:body">
+          ${renderSummary(totalHours, monthlyTotalHours, requiredMonthlyHours, monthlyWarning)}
+        </div>
       </div>
     </div>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        if (window.TimeSlider) {
+          const projects = ${projectsJson};
+          const segments = ${segmentsJson};
+          const totalHours = ${sliderTotalHours};
+          
+          window.timeSliderInstance = new TimeSlider('time-slider-container', {
+            totalHours: totalHours,
+            segments: segments,
+            projects: projects,
+            date: '${selectedDate}',
+            onChange: function(data) {
+              // Handle time slider changes if needed
+              console.log('Time slider changed:', data);
+            }
+          });
+        }
+      });
+    </script>
   `;
 
   return renderBaseLayout(content, req, "worker");

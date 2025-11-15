@@ -1,0 +1,802 @@
+<div id="time-slider-container" class="time-slider-wrapper">
+  <div class="time-slider-header">
+    <h3 class="time-slider-title">Daily Time Allocation</h3>
+    <div class="time-slider-controls">
+      <label class="time-slider-total-label">
+        Total Hours:
+        <input 
+          type="number" 
+          id="total-hours-input" 
+          class="time-slider-total-input"
+          min="1" 
+          max="24" 
+          step="0.5" 
+          value="8"
+        />
+      </label>
+    </div>
+  </div>
+
+  <div class="time-slider-track-container">
+    <div id="time-slider-track" class="time-slider-track">
+      <!-- Segments and handles will be dynamically inserted here -->
+    </div>
+    <div class="time-slider-labels">
+      <div class="time-slider-label">0h</div>
+      <div class="time-slider-label" id="time-slider-end-label">8h</div>
+    </div>
+  </div>
+
+  <div class="time-slider-projects">
+    <div class="time-slider-projects-header">
+      <span class="time-slider-projects-title">Available Projects</span>
+    </div>
+    <div id="time-slider-project-chips" class="time-slider-project-chips">
+      <!-- Project chips will be dynamically inserted here -->
+    </div>
+  </div>
+
+  <div id="time-slider-segments-info" class="time-slider-segments-info">
+    <!-- Segment information will be displayed here -->
+  </div>
+</div>
+
+<style>
+  .time-slider-wrapper {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: var(--shadow-sm);
+    margin: 24px 0;
+  }
+
+  .time-slider-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+
+  .time-slider-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  .time-slider-controls {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .time-slider-total-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+
+  .time-slider-total-input {
+    background-color: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 14px;
+    width: 70px;
+    transition: all 0.2s ease;
+  }
+
+  .time-slider-total-input:focus {
+    outline: none;
+    border-color: #14b8a6;
+    box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1);
+  }
+
+  .time-slider-track-container {
+    position: relative;
+    margin: 32px 0;
+  }
+
+  .time-slider-track {
+    position: relative;
+    height: 80px;
+    background: linear-gradient(to right, 
+      var(--bg-tertiary) 0%, 
+      rgba(20, 184, 166, 0.05) 50%, 
+      var(--bg-tertiary) 100%);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    overflow: visible;
+    cursor: pointer;
+  }
+
+  .time-slider-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--text-tertiary);
+  }
+
+  .time-slider-label {
+    font-weight: 500;
+  }
+
+  .time-slider-segment {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    border-radius: 8px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    cursor: pointer;
+  }
+
+  .time-slider-segment:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .time-slider-segment-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    pointer-events: none;
+  }
+
+  .time-slider-segment-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    margin-bottom: 2px;
+  }
+
+  .time-slider-segment-duration {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.9);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  }
+
+  .time-slider-handle {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 24px;
+    height: 48px;
+    background: var(--bg-primary);
+    border: 2px solid #14b8a6;
+    border-radius: 6px;
+    cursor: grab;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease;
+  }
+
+  .time-slider-handle:hover {
+    border-color: #0d9488;
+    box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+
+  .time-slider-handle:active {
+    cursor: grabbing;
+  }
+
+  .time-slider-handle.active {
+    border-color: #06b6d4;
+    box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.2), 
+                0 4px 16px rgba(20, 184, 166, 0.4);
+    transform: translate(-50%, -50%) scale(1.15);
+  }
+
+  .time-slider-handle-bars {
+    display: flex;
+    gap: 2px;
+    align-items: center;
+  }
+
+  .time-slider-handle-bar {
+    width: 2px;
+    height: 20px;
+    background: #14b8a6;
+    border-radius: 1px;
+  }
+
+  .time-slider-handle.active .time-slider-handle-bar {
+    background: #06b6d4;
+  }
+
+  .time-slider-projects {
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+
+  .time-slider-projects-header {
+    margin-bottom: 12px;
+  }
+
+  .time-slider-projects-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .time-slider-project-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .time-slider-project-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid var(--border);
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+  }
+
+  .time-slider-project-chip:hover:not(.disabled) {
+    background-color: var(--bg-secondary);
+    border-color: #14b8a6;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(20, 184, 166, 0.2);
+  }
+
+  .time-slider-project-chip.active {
+    background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+    color: white;
+    border-color: #0d9488;
+    box-shadow: 0 2px 8px rgba(20, 184, 166, 0.3);
+  }
+
+  .time-slider-project-chip.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background-color: var(--bg-tertiary);
+  }
+
+  .time-slider-segments-info {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+
+  .time-slider-segment-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background-color: var(--bg-tertiary);
+    border-radius: 8px;
+    margin-bottom: 8px;
+    border: 1px solid var(--border);
+    transition: all 0.2s ease;
+  }
+
+  .time-slider-segment-item:hover {
+    background-color: var(--bg-secondary);
+    border-color: #14b8a6;
+  }
+
+  .time-slider-segment-item-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .time-slider-segment-item-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+
+  .time-slider-segment-item-name {
+    font-weight: 500;
+    color: var(--text-primary);
+    font-size: 14px;
+  }
+
+  .time-slider-segment-item-duration {
+    font-size: 14px;
+    color: var(--text-secondary);
+    font-weight: 600;
+  }
+
+  .time-slider-segment-item-remove {
+    background: none;
+    border: none;
+    color: var(--text-tertiary);
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    transition: all 0.2s ease;
+  }
+
+  .time-slider-segment-item-remove:hover {
+    background-color: rgba(248, 113, 113, 0.1);
+    color: var(--error);
+  }
+
+  .time-slider-empty-state {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--text-tertiary);
+    font-size: 14px;
+  }
+
+  .time-slider-empty-state-text {
+    margin-bottom: 16px;
+  }
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .time-slider-segment {
+    animation: slideIn 0.3s ease;
+  }
+</style>
+
+<script>
+  class TimeSlider {
+    constructor(containerId, options = {}) {
+      this.container = document.getElementById(containerId);
+      if (!this.container) {
+        throw new Error(`Container with id "${containerId}" not found`);
+      }
+
+      this.totalHours = options.totalHours || 8;
+      this.snapIncrement = options.snapIncrement || 15; // minutes
+      this.segments = options.segments || [];
+      this.projects = options.projects || [];
+      this.onChange = options.onChange || (() => {});
+      this.date = options.date || new Date().toISOString().split('T')[0];
+
+      this.activeHandle = null;
+      this.dragStartX = 0;
+      this.dragStartPosition = 0;
+      this.trackWidth = 0;
+
+      this.projectColors = this.generateProjectColors();
+      this.init();
+    }
+
+    generateProjectColors() {
+      const colors = [
+        { bg: 'linear-gradient(135deg, #14b8a6 0%, #0d9488 100%)', solid: '#14b8a6' },
+        { bg: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)', solid: '#06b6d4' },
+        { bg: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', solid: '#3b82f6' },
+        { bg: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)', solid: '#8b5cf6' },
+        { bg: 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)', solid: '#ec4899' },
+        { bg: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)', solid: '#f59e0b' },
+        { bg: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', solid: '#10b981' },
+        { bg: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)', solid: '#6366f1' },
+      ];
+      return colors;
+    }
+
+    getProjectColor(projectId) {
+      const index = this.projects.findIndex(p => p.id === projectId);
+      return this.projectColors[index % this.projectColors.length];
+    }
+
+    init() {
+      this.setupEventListeners();
+      this.render();
+    }
+
+    setupEventListeners() {
+      const totalInput = this.container.querySelector('#total-hours-input');
+      if (totalInput) {
+        totalInput.addEventListener('change', (e) => {
+          this.totalHours = parseFloat(e.target.value) || 8;
+          this.render();
+          this.onChange(this.getSegmentsData());
+        });
+      }
+    }
+
+    hoursToMinutes(hours) {
+      return Math.round(hours * 60);
+    }
+
+    minutesToHours(minutes) {
+      return minutes / 60;
+    }
+
+    snapToIncrement(minutes) {
+      return Math.round(minutes / this.snapIncrement) * this.snapIncrement;
+    }
+
+    render() {
+      this.renderTrack();
+      this.renderProjectChips();
+      this.renderSegmentsInfo();
+    }
+
+    renderTrack() {
+      const track = this.container.querySelector('#time-slider-track');
+      const endLabel = this.container.querySelector('#time-slider-end-label');
+      
+      if (!track) return;
+
+      track.innerHTML = '';
+      this.trackWidth = track.offsetWidth;
+
+      if (endLabel) {
+        endLabel.textContent = `${this.totalHours}h`;
+      }
+
+      if (this.segments.length === 0) {
+        track.innerHTML = '<div class="time-slider-empty-state"><div class="time-slider-empty-state-text">Click a project chip to add a time segment</div></div>';
+        return;
+      }
+
+      let currentPosition = 0;
+      const totalMinutes = this.hoursToMinutes(this.totalHours);
+
+      this.segments.forEach((segment, index) => {
+        const segmentMinutes = segment.minutes || 0;
+        const segmentWidth = (segmentMinutes / totalMinutes) * 100;
+        const leftPercent = (currentPosition / totalMinutes) * 100;
+
+        const segmentEl = this.createSegmentElement(segment, leftPercent, segmentWidth, index);
+        track.appendChild(segmentEl);
+
+        // Add handle after each segment (except the last one)
+        if (index < this.segments.length - 1) {
+          const handlePosition = leftPercent + segmentWidth;
+          const handleEl = this.createHandleElement(handlePosition, index);
+          track.appendChild(handleEl);
+        }
+
+        currentPosition += segmentMinutes;
+      });
+    }
+
+    createSegmentElement(segment, leftPercent, widthPercent, index) {
+      const segmentEl = document.createElement('div');
+      segmentEl.className = 'time-slider-segment';
+      segmentEl.style.left = `${leftPercent}%`;
+      segmentEl.style.width = `${widthPercent}%`;
+      
+      const color = this.getProjectColor(segment.project_id);
+      segmentEl.style.background = color.bg;
+      segmentEl.dataset.segmentIndex = index;
+      segmentEl.dataset.projectId = segment.project_id;
+
+      const content = document.createElement('div');
+      content.className = 'time-slider-segment-content';
+      
+      const name = document.createElement('div');
+      name.className = 'time-slider-segment-name';
+      const project = this.projects.find(p => p.id === segment.project_id);
+      name.textContent = project ? project.name : 'Unknown';
+      
+      const duration = document.createElement('div');
+      duration.className = 'time-slider-segment-duration';
+      duration.textContent = `${this.minutesToHours(segment.minutes).toFixed(1)}h`;
+
+      content.appendChild(name);
+      content.appendChild(duration);
+      segmentEl.appendChild(content);
+
+      segmentEl.addEventListener('click', () => {
+        this.removeSegment(index);
+      });
+
+      return segmentEl;
+    }
+
+    createHandleElement(positionPercent, handleIndex) {
+      const handleEl = document.createElement('div');
+      handleEl.className = 'time-slider-handle';
+      handleEl.style.left = `${positionPercent}%`;
+      handleEl.dataset.handleIndex = handleIndex;
+
+      const bars = document.createElement('div');
+      bars.className = 'time-slider-handle-bars';
+      
+      for (let i = 0; i < 3; i++) {
+        const bar = document.createElement('div');
+        bar.className = 'time-slider-handle-bar';
+        bars.appendChild(bar);
+      }
+
+      handleEl.appendChild(bars);
+
+      this.attachHandleEvents(handleEl, handleIndex);
+
+      return handleEl;
+    }
+
+    attachHandleEvents(handleEl, handleIndex) {
+      handleEl.addEventListener('mousedown', (e) => this.startDrag(e, handleIndex));
+      handleEl.addEventListener('touchstart', (e) => this.startDrag(e, handleIndex), { passive: false });
+    }
+
+    startDrag(e, handleIndex) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      this.activeHandle = handleIndex;
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      this.dragStartX = clientX;
+
+      const handle = this.container.querySelector(`[data-handle-index="${handleIndex}"]`);
+      if (handle) {
+        handle.classList.add('active');
+        const rect = handle.getBoundingClientRect();
+        this.dragStartPosition = parseFloat(handle.style.left);
+      }
+
+      document.addEventListener('mousemove', this.handleDrag);
+      document.addEventListener('mouseup', this.stopDrag);
+      document.addEventListener('touchmove', this.handleDrag, { passive: false });
+      document.addEventListener('touchend', this.stopDrag);
+    }
+
+    handleDrag = (e) => {
+      if (this.activeHandle === null) return;
+
+      e.preventDefault();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const track = this.container.querySelector('#time-slider-track');
+      if (!track) return;
+
+      const trackRect = track.getBoundingClientRect();
+      const deltaX = clientX - this.dragStartX;
+      const deltaPercent = (deltaX / trackRect.width) * 100;
+      const newPosition = Math.max(0, Math.min(100, this.dragStartPosition + deltaPercent));
+
+      this.updateHandlePosition(this.activeHandle, newPosition);
+    };
+
+    stopDrag = () => {
+      if (this.activeHandle !== null) {
+        const handle = this.container.querySelector(`[data-handle-index="${this.activeHandle}"]`);
+        if (handle) {
+          handle.classList.remove('active');
+        }
+        this.activeHandle = null;
+        this.onChange(this.getSegmentsData());
+      }
+
+      document.removeEventListener('mousemove', this.handleDrag);
+      document.removeEventListener('mouseup', this.stopDrag);
+      document.removeEventListener('touchmove', this.handleDrag);
+      document.removeEventListener('touchend', this.stopDrag);
+    };
+
+    updateHandlePosition(handleIndex, positionPercent) {
+      const totalMinutes = this.hoursToMinutes(this.totalHours);
+      const positionMinutes = (positionPercent / 100) * totalMinutes;
+      const snappedMinutes = Math.max(0, Math.min(totalMinutes, this.snapToIncrement(positionMinutes)));
+      const snappedPercent = (snappedMinutes / totalMinutes) * 100;
+
+      const handle = this.container.querySelector(`[data-handle-index="${handleIndex}"]`);
+      if (!handle) return;
+
+      handle.style.left = `${snappedPercent}%`;
+
+      // Update adjacent segments
+      const segmentBefore = this.segments[handleIndex];
+      const segmentAfter = this.segments[handleIndex + 1];
+
+      if (segmentBefore && segmentAfter) {
+        const currentBoundary = this.getCurrentBoundaryPosition(handleIndex);
+        const newBoundary = snappedMinutes;
+
+        const delta = newBoundary - currentBoundary;
+        const segmentBeforeMinutes = segmentBefore.minutes + delta;
+        const segmentAfterMinutes = segmentAfter.minutes - delta;
+
+        // Ensure minimum segment size (15 minutes)
+        const minMinutes = 15;
+        if (segmentBeforeMinutes >= minMinutes && segmentAfterMinutes >= minMinutes) {
+          segmentBefore.minutes = segmentBeforeMinutes;
+          segmentAfter.minutes = segmentAfterMinutes;
+          this.render();
+        } else {
+          // Revert handle position if constraints violated
+          const revertPercent = (currentBoundary / totalMinutes) * 100;
+          handle.style.left = `${revertPercent}%`;
+        }
+      }
+    }
+
+    getCurrentBoundaryPosition(handleIndex) {
+      let position = 0;
+      for (let i = 0; i <= handleIndex; i++) {
+        position += this.segments[i].minutes;
+      }
+      return position;
+    }
+
+    renderProjectChips() {
+      const chipsContainer = this.container.querySelector('#time-slider-project-chips');
+      if (!chipsContainer) return;
+
+      chipsContainer.innerHTML = '';
+
+      this.projects.forEach(project => {
+        const chip = document.createElement('div');
+        chip.className = 'time-slider-project-chip';
+        chip.textContent = project.name;
+        chip.dataset.projectId = project.id;
+
+        const isUsed = this.segments.some(s => s.project_id === project.id);
+        if (isUsed) {
+          chip.classList.add('active');
+        }
+
+        if (project.suppressed) {
+          chip.classList.add('disabled');
+        } else {
+          chip.addEventListener('click', () => {
+            this.toggleProject(project.id);
+          });
+        }
+
+        chipsContainer.appendChild(chip);
+      });
+    }
+
+    toggleProject(projectId) {
+      const existingIndex = this.segments.findIndex(s => s.project_id === projectId);
+      
+      if (existingIndex !== -1) {
+        // Project exists, remove it
+        this.removeSegment(existingIndex);
+      } else {
+        // Project doesn't exist, add it
+        this.addSegment(projectId);
+      }
+    }
+
+    addSegment(projectId) {
+      const totalMinutes = this.hoursToMinutes(this.totalHours);
+      
+      // First segment: use full Total Hours value
+      if (this.segments.length === 0) {
+        this.segments.push({
+          project_id: projectId,
+          minutes: totalMinutes,
+        });
+      } else {
+        // When adding a new project, redistribute time among all segments (including new one)
+        // Offset existing workloads to make room for the new segment
+        const newSegmentCount = this.segments.length + 1;
+        const minutesPerSegment = Math.floor(totalMinutes / newSegmentCount);
+        const remainder = totalMinutes % newSegmentCount;
+        
+        // Redistribute time to existing segments
+        this.segments.forEach(segment => {
+          segment.minutes = minutesPerSegment;
+        });
+        
+        // Add new segment with its share, plus any remainder
+        this.segments.push({
+          project_id: projectId,
+          minutes: minutesPerSegment + remainder,
+        });
+      }
+
+      this.render();
+      this.onChange(this.getSegmentsData());
+    }
+
+    removeSegment(index) {
+      // Remove the segment
+      this.segments.splice(index, 1);
+      
+      // If there are remaining segments, redistribute the removed segment's time
+      if (this.segments.length > 0) {
+        const totalMinutes = this.hoursToMinutes(this.totalHours);
+        const minutesPerSegment = Math.floor(totalMinutes / this.segments.length);
+        const remainder = totalMinutes % this.segments.length;
+        
+        // Redistribute time to remaining segments
+        this.segments.forEach((segment, idx) => {
+          segment.minutes = minutesPerSegment + (idx === 0 ? remainder : 0);
+        });
+      }
+      
+      this.render();
+      this.onChange(this.getSegmentsData());
+    }
+
+    renderSegmentsInfo() {
+      const infoContainer = this.container.querySelector('#time-slider-segments-info');
+      if (!infoContainer) return;
+
+      if (this.segments.length === 0) {
+        infoContainer.innerHTML = '';
+        return;
+      }
+
+      const totalMinutes = this.segments.reduce((sum, s) => sum + s.minutes, 0);
+      const totalHours = this.minutesToHours(totalMinutes);
+
+      let html = `<div style="margin-bottom: 12px; font-size: 14px; color: var(--text-secondary);">
+        <strong>Total Allocated: ${totalHours.toFixed(1)}h / ${this.totalHours}h</strong>
+      </div>`;
+
+      this.segments.forEach((segment, index) => {
+        const project = this.projects.find(p => p.id === segment.project_id);
+        const color = this.getProjectColor(segment.project_id);
+        const hours = this.minutesToHours(segment.minutes);
+
+        html += `
+          <div class="time-slider-segment-item">
+            <div class="time-slider-segment-item-info">
+              <div class="time-slider-segment-item-color" style="background: ${color.solid};"></div>
+              <span class="time-slider-segment-item-name">${project ? project.name : 'Unknown'}</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 16px;">
+              <span class="time-slider-segment-item-duration">${hours.toFixed(1)}h</span>
+              <button class="time-slider-segment-item-remove" onclick="window.timeSliderInstance.removeSegment(${index})">
+                Remove
+              </button>
+            </div>
+          </div>
+        `;
+      });
+
+      infoContainer.innerHTML = html;
+    }
+
+    getSegmentsData() {
+      return {
+        segments: this.segments,
+        totalHours: this.totalHours,
+        date: this.date,
+      };
+    }
+
+    setSegments(segments) {
+      this.segments = segments;
+      this.render();
+    }
+
+    setProjects(projects) {
+      this.projects = projects;
+      this.render();
+    }
+  }
+
+  // Export for use
+  window.TimeSlider = TimeSlider;
+</script>
+

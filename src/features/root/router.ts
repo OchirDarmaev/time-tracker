@@ -21,8 +21,8 @@ export const rootRouter = s.router(rootContract, {
           status: 302,
           body: undefined,
         };
-      } else if (currentUser.roles.includes("worker")) {
-        res.setHeader("Location", "/worker/time");
+      } else if (currentUser.roles.includes("account")) {
+        res.setHeader("Location", "/account/time");
         return {
           status: 302,
           body: undefined,

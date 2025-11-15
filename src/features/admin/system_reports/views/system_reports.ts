@@ -6,13 +6,13 @@ import { minutesToHours } from "../../../../shared/utils/date_utils.js";
 
 export function renderSystemReports(): string {
   const allEntries = timeEntryModel.getAll();
-  const workers = userModel.getWorkers();
+  const accounts = userModel.getAccounts();
   const projects = projectModel.getAll();
 
-  const workerTotals: Record<number, number> = {};
-  workers.forEach((w) => {
+  const accountTotals: Record<number, number> = {};
+  accounts.forEach((w) => {
     const entries = timeEntryModel.getByUserId(w.id);
-    workerTotals[w.id] = entries.reduce((sum, e) => sum + e.minutes, 0);
+    accountTotals[w.id] = entries.reduce((sum, e) => sum + e.minutes, 0);
   });
 
   const projectTotals: Record<number, number> = {};
@@ -40,7 +40,9 @@ export function renderSystemReports(): string {
       <div
         class="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-5 shadow-sm"
       >
-        <h2 class="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">Hours by Worker</h2>
+        <h2 class="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">
+          Hours by Account
+        </h2>
         <table
           class="w-full border-separate border-spacing-0 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden shadow-sm"
         >
@@ -49,7 +51,7 @@ export function renderSystemReports(): string {
               <th
                 class="px-5 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600"
               >
-                Worker
+                Account
               </th>
               <th
                 class="px-5 py-4 text-right text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600"
@@ -59,11 +61,11 @@ export function renderSystemReports(): string {
             </tr>
           </thead>
           <tbody>
-            ${workers
+            ${accounts
               .map((w) => {
-                const hours = minutesToHours(workerTotals[w.id] || 0);
+                const hours = minutesToHours(accountTotals[w.id] || 0);
                 return `
-                <tr id="system-worker-${w.id}" class="hover:bg-gray-200 dark:hover:bg-gray-700">
+                <tr id="system-account-${w.id}" class="hover:bg-gray-200 dark:hover:bg-gray-700">
                   <td class="px-5 py-4 font-medium text-gray-900 dark:text-gray-100 text-sm">${w.email}</td>
                   <td class="px-5 py-4 text-right font-semibold text-indigo-600 dark:text-indigo-400 text-sm">${hours.toFixed(1)}h</td>
                 </tr>

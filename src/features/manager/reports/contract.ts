@@ -12,9 +12,9 @@ export const managerReportsContract = c.router({
       200: htmlResponse,
     },
   },
-  managerReportsWorker: {
+  managerReportsAccount: {
     method: "GET",
-    path: "/manager/reports/worker",
+    path: "/manager/reports/account",
     query: z.any(),
     responses: {
       200: htmlResponse,

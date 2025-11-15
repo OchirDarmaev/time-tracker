@@ -1,7 +1,7 @@
 import { initServer } from "@ts-rest/express";
 import { managerReportsContract } from "./contract.js";
 import { AuthStubRequest } from "../../../shared/middleware/auth_stub.js";
-import { renderWorkerReport } from "./views/worker_report.js";
+import { renderAccountReport } from "./views/account_report.js";
 import { renderProjectReport } from "./views/project_report.js";
 import { renderReportsPage } from "./views/reports_page.js";
 
@@ -34,7 +34,7 @@ export const managerReportsRouter = s.router(managerReportsContract, {
     };
   },
 
-  managerReportsWorker: async ({ query, req }) => {
+  managerReportsAccount: async ({ query, req }) => {
     const authReq = req as unknown as AuthStubRequest;
 
     if (!authReq.currentUser) {
@@ -53,14 +53,14 @@ export const managerReportsRouter = s.router(managerReportsContract, {
       };
     }
 
-    const userId = parseInt(query?.worker_id as string);
+    const userId = parseInt(query?.account_id as string);
     if (!userId) {
       return {
         status: 200,
-        body: '<p class="text-gray-500">Select a worker to view reports.</p>',
+        body: '<p class="text-gray-500">Select a account to view reports.</p>',
       };
     }
-    const html = renderWorkerReport(userId);
+    const html = renderAccountReport(userId);
     return {
       status: 200,
       body: html,

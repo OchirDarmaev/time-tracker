@@ -4,18 +4,18 @@ import { htmlResponse } from "../../../shared/contracts/html_response.js";
 
 const c = initContract();
 
-export const workerTimeContract = c.router({
-  workerTime: {
+export const accountTimeContract = c.router({
+  accountTime: {
     method: "GET",
-    path: "/worker/time",
+    path: "/account/time",
     query: z.any(),
     responses: {
       200: htmlResponse,
     },
   },
-  workerTimeEntries: {
+  accountTimeEntries: {
     method: "GET",
-    path: "/worker/time/entries",
+    path: "/account/time/entries",
     query: z.any(),
     responses: {
       200: htmlResponse,
@@ -24,7 +24,7 @@ export const workerTimeContract = c.router({
   },
   createTimeEntry: {
     method: "POST",
-    path: "/worker/time/entries",
+    path: "/account/time/entries",
     body: z.object({
       project_id: z.string(),
       date: z.string(),
@@ -39,7 +39,7 @@ export const workerTimeContract = c.router({
   },
   deleteTimeEntry: {
     method: "DELETE",
-    path: "/worker/time/entries/:id",
+    path: "/account/time/entries/:id",
     pathParams: z.object({ id: z.string() }),
     responses: {
       200: htmlResponse,
@@ -49,7 +49,7 @@ export const workerTimeContract = c.router({
   },
   syncTimeEntries: {
     method: "POST",
-    path: "/worker/time/sync",
+    path: "/account/time/sync",
     body: z.object({
       date: z.string(),
       segments: z.array(
@@ -66,9 +66,9 @@ export const workerTimeContract = c.router({
       403: z.any(),
     },
   },
-  workerTimeSummary: {
+  accountTimeSummary: {
     method: "GET",
-    path: "/worker/time/summary",
+    path: "/account/time/summary",
     query: z.any(),
     responses: {
       200: htmlResponse,

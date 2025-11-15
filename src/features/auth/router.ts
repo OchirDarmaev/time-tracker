@@ -46,7 +46,7 @@ export const authRouter = s.router(authContract, {
   setRole: async ({ body, req, res }) => {
     const authReq = req as unknown as AuthStubRequest;
     const role = body.role;
-    if (role && ["worker", "office-manager", "admin"].includes(role)) {
+    if (role && ["account", "office-manager", "admin"].includes(role)) {
       const userId = authReq.session!.userId as number | undefined;
       if (userId) {
         const user = userModel.getById(userId);

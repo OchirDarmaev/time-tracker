@@ -4,10 +4,10 @@ import { timeEntryModel } from "../../../../shared/models/time_entry.js";
 import { userModel } from "../../../../shared/models/user.js";
 import { minutesToHours } from "../../../../shared/utils/date_utils.js";
 
-export function renderWorkerReport(userId: number): string {
+export function renderAccountReport(userId: number): string {
   const user = userModel.getById(userId);
   if (!user) {
-    return '<div class="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-5 shadow-sm"><p class="text-red-500 dark:text-red-400">Worker not found.</p></div>';
+    return '<div class="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-5 shadow-sm"><p class="text-red-500 dark:text-red-400">Account not found.</p></div>';
   }
 
   const entries = timeEntryModel.getByUserId(userId);

@@ -20,7 +20,7 @@ export const adminUsersProjectsContract = c.router({
       200: htmlResponse,
     },
   },
-  assignWorkerToProject: {
+  assignAccountToProject: {
     method: "POST",
     path: "/admin/users-projects",
     body: z.object({ project_id: z.string(), user_id: z.coerce.number() }),
@@ -30,7 +30,7 @@ export const adminUsersProjectsContract = c.router({
       500: z.any(),
     },
   },
-  removeWorkerFromProject: {
+  removeAccountFromProject: {
     method: "DELETE",
     path: "/admin/users-projects/:id",
     pathParams: z.object({ id: z.string() }),

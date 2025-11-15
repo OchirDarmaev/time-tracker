@@ -1,6 +1,6 @@
 # Internal Time Reporting Tool
 
-A simple internal tool for tracking daily time across multiple projects with role-based access (Worker, Office-manager, Admin).
+A simple internal tool for tracking daily time across multiple projects with role-based access (Account, Office-manager, Admin).
 
 ## Tech Stack
 
@@ -39,7 +39,7 @@ yarn dev
 
 ## User Roles
 
-- **Worker**: Track time, view own reports
-- **Office-manager**: View aggregated reports across workers/projects
-- **Admin**: Manage projects, assign workers, view system-wide reports
+- **Account**: Track time, view own reports
+- **Office-manager**: View aggregated reports across accounts/projects
+- **Admin**: Manage projects, assign accounts, view system-wide reports
 

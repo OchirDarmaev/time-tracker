@@ -26,16 +26,16 @@ export function authStubMiddleware(req: AuthStubRequest, res: Response, next: Ne
     }
   }
 
-  // Default to first worker if no user selected
+  // Default to first account if no user selected
   if (!req.currentUser) {
-    const workers = userModel.getWorkers();
-    if (workers.length > 0) {
-      const worker = workers[0];
+    const accounts = userModel.getAccounts();
+    if (accounts.length > 0) {
+      const account = accounts[0];
       req.currentUser = {
-        id: worker.id,
-        email: worker.email,
-        role: worker.roles[0] || "worker",
-        roles: worker.roles,
+        id: account.id,
+        email: account.email,
+        role: account.roles[0] || "account",
+        roles: account.roles,
       };
     }
   }

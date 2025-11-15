@@ -1,5 +1,5 @@
 import { initServer } from "@ts-rest/express";
-import { workerTimeContract } from "./contract.js";
+import { accountTimeContract } from "./contract.js";
 import { AuthStubRequest } from "../../../shared/middleware/auth_stub.js";
 import { timeEntryModel } from "../../../shared/models/time_entry.js";
 import { projectModel } from "../../../shared/models/project.js";
@@ -17,8 +17,8 @@ import { renderTimeTrackingPage } from "./views/time_tracking_page.js";
 
 const s = initServer();
 
-export const workerTimeRouter = s.router(workerTimeContract, {
-  workerTime: async ({ req }) => {
+export const accountTimeRouter = s.router(accountTimeContract, {
+  accountTime: async ({ req }) => {
     const authReq = req as unknown as AuthStubRequest;
 
     if (!authReq.currentUser) {
@@ -27,7 +27,7 @@ export const workerTimeRouter = s.router(workerTimeContract, {
         body: { body: "Unauthorized" },
       };
     }
-    if (!authReq.currentUser.roles.includes("worker")) {
+    if (!authReq.currentUser.roles.includes("account")) {
       return {
         status: 403,
         body: { body: "Forbidden" },
@@ -54,7 +54,7 @@ export const workerTimeRouter = s.router(workerTimeContract, {
     }
   },
 
-  workerTimeEntries: async ({ query, req }) => {
+  accountTimeEntries: async ({ query, req }) => {
     const authReq = req as unknown as AuthStubRequest;
 
     if (!authReq.currentUser) {
@@ -63,7 +63,7 @@ export const workerTimeRouter = s.router(workerTimeContract, {
         body: { body: "Unauthorized" },
       };
     }
-    if (!authReq.currentUser.roles.includes("worker")) {
+    if (!authReq.currentUser.roles.includes("account")) {
       return {
         status: 403,
         body: { body: "Forbidden" },
@@ -98,7 +98,7 @@ export const workerTimeRouter = s.router(workerTimeContract, {
         body: { body: "Unauthorized" },
       };
     }
-    if (!authReq.currentUser.roles.includes("worker")) {
+    if (!authReq.currentUser.roles.includes("account")) {
       return {
         status: 403,
         body: { body: "Forbidden" },
@@ -159,7 +159,7 @@ export const workerTimeRouter = s.router(workerTimeContract, {
         body: { body: "Unauthorized" },
       };
     }
-    if (!authReq.currentUser.roles.includes("worker")) {
+    if (!authReq.currentUser.roles.includes("account")) {
       return {
         status: 403,
         body: { body: "Forbidden" },
@@ -205,7 +205,7 @@ export const workerTimeRouter = s.router(workerTimeContract, {
         body: { success: false },
       };
     }
-    if (!authReq.currentUser.roles.includes("worker")) {
+    if (!authReq.currentUser.roles.includes("account")) {
       return {
         status: 403,
         body: { success: false },
@@ -264,7 +264,7 @@ export const workerTimeRouter = s.router(workerTimeContract, {
     };
   },
 
-  workerTimeSummary: async ({ query, req }) => {
+  accountTimeSummary: async ({ query, req }) => {
     const authReq = req as unknown as AuthStubRequest;
 
     if (!authReq.currentUser) {
@@ -273,7 +273,7 @@ export const workerTimeRouter = s.router(workerTimeContract, {
         body: { body: "Unauthorized" },
       };
     }
-    if (!authReq.currentUser.roles.includes("worker")) {
+    if (!authReq.currentUser.roles.includes("account")) {
       return {
         status: 403,
         body: { body: "Forbidden" },

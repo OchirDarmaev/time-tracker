@@ -48,7 +48,7 @@ export function renderTimeTrackingPage(req: AuthStubRequest, includeLayout: bool
         </div>
         ${renderDatePicker({
           value: selectedDate,
-          hxGet: "/worker/time",
+          hxGet: "/account/time",
           hxTarget: "main",
           hxTrigger: "change",
           label: "Date",
@@ -64,11 +64,11 @@ export function renderTimeTrackingPage(req: AuthStubRequest, includeLayout: bool
           suppressed: p.suppressed || false,
         })),
         date: selectedDate,
-        syncUrl: "/worker/time/sync",
+        syncUrl: "/account/time/sync",
       })}
       ${renderTimeSummary({
         date: selectedDate,
-        hxGet: "/worker/time/summary",
+        hxGet: "/account/time/summary",
         hxTrigger: "load, entries-changed from:body",
       })}
     </div>
@@ -78,7 +78,7 @@ export function renderTimeTrackingPage(req: AuthStubRequest, includeLayout: bool
   `;
 
   if (includeLayout) {
-    return renderBaseLayout(content, req, "worker");
+    return renderBaseLayout(content, req, "account");
   } else {
     return content;
   }

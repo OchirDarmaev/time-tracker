@@ -9,9 +9,9 @@ export function renderUsersProjectsPage(req: AuthStubRequest) {
   const content = html`
     <div class="space-y-8">
       <div>
-        <h1 class="text-3xl font-bold mb-2 text-gray-900 dark:text-gray-100">Assign Workers</h1>
+        <h1 class="text-3xl font-bold mb-2 text-gray-900 dark:text-gray-100">Assign Accounts</h1>
         <p class="text-sm text-gray-600 dark:text-gray-400">
-          Manage worker assignments to projects
+          Manage account assignments to projects
         </p>
       </div>
 
@@ -26,7 +26,7 @@ export function renderUsersProjectsPage(req: AuthStubRequest) {
         <select
           id="project-select"
           hx-get="/admin/users-projects/project"
-          hx-target="#project-workers"
+          hx-target="#project-accounts"
           hx-swap="innerHTML transition:true"
           hx-trigger="change"
           hx-include="[name='project_id']"
@@ -38,12 +38,12 @@ export function renderUsersProjectsPage(req: AuthStubRequest) {
         </select>
       </div>
 
-      <div id="project-workers">
+      <div id="project-accounts">
         <div
           class="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-5 shadow-sm"
         >
           <p class="text-gray-600 dark:text-gray-400 text-center py-6">
-            Select a project to manage workers.
+            Select a project to manage accounts.
           </p>
         </div>
       </div>

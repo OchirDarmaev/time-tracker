@@ -1,6 +1,6 @@
 import { db } from "../config/database.js";
 
-export type UserRole = "worker" | "office-manager" | "admin";
+export type UserRole = "account" | "office-manager" | "admin";
 
 export interface User {
   id: number;
@@ -50,11 +50,11 @@ export const userModel = {
     return row ? parseUser(row) : undefined;
   },
 
-  getWorkers(): User[] {
+  getAccounts(): User[] {
     const rows = db
       .prepare("SELECT * FROM users WHERE active = 1 ORDER BY email")
       .all() as UserRow[];
-    return rows.map(parseUser).filter((user) => user.roles.includes("worker"));
+    return rows.map(parseUser).filter((user) => user.roles.includes("account"));
   },
 
   create(email: string, roles: UserRole[]): User {

@@ -11,7 +11,7 @@ export function renderProjectReport(projectId: number): string {
   }
 
   const entries = timeEntryModel.getByProjectId(projectId);
-  const workers = userModel.getWorkers();
+  const accounts = userModel.getAccounts();
 
   const grouped: Record<string, Record<number, number>> = {};
   entries.forEach((entry) => {
@@ -61,7 +61,7 @@ export function renderProjectReport(projectId: number): string {
               >
                 Date
               </th>
-              ${workers
+              ${accounts
                 .map(
                   (w) =>
                     `<th class="px-5 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600">${w.email}</th>`
@@ -88,7 +88,7 @@ export function renderProjectReport(projectId: number): string {
         class="hover:bg-gray-200 dark:hover:bg-gray-700"
       >
         <td class="px-5 py-4 font-medium text-gray-900 dark:text-gray-100 text-sm">${date}</td>
-        ${workers
+        ${accounts
           .map((w) => {
             const minutes = grouped[date][w.id] || 0;
             return `<td class="px-5 py-4 text-sm ${minutes > 0 ? "text-gray-900 dark:text-gray-100" : "text-gray-500 dark:text-gray-400"}">${minutesToHours(minutes).toFixed(1)}</td>`;
@@ -106,13 +106,13 @@ export function renderProjectReport(projectId: number): string {
           <tfoot>
             <tr class="bg-gray-200 dark:bg-gray-700">
               <td class="px-5 py-4 font-semibold text-gray-900 dark:text-gray-100 text-sm">Total</td>
-              ${workers
+              ${accounts
                 .map((w) => {
-                  const workerTotal = dates.reduce(
+                  const accountTotal = dates.reduce(
                     (sum, date) => sum + (grouped[date][w.id] || 0),
                     0
                   );
-                  return `<td class="px-5 py-4 font-semibold text-indigo-600 dark:text-indigo-400 text-sm">${minutesToHours(workerTotal).toFixed(1)}h</td>`;
+                  return `<td class="px-5 py-4 font-semibold text-indigo-600 dark:text-indigo-400 text-sm">${minutesToHours(accountTotal).toFixed(1)}h</td>`;
                 })
                 .join("")}
               <td class="px-5 py-4 text-right font-bold text-indigo-600 dark:text-indigo-400 text-sm">${minutesToHours(grandTotal).toFixed(1)}h</td>

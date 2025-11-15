@@ -4,7 +4,7 @@ import { AuthStubRequest } from "../../../shared/middleware/auth_stub.js";
 import { projectModel } from "../../../shared/models/project.js";
 import { ProjectUser, projectUserModel } from "../../../shared/models/project_user.js";
 import { renderUsersProjectsPage } from "./views/users_projects_page.js";
-import { renderProjectWorkers } from "./views/project_workers.js";
+import { renderProjectAccounts } from "./views/project_accounts.js";
 
 const s = initServer();
 
@@ -52,17 +52,17 @@ export const adminUsersProjectsRouter = s.router(adminUsersProjectsContract, {
     if (!projectId) {
       return {
         status: 200,
-        body: '<p class="text-gray-500">Select a project to manage workers.</p>',
+        body: '<p class="text-gray-500">Select a project to manage accounts.</p>',
       };
     }
-    const html = renderProjectWorkers(projectId);
+    const html = renderProjectAccounts(projectId);
     return {
       status: 200,
       body: html,
     };
   },
 
-  assignWorkerToProject: async ({ body, req }) => {
+  assignAccountToProject: async ({ body, req }) => {
     const authReq = req as unknown as AuthStubRequest;
 
     if (!authReq.currentUser) {
@@ -91,7 +91,7 @@ export const adminUsersProjectsRouter = s.router(adminUsersProjectsContract, {
 
     try {
       projectUserModel.create(userId, projectId);
-      const html = renderProjectWorkers(projectId);
+      const html = renderProjectAccounts(projectId);
       return {
         status: 200,
         body: html,
@@ -100,17 +100,17 @@ export const adminUsersProjectsRouter = s.router(adminUsersProjectsContract, {
       if (error instanceof Error && error.message.includes("UNIQUE constraint")) {
         return {
           status: 400,
-          body: { body: "Worker already assigned to this project" },
+          body: { body: "Account already assigned to this project" },
         };
       }
       return {
         status: 500,
-        body: { body: "Error assigning worker" },
+        body: { body: "Error assigning account" },
       };
     }
   },
 
-  removeWorkerFromProject: async ({ params, req }) => {
+  removeAccountFromProject: async ({ params, req }) => {
     const authReq = req as unknown as AuthStubRequest;
 
     if (!authReq.currentUser) {
@@ -147,7 +147,7 @@ export const adminUsersProjectsRouter = s.router(adminUsersProjectsContract, {
     }
 
     projectUserModel.delete(id);
-    const html = renderProjectWorkers(projectUser.project_id);
+    const html = renderProjectAccounts(projectUser.project_id);
     return {
       status: 200,
       body: html,

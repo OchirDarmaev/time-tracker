@@ -66,7 +66,7 @@ export function renderEntriesTable(entries: TimeEntry[], projects: Project[]): s
             </td>
             <td class="px-5 py-4 text-right">
               <button 
-                hx-delete="/worker/time/entries/${entry.id}"
+                hx-delete="/account/time/entries/${entry.id}"
                 hx-target="#entries-container"
                 hx-swap="innerHTML transition:true"
                 hx-confirm="Delete this entry?"

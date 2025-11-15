@@ -8,8 +8,8 @@ import { authContract } from "./features/auth/contract.js";
 import { authRouter } from "./features/auth/router.js";
 import { rootContract } from "./features/root/contract.js";
 import { rootRouter } from "./features/root/router.js";
-import { workerTimeContract } from "./features/worker/time/contract.js";
-import { workerTimeRouter } from "./features/worker/time/router.js";
+import { accountTimeContract } from "./features/account/time/contract.js";
+import { accountTimeRouter } from "./features/account/time/router.js";
 import { managerReportsContract } from "./features/manager/reports/contract.js";
 import { managerReportsRouter } from "./features/manager/reports/router.js";
 import { adminProjectsContract } from "./features/admin/projects/contract.js";
@@ -53,7 +53,7 @@ createExpressEndpoints(rootContract, rootRouter, app, {
   jsonQuery: true,
 });
 
-createExpressEndpoints(workerTimeContract, workerTimeRouter, app, {
+createExpressEndpoints(accountTimeContract, accountTimeRouter, app, {
   responseValidation: false,
   jsonQuery: true,
 });

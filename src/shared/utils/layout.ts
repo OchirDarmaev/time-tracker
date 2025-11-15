@@ -10,7 +10,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const roleLabels: Record<string, string> = {
-  worker: "Worker",
+  account: "Account",
   "office-manager": "Office Manager",
   admin: "Admin",
 };
@@ -18,10 +18,10 @@ const roleLabels: Record<string, string> = {
 function getNavButtons(availableRoles: string[], activeNav: string): string {
   const navItems = [
     {
-      href: "/worker/time",
+      href: "/account/time",
       label: "My Time",
-      requiredRoles: ["worker"],
-      activeNav: "worker",
+      requiredRoles: ["account"],
+      activeNav: "account",
     },
     {
       href: "/manager/reports",
@@ -37,7 +37,7 @@ function getNavButtons(availableRoles: string[], activeNav: string): string {
     },
     {
       href: "/admin/users-projects",
-      label: "Assign Workers",
+      label: "Assign Accounts",
       requiredRoles: ["admin"],
       activeNav: "admin_users",
     },
@@ -101,7 +101,7 @@ function getRoleSelector(availableRoles: string[], currentRole: string | undefin
 }
 
 function getProjectSelector(availableRoles: string[], userId: number | undefined): string {
-  if (!availableRoles.includes("worker") || !userId) return "";
+  if (!availableRoles.includes("account") || !userId) return "";
 
   const userProjects = projectModel.getByUserId(userId);
   if (userProjects.length === 0) return "";
@@ -109,7 +109,7 @@ function getProjectSelector(availableRoles: string[], userId: number | undefined
   return html`
     <select
       class="bg-gray-200 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-lg px-3 py-2 text-sm cursor-pointer hover:border-indigo-500 dark:hover:border-indigo-500 hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:border-indigo-500 focus:ring-3 focus:ring-indigo-500/10 min-w-[160px]"
-      onchange="if(this.value) window.location.href='/worker/time?project=' + this.value"
+      onchange="if(this.value) window.location.href='/account/time?project=' + this.value"
     >
       <option value="">All Projects</option>
       ${userProjects
@@ -125,7 +125,7 @@ export function renderBaseLayout(content: string, req: AuthStubRequest, activeNa
   const layoutPath = join(__dirname, "../views/layouts/base.html");
   let layout = readFileSync(layoutPath, "utf-8");
 
-  const currentUser = req.currentUser || { email: "Unknown", role: "worker", roles: ["worker"] };
+  const currentUser = req.currentUser || { email: "Unknown", role: "account", roles: ["account"] };
   const users = userModel.getAll();
   const userOptions = users
     .map((u) => {
@@ -136,7 +136,7 @@ export function renderBaseLayout(content: string, req: AuthStubRequest, activeNa
     .join("");
 
   // Get available roles for current user - use currentUser.roles directly (set by middleware)
-  const availableRoles: string[] = currentUser.roles || ["worker"];
+  const availableRoles: string[] = currentUser.roles || ["account"];
   const allRolesDisplay =
     availableRoles.map((role) => roleLabels[role] || role).join(", ") || "None";
 
@@ -160,8 +160,8 @@ export function renderBaseLayout(content: string, req: AuthStubRequest, activeNa
 }
 
 export function renderNavBar(req: AuthStubRequest, activeNav: string = ""): string {
-  const currentUser = req.currentUser || { email: "Unknown", role: "worker", roles: ["worker"] };
-  const availableRoles: string[] = currentUser.roles || ["worker"];
+  const currentUser = req.currentUser || { email: "Unknown", role: "account", roles: ["account"] };
+  const availableRoles: string[] = currentUser.roles || ["account"];
 
   const navButtons = getNavButtons(availableRoles, activeNav);
   const currentRole = req.session?.userRole as string | undefined;

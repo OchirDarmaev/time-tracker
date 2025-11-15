@@ -3,7 +3,13 @@ import { workerContract } from "../contracts/worker_contract.js";
 import { AuthStubRequest } from "../middleware/auth_stub.js";
 import { timeEntryModel } from "../models/time_entry.js";
 import { projectModel } from "../models/project.js";
-import { formatDate, getMonthFromDate, minutesToHours, getWorkingDaysInMonth, parseDate } from "../utils/date_utils.js";
+import {
+  formatDate,
+  getMonthFromDate,
+  minutesToHours,
+  getWorkingDaysInMonth,
+  parseDate,
+} from "../utils/date_utils.js";
 import { validateDate, validateMinutes } from "../utils/validation.js";
 import { renderSummary } from "../renderSummary.js";
 import { renderEntriesTable } from "../renderEntriesTable.js";
@@ -304,4 +310,3 @@ export const workerRouter = s.router(workerContract, {
     };
   },
 });
-

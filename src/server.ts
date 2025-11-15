@@ -4,8 +4,6 @@ import cookieParser from "cookie-parser";
 import { initializeDatabase } from "./config/database.js";
 import { authStubMiddleware } from "./middleware/auth_stub.js";
 import { createExpressEndpoints } from "@ts-rest/express";
-import { join, dirname } from "path";
-import { fileURLToPath } from "url";
 import { authStubContract } from "./contracts/auth_stub_contract.js";
 import { authStubRouter } from "./routes/auth_stub_router.js";
 import { rootContract } from "./contracts/root_contract.js";
@@ -21,11 +19,8 @@ import { adminUsersProjectsRouter } from "./routes/admin_users_projects_router.j
 import { adminSystemReportsContract } from "./contracts/admin_system_reports_contract.js";
 import { adminSystemReportsRouter } from "./routes/admin_system_reports_router.js";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
 const app = express();
-const PORT = process.env.PORT || 3002;
+const PORT = process.env.PORT || 3000;
 
 try {
   initializeDatabase();
@@ -47,13 +42,6 @@ app.use(
 );
 
 app.use(authStubMiddleware);
-
-// Serve static component files
-// TypeScript components are compiled to dist/views/components/*.js
-// Always serve from dist/views/components (components must be compiled first)
-const componentsPath = join(process.cwd(), "dist/views/components");
-app.use("/components", express.static(componentsPath, { extensions: ["js"] }));
-console.log(`Serving components from: ${componentsPath}`);
 
 createExpressEndpoints(authStubContract, authStubRouter, app, {
   responseValidation: false,

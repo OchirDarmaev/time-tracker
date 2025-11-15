@@ -12,7 +12,11 @@ export function renderTimeSummary(props: TimeSummaryProps = {}): string {
   const hxTrigger = props.hxTrigger || "load";
 
   // Build the URL with date parameter if provided
-  const url = hxGet ? (hxGet.includes("?") ? `${hxGet}&date=${date}` : `${hxGet}?date=${date}`) : "";
+  const url = hxGet
+    ? hxGet.includes("?")
+      ? `${hxGet}&date=${date}`
+      : `${hxGet}?date=${date}`
+    : "";
 
   // Determine the trigger attribute
   let triggerAttr = "";

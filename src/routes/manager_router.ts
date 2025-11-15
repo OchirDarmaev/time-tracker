@@ -100,4 +100,3 @@ export const managerRouter = s.router(managerContract, {
     };
   },
 });
-

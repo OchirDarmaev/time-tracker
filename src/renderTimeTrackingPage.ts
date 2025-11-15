@@ -1,5 +1,4 @@
 import { readFileSync } from "fs";
-import { join } from "path/posix";
 import { html } from "./utils/html";
 import { AuthStubRequest } from "./middleware/auth_stub";
 import { projectModel } from "./models/project";
@@ -9,6 +8,11 @@ import { renderBaseLayout } from "./utils/layout";
 import { renderDatePicker } from "./views/components/date_picker_component";
 import { renderTimeSlider } from "./views/components/time_slider_component";
 import { renderTimeSummary } from "./views/components/time_summary_component";
+import { join, dirname } from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // Worker time helper functions
 
@@ -34,14 +38,14 @@ export function renderTimeTrackingPage(req: AuthStubRequest, includeLayout: bool
   const sliderTotalHours = totalHours > 0 ? Math.max(totalHours, 8) : 8;
 
   // Read time slider HTML template (still needed for TimeSlider class definition)
-  const timeSliderPath = join(process.cwd(), "src/views/components/time_slider.html");
+  const timeSliderPath = join(__dirname, "views/components/time_slider.html");
   const timeSliderHtml = readFileSync(timeSliderPath, "utf-8");
 
-  // Prepare projects data for JavaScript
-  const projectsJson = JSON.stringify(
-    projects.map((p) => ({ id: p.id, name: p.name, suppressed: p.suppressed || false }))
-  );
-  const segmentsJson = JSON.stringify(segments);
+  // // Prepare projects data for JavaScript
+  // const projectsJson = JSON.stringify(
+  //   projects.map((p) => ({ id: p.id, name: p.name, suppressed: p.suppressed || false }))
+  // );
+  // const segmentsJson = JSON.stringify(segments);
 
   const content = html`
     <div class="space-y-8">
@@ -70,7 +74,6 @@ export function renderTimeTrackingPage(req: AuthStubRequest, includeLayout: bool
         date: selectedDate,
         syncUrl: "/worker/time/sync",
       })}
-
       ${renderTimeSummary({
         date: selectedDate,
         hxGet: "/worker/time/summary",

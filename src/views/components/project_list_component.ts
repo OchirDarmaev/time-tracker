@@ -18,7 +18,10 @@ export function renderProjectList(props: ProjectListProps): string {
   }
 
   return html`
-    <div class="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-5 shadow-sm" id="projects-list">
+    <div
+      class="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-5 shadow-sm"
+      id="projects-list"
+    >
       <table
         class="w-full border-separate border-spacing-0 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden shadow-sm"
       >

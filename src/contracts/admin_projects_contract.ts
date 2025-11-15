@@ -1,11 +1,8 @@
 import { initContract } from "@ts-rest/core";
 import { z } from "zod";
+import { htmlResponse } from "./htmlResponse";
 
-const c = initContract();
-const htmlResponse = c.otherResponse({
-  contentType: "text/html",
-  body: c.type<string>(),
-});
+export const c = initContract();
 
 export const adminProjectsContract = c.router({
   adminProjects: {
@@ -35,4 +32,3 @@ export const adminProjectsContract = c.router({
     },
   },
 });
-

@@ -8,9 +8,6 @@ import { renderProjectList } from "./views/components/project_list_component";
 
 export function renderProjectsPage(req: AuthStubRequest) {
   const projects = projectModel.getAll(true);
-  const projectsJson = JSON.stringify(
-    projects.map((p) => ({ id: p.id, name: p.name, suppressed: p.suppressed || false }))
-  );
 
   const content = html`
     <div class="space-y-8">

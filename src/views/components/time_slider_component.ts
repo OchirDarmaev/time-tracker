@@ -97,22 +97,24 @@ export function renderTimeSlider(props: TimeSliderProps = {}): string {
       </div>
     </div>
     <script>
-      (function() {
-        const container = document.getElementById('time-slider-container');
+      (function () {
+        const container = document.getElementById("time-slider-container");
         if (!container) return;
-        
+
         const tryInit = () => {
           if (window.TimeSlider) {
             try {
-              const totalHours = parseFloat(container.getAttribute('data-total-hours') || '8');
-              const segments = JSON.parse(container.getAttribute('data-segments') || '[]');
-              const projects = JSON.parse(container.getAttribute('data-projects') || '[]');
-              const date = container.getAttribute('data-date') || new Date().toISOString().split('T')[0];
-              const syncUrl = container.getAttribute('data-sync-url') || '';
-              
-              const uniqueId = 'time-slider-' + Date.now() + '-' + Math.random().toString(36).substring(2, 11);
+              const totalHours = parseFloat(container.getAttribute("data-total-hours") || "8");
+              const segments = JSON.parse(container.getAttribute("data-segments") || "[]");
+              const projects = JSON.parse(container.getAttribute("data-projects") || "[]");
+              const date =
+                container.getAttribute("data-date") || new Date().toISOString().split("T")[0];
+              const syncUrl = container.getAttribute("data-sync-url") || "";
+
+              const uniqueId =
+                "time-slider-" + Date.now() + "-" + Math.random().toString(36).substring(2, 11);
               container.id = uniqueId;
-              
+
               window.timeSliderInstance = new window.TimeSlider(uniqueId, {
                 totalHours: totalHours,
                 segments: segments,
@@ -121,31 +123,31 @@ export function renderTimeSlider(props: TimeSliderProps = {}): string {
                 onChange: (data) => {
                   if (syncUrl) {
                     fetch(syncUrl, {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
                       body: JSON.stringify({
                         date: data.date,
                         segments: data.segments,
                       }),
                     })
-                    .then(response => response.json())
-                    .then(result => {
-                      if (result.success && window.htmx) {
-                        window.htmx.trigger('body', 'entries-changed');
-                      }
-                    })
-                    .catch(error => console.error('Sync error:', error));
+                      .then((response) => response.json())
+                      .then((result) => {
+                        if (result.success && window.htmx) {
+                          window.htmx.trigger("body", "entries-changed");
+                        }
+                      })
+                      .catch((error) => console.error("Sync error:", error));
                   }
                 },
               });
             } catch (error) {
-              console.error('Error initializing TimeSlider:', error);
+              console.error("Error initializing TimeSlider:", error);
             }
           } else {
             setTimeout(tryInit, 50);
           }
         };
-        
+
         tryInit();
       })();
     </script>

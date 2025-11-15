@@ -18,6 +18,7 @@ class ProjectListComponent extends HTMLElement {
 
   constructor() {
     super();
+    this.className = "block";
   }
 
   connectedCallback(): void {
@@ -45,83 +46,7 @@ class ProjectListComponent extends HTMLElement {
     const projects: Project[] = JSON.parse(projectsJson);
 
     this.innerHTML = `
-      <style>
-        :host {
-          display: block;
-        }
-        .card {
-          background-color: var(--bg-secondary);
-          border: 1px solid var(--border);
-          border-radius: 10px;
-          padding: 20px;
-          box-shadow: var(--shadow-sm);
-        }
-        .table-modern {
-          width: 100%;
-          border-collapse: separate;
-          border-spacing: 0;
-          background-color: var(--bg-secondary);
-          border-radius: 10px;
-          overflow: hidden;
-          box-shadow: var(--shadow-sm);
-        }
-        .table-modern thead {
-          background-color: var(--bg-tertiary);
-        }
-        .table-modern th {
-          padding: 16px 20px;
-          text-align: left;
-          font-size: 13px;
-          font-weight: 600;
-          color: var(--text-secondary);
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
-          border-bottom: 1px solid var(--border);
-        }
-        .table-modern td {
-          padding: 16px 20px;
-          border-bottom: 1px solid var(--border);
-          color: var(--text-primary);
-          font-size: 14px;
-        }
-        .table-modern tbody tr:hover {
-          background-color: var(--bg-tertiary);
-        }
-        .table-modern tbody tr:last-child td {
-          border-bottom: none;
-        }
-        .badge {
-          display: inline-flex;
-          align-items: center;
-          padding: 4px 8px;
-          border-radius: 6px;
-          font-size: 12px;
-          font-weight: 500;
-        }
-        .badge-success {
-          background-color: rgba(74, 222, 128, 0.12);
-          color: var(--success);
-        }
-        .badge-neutral {
-          background-color: var(--bg-tertiary);
-          color: var(--text-secondary);
-        }
-        .btn-secondary {
-          background-color: var(--bg-tertiary);
-          color: var(--text-primary);
-          border: 1px solid var(--border);
-          border-radius: 8px;
-          padding: 8px 16px;
-          font-size: 14px;
-          font-weight: 500;
-          cursor: pointer;
-        }
-        .btn-secondary:hover {
-          background-color: var(--bg-secondary);
-          border-color: var(--accent);
-        }
-      </style>
-      <div class="card" id="projects-list">
+      <div class="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-5 shadow-sm" id="projects-list">
         ${this.renderProjectsList(projects)}
       </div>
     `;
@@ -129,36 +54,35 @@ class ProjectListComponent extends HTMLElement {
 
   private renderProjectsList(projects: Project[]): string {
     if (projects.length === 0) {
-      return '<p style="color: var(--text-secondary);">No projects found.</p>';
+      return '<p class="text-gray-600 dark:text-gray-400">No projects found.</p>';
     }
 
     return `
-      <table class="table-modern">
-        <thead>
+      <table class="w-full border-separate border-spacing-0 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden shadow-sm">
+        <thead class="bg-gray-200 dark:bg-gray-700">
           <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Status</th>
-            <th style="text-align: right;">Actions</th>
+            <th class="px-5 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600">ID</th>
+            <th class="px-5 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600">Name</th>
+            <th class="px-5 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600">Status</th>
+            <th class="px-5 py-4 text-right text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600">Actions</th>
           </tr>
         </thead>
         <tbody>
           ${projects
             .map(
               (project) => `
-            <tr id="project-${project.id}" style="${project.suppressed ? "opacity: 0.6;" : ""}">
-              <td style="color: var(--text-tertiary); font-size: 13px;">#${project.id}</td>
-              <td style="font-weight: 500;">${project.name}</td>
-              <td>
-                ${project.suppressed ? '<span class="badge badge-neutral">Suppressed</span>' : '<span class="badge badge-success">Active</span>'}
+            <tr id="project-${project.id}" class="hover:bg-gray-200 dark:hover:bg-gray-700 ${project.suppressed ? "opacity-60" : ""}">
+              <td class="px-5 py-4 text-gray-500 dark:text-gray-400 text-sm">#${project.id}</td>
+              <td class="px-5 py-4 text-gray-900 dark:text-gray-100 font-medium text-sm">${project.name}</td>
+              <td class="px-5 py-4">
+                ${project.suppressed ? '<span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400">Suppressed</span>' : '<span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400">Active</span>'}
               </td>
-              <td style="text-align: right;">
+              <td class="px-5 py-4 text-right">
                 <button 
                   hx-patch="/admin/projects/${project.id}/suppress"
                   hx-target="closest project-list"
                   hx-swap="outerHTML"
-                  class="btn-secondary"
-                  style="font-size: 13px; padding: 6px 12px;"
+                  class="bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-xs font-medium cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-600 hover:border-indigo-500 dark:hover:border-indigo-500"
                 >
                   ${project.suppressed ? "Activate" : "Suppress"}
                 </button>

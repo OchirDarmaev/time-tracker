@@ -16,6 +16,7 @@ class TimeSummaryComponent extends HTMLElement {
 
   constructor() {
     super();
+    this.className = "block w-full max-w-full box-border";
   }
 
   connectedCallback(): void {
@@ -95,22 +96,8 @@ class TimeSummaryComponent extends HTMLElement {
       this.getAttribute("data-hx-trigger") || this.getAttribute("hx-trigger") || "load";
 
     this.innerHTML = `
-      <style>
-        :host {
-          display: block;
-          width: 100%;
-          max-width: 100%;
-          box-sizing: border-box;
-        }
-        #summary-content {
-          min-height: 60px;
-          width: 100%;
-          max-width: 100%;
-          box-sizing: border-box;
-        }
-      </style>
-      <div id="summary-content" ${hxGet && hxTrigger.includes("entries-changed") ? `hx-get="${hxGet}" hx-target="this" hx-swap="innerHTML" hx-trigger="entries-changed from:body"` : ""}>
-        <div style="color: var(--text-secondary); text-align: center; padding: 20px;">
+      <div id="summary-content" class="block w-full max-w-full box-border min-h-[60px]" ${hxGet && hxTrigger.includes("entries-changed") ? `hx-get="${hxGet}" hx-target="this" hx-swap="innerHTML" hx-trigger="entries-changed from:body"` : ""}>
+        <div class="text-gray-500 dark:text-gray-400 text-center py-5">
           Loading...
         </div>
       </div>

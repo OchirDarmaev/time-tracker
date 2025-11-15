@@ -55,13 +55,15 @@ function getNavButtons(availableRoles: string[], activeNav: string): string {
       const activeClass = isActive ? "active" : "";
 
       if (hasAccess) {
-        return `<a href="${item.href}" class="nav-link ${activeClass}">${item.label}</a>`;
+        const baseClasses = "text-gray-600 dark:text-gray-400 no-underline text-sm font-medium px-3 py-2 rounded-md hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-700";
+        const activeClasses = isActive ? "text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20" : "";
+        return `<a href="${item.href}" class="${baseClasses} ${activeClasses}">${item.label}</a>`;
       } else {
         const requiredRolesText = item.requiredRoles
           .map((r) => `'${roleLabels[r] || r}'`)
           .join(" or ");
         const tooltipText = `role ${requiredRolesText} required`;
-        return `<span style="color: var(--text-tertiary); cursor: not-allowed; padding: 8px 12px; font-size: 14px;" title="${tooltipText}">${item.label}</span>`;
+        return `<span class="text-gray-500 dark:text-gray-500 cursor-not-allowed px-3 py-2 text-sm" title="${tooltipText}">${item.label}</span>`;
       }
     })
     .join("");
@@ -78,8 +80,7 @@ function getRoleSelector(availableRoles: string[], currentRole: string | undefin
       hx-trigger="change"
       hx-include="[name='role']"
       name="role"
-      class="select-modern"
-      style="min-width: 140px;"
+      class="bg-gray-200 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-lg px-3 py-2 text-sm cursor-pointer hover:border-indigo-500 dark:hover:border-indigo-500 hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:border-indigo-500 focus:ring-3 focus:ring-indigo-500/10 min-w-[140px]"
     >
       ${availableRoles
         .map((role) => {
@@ -99,8 +100,7 @@ function getProjectSelector(availableRoles: string[], userId: number | undefined
 
   return `
     <select 
-      class="select-modern"
-      style="min-width: 160px;"
+      class="bg-gray-200 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-lg px-3 py-2 text-sm cursor-pointer hover:border-indigo-500 dark:hover:border-indigo-500 hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:border-indigo-500 focus:ring-3 focus:ring-indigo-500/10 min-w-[160px]"
       onchange="if(this.value) window.location.href='/worker/time?project=' + this.value"
     >
       <option value="">All Projects</option>

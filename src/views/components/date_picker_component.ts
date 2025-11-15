@@ -9,6 +9,16 @@ class DatePickerComponent extends HTMLElement {
   constructor() {
     super();
     this.shadow = this.attachShadow({ mode: "open" });
+    const style = document.createElement("style");
+    style.textContent = `
+      :host {
+        display: block;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+      }
+    `;
+    this.shadow.appendChild(style);
   }
 
   connectedCallback(): void {
@@ -43,46 +53,12 @@ class DatePickerComponent extends HTMLElement {
     const label = this.getAttribute("label") || "Date";
 
     this.shadow.innerHTML = `
-      <style>
-        :host {
-          display: block;
-          width: 100%;
-          max-width: 100%;
-          box-sizing: border-box;
-        }
-        .date-picker-wrapper {
-          margin-bottom: 24px;
-          width: 100%;
-          max-width: 100%;
-          box-sizing: border-box;
-        }
-        label {
-          display: block;
-          font-size: 14px;
-          font-weight: 500;
-          margin-bottom: 8px;
-          color: var(--text-secondary);
-        }
-        input {
-          background-color: var(--bg-tertiary);
-          border: 1px solid var(--border);
-          color: var(--text-primary);
-          border-radius: 8px;
-          padding: 10px 14px;
-          font-size: 14px;
-          width: 100%;
-        }
-        input:focus {
-          outline: none;
-          border-color: var(--accent);
-          box-shadow: 0 0 0 3px rgba(107, 117, 216, 0.08);
-        }
-      </style>
-      <div class="date-picker-wrapper">
-        <label for="date-picker">${label}</label>
+      <div class="mb-6 w-full max-w-full box-border">
+        <label for="date-picker" class="block text-sm font-medium mb-2 text-gray-600 dark:text-gray-400">${label}</label>
         <input 
           type="date" 
           id="date-picker" 
+          class="bg-gray-200 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-lg px-3.5 py-2.5 text-sm w-full focus:outline-none focus:border-indigo-500 focus:ring-3 focus:ring-indigo-500/10"
           value="${value}"
           ${hxGet ? `hx-get="${hxGet}"` : ""}
           ${hxTarget ? `hx-target="${hxTarget}"` : ""}

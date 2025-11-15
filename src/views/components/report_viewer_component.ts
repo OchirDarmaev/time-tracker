@@ -45,6 +45,13 @@ class ReportViewerComponent extends HTMLElement {
   constructor() {
     super();
     this.shadow = this.attachShadow({ mode: "open" });
+    const style = document.createElement("style");
+    style.textContent = `
+      :host {
+        display: block;
+      }
+    `;
+    this.shadow.appendChild(style);
   }
 
   connectedCallback(): void {
@@ -73,65 +80,7 @@ class ReportViewerComponent extends HTMLElement {
     const data: ReportData = JSON.parse(dataJson);
 
     this.shadow.innerHTML = `
-      <style>
-        :host {
-          display: block;
-        }
-        .card {
-          background-color: var(--bg-secondary);
-          border: 1px solid var(--border);
-          border-radius: 10px;
-          padding: 20px;
-          box-shadow: var(--shadow-sm);
-        }
-        .table-modern {
-          width: 100%;
-          border-collapse: separate;
-          border-spacing: 0;
-          background-color: var(--bg-secondary);
-          border-radius: 10px;
-          overflow: hidden;
-          box-shadow: var(--shadow-sm);
-        }
-        .table-modern thead {
-          background-color: var(--bg-tertiary);
-        }
-        .table-modern th {
-          padding: 16px 20px;
-          text-align: left;
-          font-size: 13px;
-          font-weight: 600;
-          color: var(--text-secondary);
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
-          border-bottom: 1px solid var(--border);
-        }
-        .table-modern td {
-          padding: 16px 20px;
-          border-bottom: 1px solid var(--border);
-          color: var(--text-primary);
-          font-size: 14px;
-        }
-        .table-modern tbody tr:hover {
-          background-color: var(--bg-tertiary);
-        }
-        .table-modern tfoot tr {
-          background-color: var(--bg-tertiary);
-        }
-        .badge {
-          display: inline-flex;
-          align-items: center;
-          padding: 4px 8px;
-          border-radius: 6px;
-          font-size: 12px;
-          font-weight: 500;
-        }
-        .badge-neutral {
-          background-color: var(--bg-tertiary);
-          color: var(--text-secondary);
-        }
-      </style>
-      <div class="card">
+      <div class="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-5 shadow-sm">
         ${this.renderReport(type, data)}
       </div>
     `;
@@ -143,12 +92,12 @@ class ReportViewerComponent extends HTMLElement {
     } else if (type === "project") {
       return this.renderProjectReport(data as ProjectReportData);
     }
-    return '<p style="color: var(--text-secondary);">Select a worker or project to view reports.</p>';
+    return '<p class="text-gray-600 dark:text-gray-400">Select a worker or project to view reports.</p>';
   }
 
   private renderWorkerReport(data: WorkerReportData): string {
     if (!data.user || !data.entries || data.entries.length === 0) {
-      return `<p style="color: var(--text-secondary);">No time entries for ${data.user?.email || "this worker"}.</p>`;
+      return `<p class="text-gray-600 dark:text-gray-400">No time entries for ${data.user?.email || "this worker"}.</p>`;
     }
 
     // Group entries by date and project
@@ -176,16 +125,16 @@ class ReportViewerComponent extends HTMLElement {
 
     return `
       <div class="flex items-center justify-between mb-6">
-        <h3 class="text-lg font-semibold" style="color: var(--text-primary);">Report for ${data.user.email}</h3>
-        <div class="badge badge-neutral">${(grandTotal / 60).toFixed(1)}h total</div>
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Report for ${data.user.email}</h3>
+        <div class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400">${(grandTotal / 60).toFixed(1)}h total</div>
       </div>
-      <div style="overflow-x: scroll; overflow-y: visible;">
-        <table class="table-modern">
-          <thead>
+      <div class="overflow-x-scroll overflow-y-visible">
+        <table class="w-full border-separate border-spacing-0 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden shadow-sm">
+          <thead class="bg-gray-200 dark:bg-gray-700">
             <tr>
-              <th>Date</th>
-              ${projects.map((p) => `<th>${p.name}</th>`).join("")}
-              <th style="text-align: right;">Total</th>
+              <th class="px-5 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600">Date</th>
+              ${projects.map((p) => `<th class="px-5 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600">${p.name}</th>`).join("")}
+              <th class="px-5 py-4 text-right text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600">Total</th>
             </tr>
           </thead>
           <tbody>
@@ -193,33 +142,33 @@ class ReportViewerComponent extends HTMLElement {
               .map((date) => {
                 const dayTotal = Object.values(grouped[date]).reduce((sum, mins) => sum + mins, 0);
                 return `
-                <tr id="report-row-${data.user.id}-${date}">
-                  <td style="font-weight: 500;">${date}</td>
+                <tr id="report-row-${data.user.id}-${date}" class="hover:bg-gray-200 dark:hover:bg-gray-700">
+                  <td class="px-5 py-4 font-medium text-gray-900 dark:text-gray-100 text-sm">${date}</td>
                   ${projects
                     .map((p) => {
                       const minutes = grouped[date][p.id] || 0;
-                      return `<td style="color: ${minutes > 0 ? "var(--text-primary)" : "var(--text-tertiary)"};">${(minutes / 60).toFixed(1)}</td>`;
+                      return `<td class="px-5 py-4 text-sm ${minutes > 0 ? "text-gray-900 dark:text-gray-100" : "text-gray-500 dark:text-gray-400"}">${(minutes / 60).toFixed(1)}</td>`;
                     })
                     .join("")}
-                  <td style="text-align: right; font-weight: 600; color: var(--accent);">${(dayTotal / 60).toFixed(1)}h</td>
+                  <td class="px-5 py-4 text-right font-semibold text-indigo-600 dark:text-indigo-400 text-sm">${(dayTotal / 60).toFixed(1)}h</td>
                 </tr>
               `;
               })
               .join("")}
           </tbody>
           <tfoot>
-            <tr>
-              <td style="font-weight: 600;">Total</td>
+            <tr class="bg-gray-200 dark:bg-gray-700">
+              <td class="px-5 py-4 font-semibold text-gray-900 dark:text-gray-100 text-sm">Total</td>
               ${projects
                 .map((p) => {
                   const projectTotal = dates.reduce(
                     (sum, date) => sum + (grouped[date][p.id] || 0),
                     0
                   );
-                  return `<td style="font-weight: 600; color: var(--accent);">${(projectTotal / 60).toFixed(1)}h</td>`;
+                  return `<td class="px-5 py-4 font-semibold text-indigo-600 dark:text-indigo-400 text-sm">${(projectTotal / 60).toFixed(1)}h</td>`;
                 })
                 .join("")}
-              <td style="text-align: right; font-weight: 700; color: var(--accent);">${(grandTotal / 60).toFixed(1)}h</td>
+              <td class="px-5 py-4 text-right font-bold text-indigo-600 dark:text-indigo-400 text-sm">${(grandTotal / 60).toFixed(1)}h</td>
             </tr>
           </tfoot>
         </table>
@@ -229,7 +178,7 @@ class ReportViewerComponent extends HTMLElement {
 
   private renderProjectReport(data: ProjectReportData): string {
     if (!data.project || !data.entries || data.entries.length === 0) {
-      return `<p style="color: var(--text-secondary);">No time entries for project ${data.project?.name || "this project"}.</p>`;
+      return `<p class="text-gray-600 dark:text-gray-400">No time entries for project ${data.project?.name || "this project"}.</p>`;
     }
 
     // Group entries by date and user
@@ -257,16 +206,16 @@ class ReportViewerComponent extends HTMLElement {
 
     return `
       <div class="flex items-center justify-between mb-6">
-        <h3 class="text-lg font-semibold" style="color: var(--text-primary);">Report for ${data.project.name}</h3>
-        <div class="badge badge-neutral">${(grandTotal / 60).toFixed(1)}h total</div>
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Report for ${data.project.name}</h3>
+        <div class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400">${(grandTotal / 60).toFixed(1)}h total</div>
       </div>
-      <div style="overflow-x: scroll; overflow-y: visible;">
-        <table class="table-modern">
-          <thead>
+      <div class="overflow-x-scroll overflow-y-visible">
+        <table class="w-full border-separate border-spacing-0 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden shadow-sm">
+          <thead class="bg-gray-200 dark:bg-gray-700">
             <tr>
-              <th>Date</th>
-              ${workers.map((w) => `<th>${w.email}</th>`).join("")}
-              <th style="text-align: right;">Total</th>
+              <th class="px-5 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600">Date</th>
+              ${workers.map((w) => `<th class="px-5 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600">${w.email}</th>`).join("")}
+              <th class="px-5 py-4 text-right text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600">Total</th>
             </tr>
           </thead>
           <tbody>
@@ -274,33 +223,33 @@ class ReportViewerComponent extends HTMLElement {
               .map((date) => {
                 const dayTotal = Object.values(grouped[date]).reduce((sum, mins) => sum + mins, 0);
                 return `
-                <tr id="report-row-project-${data.project.id}-${date}">
-                  <td style="font-weight: 500;">${date}</td>
+                <tr id="report-row-project-${data.project.id}-${date}" class="hover:bg-gray-200 dark:hover:bg-gray-700">
+                  <td class="px-5 py-4 font-medium text-gray-900 dark:text-gray-100 text-sm">${date}</td>
                   ${workers
                     .map((w) => {
                       const minutes = grouped[date][w.id] || 0;
-                      return `<td style="color: ${minutes > 0 ? "var(--text-primary)" : "var(--text-tertiary)"};">${(minutes / 60).toFixed(1)}</td>`;
+                      return `<td class="px-5 py-4 text-sm ${minutes > 0 ? "text-gray-900 dark:text-gray-100" : "text-gray-500 dark:text-gray-400"}">${(minutes / 60).toFixed(1)}</td>`;
                     })
                     .join("")}
-                  <td style="text-align: right; font-weight: 600; color: var(--accent);">${(dayTotal / 60).toFixed(1)}h</td>
+                  <td class="px-5 py-4 text-right font-semibold text-indigo-600 dark:text-indigo-400 text-sm">${(dayTotal / 60).toFixed(1)}h</td>
                 </tr>
               `;
               })
               .join("")}
           </tbody>
           <tfoot>
-            <tr>
-              <td style="font-weight: 600;">Total</td>
+            <tr class="bg-gray-200 dark:bg-gray-700">
+              <td class="px-5 py-4 font-semibold text-gray-900 dark:text-gray-100 text-sm">Total</td>
               ${workers
                 .map((w) => {
                   const workerTotal = dates.reduce(
                     (sum, date) => sum + (grouped[date][w.id] || 0),
                     0
                   );
-                  return `<td style="font-weight: 600; color: var(--accent);">${(workerTotal / 60).toFixed(1)}h</td>`;
+                  return `<td class="px-5 py-4 font-semibold text-indigo-600 dark:text-indigo-400 text-sm">${(workerTotal / 60).toFixed(1)}h</td>`;
                 })
                 .join("")}
-              <td style="text-align: right; font-weight: 700; color: var(--accent);">${(grandTotal / 60).toFixed(1)}h</td>
+              <td class="px-5 py-4 text-right font-bold text-indigo-600 dark:text-indigo-400 text-sm">${(grandTotal / 60).toFixed(1)}h</td>
             </tr>
           </tfoot>
         </table>

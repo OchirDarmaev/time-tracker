@@ -756,7 +756,7 @@ export const router = s.router(apiContract, {
       return new Promise((resolve) => {
         authReq.session!.save(() => {
           const referer = authReq.get('Referer') || '/';
-          res.redirect(referer);
+          res.setHeader('Location', referer);
           resolve({
             status: 302,
             body: undefined,
@@ -765,7 +765,7 @@ export const router = s.router(apiContract, {
       });
     }
     const referer = authReq.get('Referer') || '/';
-    res.redirect(referer);
+    res.setHeader('Location', referer);
     
     return {
       status: 302,
@@ -773,7 +773,7 @@ export const router = s.router(apiContract, {
     };
   },
   
-  setRole: async ({ body, req, res }) => {
+  setRole: async ({ body, req,}) => {
     const authReq = req as unknown as AuthStubRequest;
     const role = body.role;
     if (role && ['worker', 'office-manager', 'admin'].includes(role)) {
@@ -789,50 +789,49 @@ export const router = s.router(apiContract, {
       }
     }
     const referer = authReq.get('Referer') || '/';
-    res.redirect(referer);
-      return {
+    res.setHeader('Location', referer);
+    return {
       status: 302,
       body: undefined,
     };
   },
   
-  getNavBar: async ({ query, req, res }) => {
+  getNavBar: async ({ query, req,}) => {
     const authReq = req as unknown as AuthStubRequest;
     const activeNav = (query?.active_nav as string) || '';
     const html = renderNavBar(authReq, activeNav);
-    res.status(200).send(html);
     return {
       status: 200,
-      body: undefined,
+      body: html,
     };
   },
   
   // Root redirect
-  root: async ({ req, res }) => {
+  root: async ({ req,}) => {
     const authReq = req as unknown as AuthStubRequest;
     const currentUser = authReq.currentUser;
     if (currentUser) {
       if (currentUser.roles.includes('admin')) {
-        res.redirect('/admin/projects');
+        res.setHeader('Location', '/admin/projects');
         return {
           status: 302,
           body: undefined,
         };
       } else if (currentUser.roles.includes('office-manager')) {
-        res.redirect('/manager/reports');
+        res.setHeader('Location', '/manager/reports');
         return {
           status: 302,
           body: undefined,
         };
       } else if (currentUser.roles.includes('worker')) {
-        res.redirect('/worker/time');
+        res.setHeader('Location', '/worker/time');
         return {
           status: 302,
           body: undefined,
         };
       }
     }
-    res.redirect('/');
+    res.setHeader('Location', '/');
     return {
       status: 302,
       body: undefined,
@@ -840,18 +839,16 @@ export const router = s.router(apiContract, {
   },
   
   // Worker time routes
-  workerTime: async ({ query, req, res }) => {
+  workerTime: async ({ query, req,}) => {
     const authReq = req as unknown as AuthStubRequest;
     
     if (!authReq.currentUser) {
-      res.status(401).send('Unauthorized');
       return {
         status: 401,
         body: { body: 'Unauthorized' },
       };
     }
     if (!authReq.currentUser.roles.includes('worker')) {
-      res.status(403).send('Forbidden');
       return {
         status: 403,
         body: { body: 'Forbidden' },
@@ -859,25 +856,23 @@ export const router = s.router(apiContract, {
     }
     
     const html = renderTimeTrackingPage(authReq);
-    res.status(200).send(html);
+    
     return {
       status: 200,
-      body: undefined,
-    };
+      body: html,
+    }
   },
   
-  workerTimeEntries: async ({ query, req, res }) => {
+  workerTimeEntries: async ({ query, req,}) => {
     const authReq = req as unknown as AuthStubRequest;
     
     if (!authReq.currentUser) {
-      res.status(401).send('Unauthorized');
       return {
         status: 401,
         body: { body: 'Unauthorized' },
       };
     }
     if (!authReq.currentUser.roles.includes('worker')) {
-      res.status(403).send('Forbidden');
       return {
         status: 403,
         body: { body: 'Forbidden' },
@@ -888,7 +883,6 @@ export const router = s.router(apiContract, {
     const date = (query?.date as string) || formatDate(new Date());
     
     if (!validateDate(date)) {
-      res.status(400).send('Invalid date');
       return {
         status: 400,
         body: { body: 'Invalid date' },
@@ -898,25 +892,22 @@ export const router = s.router(apiContract, {
     const projects = projectModel.getByUserId(currentUser.id);
     const entries = timeEntryModel.getByUserIdAndDate(currentUser.id, date);
     const html = renderEntriesTable(entries, projects);
-    res.status(200).send(html);
     return {
       status: 200,
-      body: undefined,
+      body: html,
     };
   },
   
-  createTimeEntry: async ({ body, req, res }) => {
+  createTimeEntry: async ({ body, req,}) => {
     const authReq = req as unknown as AuthStubRequest;
     
     if (!authReq.currentUser) {
-      res.status(401).send('Unauthorized');
       return {
         status: 401,
         body: { body: 'Unauthorized' },
       };
     }
     if (!authReq.currentUser.roles.includes('worker')) {
-      res.status(403).send('Forbidden');
       return {
         status: 403,
         body: { body: 'Forbidden' },
@@ -927,7 +918,6 @@ export const router = s.router(apiContract, {
     const { project_id, date, hours, comment } = body;
     
     if (!validateDate(date)) {
-      res.status(400).send('Invalid date');
       return {
         status: 400,
         body: { body: 'Invalid date' },
@@ -936,7 +926,6 @@ export const router = s.router(apiContract, {
     
     const minutes = Math.round(parseFloat(hours) * 60);
     if (!validateMinutes(minutes)) {
-      res.status(400).send('Invalid hours');
       return {
         status: 400,
         body: { body: 'Invalid hours' },
@@ -945,7 +934,6 @@ export const router = s.router(apiContract, {
     
     const project = projectModel.getById(parseInt(project_id));
     if (!project) {
-      res.status(400).send('Invalid project');
       return {
         status: 400,
         body: { body: 'Invalid project' },
@@ -954,7 +942,6 @@ export const router = s.router(apiContract, {
     
     const userProjects = projectModel.getByUserId(currentUser.id);
     if (!userProjects.find(p => p.id === project.id)) {
-      res.status(403).send('Access denied to this project');
       return {
         status: 403,
         body: { body: 'Access denied to this project' },
@@ -966,25 +953,22 @@ export const router = s.router(apiContract, {
     const projects = projectModel.getByUserId(currentUser.id);
     const entries = timeEntryModel.getByUserIdAndDate(currentUser.id, date);
     const html = renderEntriesTable(entries, projects);
-    res.status(200).send(html);
     return {
       status: 200,
-      body: undefined,
+      body: html,
     };
   },
   
-  deleteTimeEntry: async ({ params, req, res }) => {
+  deleteTimeEntry: async ({ params, req,}) => {
     const authReq = req as unknown as AuthStubRequest;
     
     if (!authReq.currentUser) {
-      res.status(401).send('Unauthorized');
       return {
         status: 401,
         body: { body: 'Unauthorized' },
       };
     }
     if (!authReq.currentUser.roles.includes('worker')) {
-      res.status(403).send('Forbidden');
       return {
         status: 403,
         body: { body: 'Forbidden' },
@@ -996,7 +980,6 @@ export const router = s.router(apiContract, {
     
     const entry = timeEntryModel.getById(entryId);
     if (!entry) {
-      res.status(404).send('Entry not found');
       return {
         status: 404,
         body: { body: 'Entry not found' },
@@ -1004,7 +987,6 @@ export const router = s.router(apiContract, {
     }
     
     if (entry.user_id !== currentUser.id) {
-      res.status(403).send('Access denied');
       return {
         status: 403,
         body: { body: 'Access denied' },
@@ -1017,25 +999,22 @@ export const router = s.router(apiContract, {
     const projects = projectModel.getByUserId(currentUser.id);
     const entries = timeEntryModel.getByUserIdAndDate(currentUser.id, date);
     const html = renderEntriesTable(entries, projects);
-    res.status(200).send(html);
     return {
       status: 200,
-      body: undefined,
+      body: html,
     };
   },
   
-  workerTimeSummary: async ({ query, req, res }) => {
+  workerTimeSummary: async ({ query, req,}) => {
     const authReq = req as unknown as AuthStubRequest;
     
     if (!authReq.currentUser) {
-      res.status(401).send('Unauthorized');
       return {
         status: 401,
         body: { body: 'Unauthorized' },
       };
     }
     if (!authReq.currentUser.roles.includes('worker')) {
-      res.status(403).send('Forbidden');
       return {
         status: 403,
         body: { body: 'Forbidden' },
@@ -1046,7 +1025,6 @@ export const router = s.router(apiContract, {
     const date = (query?.date as string) || formatDate(new Date());
     
     if (!validateDate(date)) {
-      res.status(400).send('Invalid date');
       return {
         status: 400,
         body: { body: 'Invalid date' },
@@ -1068,26 +1046,23 @@ export const router = s.router(apiContract, {
     const monthlyWarning = monthlyTotalHours < requiredMonthlyHours;
     
     const html = renderSummary(totalHours, monthlyTotalHours, requiredMonthlyHours, dailyWarning, monthlyWarning);
-    res.status(200).send(html);
     return {
       status: 200,
-      body: undefined,
+      body: html,
     };
   },
   
   // Manager reports routes
-  managerReports: async ({ req, res }) => {
+  managerReports: async ({ req,}) => {
     const authReq = req as unknown as AuthStubRequest;
     
     if (!authReq.currentUser) {
-      res.status(401).send('Unauthorized');
       return {
         status: 401,
         body: undefined,
       };
     }
     if (!authReq.currentUser.roles.includes('office-manager') && !authReq.currentUser.roles.includes('admin')) {
-      res.status(403).send('Forbidden');
       return {
         status: 403,
         body: { body: 'Forbidden' },
@@ -1095,25 +1070,22 @@ export const router = s.router(apiContract, {
     }
     
     const html = renderReportsPage(authReq);
-    res.status(200).send(html);
     return {
       status: 200,
-      body: undefined,
+      body: html,
     };
   },
   
-  managerReportsWorker: async ({ query, req, res  }) => {
+  managerReportsWorker: async ({ query, req, }) => {
     const authReq = req as unknown as AuthStubRequest;
     
     if (!authReq.currentUser) {
-      res.status(401).send('Unauthorized');
       return {
         status: 401,
         body: undefined,
       };
     }
     if (!authReq.currentUser.roles.includes('office-manager') && !authReq.currentUser.roles.includes('admin')) {
-      res.status(403).send('Forbidden');
       return {
         status: 403,
         body: { body: 'Forbidden' },
@@ -1122,32 +1094,28 @@ export const router = s.router(apiContract, {
     
     const userId = parseInt(query?.worker_id as string);
     if (!userId) {
-      res.status(200).send('<p class="text-gray-500">Select a worker to view reports.</p>');
       return {
         status: 200,
-        body: undefined,
+        body: '<p class="text-gray-500">Select a worker to view reports.</p>',
       };
     }
     const html = renderWorkerReport(userId);
-    res.status(200).send(html);
     return {
       status: 200,
-      body: undefined,
+      body: html,
     };
   },
   
-  managerReportsProject: async ({ query, req, res  }) => {
+  managerReportsProject: async ({ query, req, }) => {
     const authReq = req as unknown as AuthStubRequest;
     
     if (!authReq.currentUser) {
-      res.status(401).send('Unauthorized');
       return {
         status: 401,
         body: undefined,
       };
     }
     if (!authReq.currentUser.roles.includes('office-manager') && !authReq.currentUser.roles.includes('admin')) {
-      res.status(403).send('Forbidden');
       return {
         status: 403,
         body: { body: 'Forbidden' },
@@ -1156,33 +1124,29 @@ export const router = s.router(apiContract, {
     
     const projectId = parseInt(query?.project_id as string);
     if (!projectId) {
-      res.status(200).send('<p class="text-gray-500">Select a project to view reports.</p>');
       return {
         status: 200,
-        body: undefined,
+        body: '<p class="text-gray-500">Select a project to view reports.</p>',
       };
     }
     const html = renderProjectReport(projectId);
-    res.status(200).send(html);
     return {
       status: 200,
-      body: undefined,
+      body: html,
     };
   },
   
   // Admin projects routes
-  adminProjects: async ({ req , res }) => {
+  adminProjects: async ({ req ,}) => {
     const authReq = req as unknown as AuthStubRequest;
     
     if (!authReq.currentUser) {
-      res.status(401).send('Unauthorized');
       return {
         status: 401,
         body: undefined,
       };
     }
     if (!authReq.currentUser.roles.includes('admin')) {
-      res.status(403).send('Forbidden');
       return {
         status: 403,
         body: { body: 'Forbidden' },
@@ -1190,25 +1154,22 @@ export const router = s.router(apiContract, {
     }
     
     const html = renderProjectsPage(authReq);
-    res.status(200).send(html);
     return {
       status: 200,
-      body: undefined,
+      body: html,
     };
   },
   
-  createProject: async ({ body, req, res  }) => {
+  createProject: async ({ body, req, }) => {
     const authReq = req as unknown as AuthStubRequest;
     
     if (!authReq.currentUser) {
-      res.status(401).send('Unauthorized');
       return {
         status: 401,
         body: undefined,
       };
     }
     if (!authReq.currentUser.roles.includes('admin')) {
-      res.status(403).send('Forbidden');
       return {
         status: 403,
         body: { body: 'Forbidden' },
@@ -1218,7 +1179,6 @@ export const router = s.router(apiContract, {
     const { name } = body;
     
     if (!validateProjectName(name)) {
-      res.status(400).send('Invalid project name');
       return {
         status: 400,
         body: { body: 'Invalid project name' },
@@ -1229,20 +1189,17 @@ export const router = s.router(apiContract, {
       projectModel.create(name.trim());
       const projects = projectModel.getAll(true);
       const html = renderProjectsList(projects);
-      res.status(200).send(html);
       return {
         status: 200,
-        body: undefined,
+        body: html,
       };
     } catch (error: any) {
       if (error.message.includes('UNIQUE constraint')) {
-        res.status(400).send('Project name already exists');
         return {
           status: 400,
           body: { body: 'Project name already exists' },
         };
       }
-      res.status(500).send('Error creating project');
       return {
         status: 500,
         body: { body: 'Error creating project' },
@@ -1250,18 +1207,16 @@ export const router = s.router(apiContract, {
     }
   },
   
-  toggleProjectSuppress: async ({ params, req, res  }) => {
+  toggleProjectSuppress: async ({ params, req, }) => {
     const authReq = req as unknown as AuthStubRequest;
     
     if (!authReq.currentUser) {
-      res.status(401).send('Unauthorized');
       return {
         status: 401,
         body: undefined,
       };
     }
     if (!authReq.currentUser.roles.includes('admin')) {
-      res.status(403).send('Forbidden');
       return {
         status: 403,
         body: { body: 'Forbidden' },
@@ -1272,26 +1227,23 @@ export const router = s.router(apiContract, {
     projectModel.toggleSuppress(id);
     const projects = projectModel.getAll(true);
     const html = renderProjectsList(projects);
-    res.status(200).send(html);
     return {
       status: 200,
-      body: undefined,
+      body: html,
     };
   },
   
   // Admin users-projects routes
-  adminUsersProjects: async ({ req , res }) => {
+  adminUsersProjects: async ({ req ,}) => {
     const authReq = req as unknown as AuthStubRequest;
     
     if (!authReq.currentUser) {
-      res.status(401).send('Unauthorized');
       return {
         status: 401,
         body: undefined,
       };
     }
     if (!authReq.currentUser.roles.includes('admin')) {
-      res.status(403).send('Forbidden');
       return {
         status: 403,
         body: { body: 'Forbidden' },
@@ -1299,25 +1251,22 @@ export const router = s.router(apiContract, {
     }
     
     const html = renderUsersProjectsPage(authReq);
-    res.status(200).send(html);
     return {
       status: 200,
-      body: undefined,
+      body: html,
     };
   },
   
-  adminUsersProjectsProject: async ({ query, req, res  }) => {
+  adminUsersProjectsProject: async ({ query, req, }) => {
     const authReq = req as unknown as AuthStubRequest;
     
     if (!authReq.currentUser) {
-      res.status(401).send('Unauthorized');
       return {
         status: 401,
         body: undefined,
       };
     }
     if (!authReq.currentUser.roles.includes('admin')) {
-      res.status(403).send('Forbidden');
       return {
         status: 403,
         body: { body: 'Forbidden' },
@@ -1326,32 +1275,28 @@ export const router = s.router(apiContract, {
     
     const projectId = parseInt(query?.project_id as string);
     if (!projectId) {
-      res.status(200).send('<p class="text-gray-500">Select a project to manage workers.</p>');
       return {
         status: 200,
-        body: undefined,
+        body: '<p class="text-gray-500">Select a project to manage workers.</p>',
       };
     }
     const html = renderProjectWorkers(projectId);
-    res.status(200).send(html);
     return {
       status: 200,
-      body: undefined,
+      body: html,
     };
   },
   
-  assignWorkerToProject: async ({ body, req, res  }) => {
+  assignWorkerToProject: async ({ body, req, }) => {
     const authReq = req as unknown as AuthStubRequest;
     
     if (!authReq.currentUser) {
-      res.status(401).send('Unauthorized');
       return {
         status: 401,
         body: undefined,
       };
     }
     if (!authReq.currentUser.roles.includes('admin')) {
-      res.status(403).send('Forbidden');
       return {
         status: 403,
         body: { body: 'Forbidden' },
@@ -1363,7 +1308,6 @@ export const router = s.router(apiContract, {
     const userId = user_id;
     
     if (!projectId || !userId) {
-      res.status(400).send('Invalid project or user ID');
       return {
         status: 400,
         body: { body: 'Invalid project or user ID' },
@@ -1373,20 +1317,17 @@ export const router = s.router(apiContract, {
     try {
       projectUserModel.create(userId, projectId);
       const html = renderProjectWorkers(projectId);
-      res.status(200).send(html);
       return {
         status: 200,
-        body: undefined,
+        body: html,
       };
     } catch (error: any) {
       if (error.message.includes('UNIQUE constraint')) {
-        res.status(400).send('Worker already assigned to this project');
         return {
           status: 400,
           body: { body: 'Worker already assigned to this project' },
         };
       }
-      res.status(500).send('Error assigning worker');
       return {
         status: 500,
         body: { body: 'Error assigning worker' },
@@ -1394,18 +1335,16 @@ export const router = s.router(apiContract, {
     }
   },
   
-  removeWorkerFromProject: async ({ params, req, res  }) => {
+  removeWorkerFromProject: async ({ params, req, }) => {
     const authReq = req as unknown as AuthStubRequest;
     
     if (!authReq.currentUser) {
-      res.status(401).send('Unauthorized');
       return {
         status: 401,
         body: undefined,
       };
     }
     if (!authReq.currentUser.roles.includes('admin')) {
-      res.status(403).send('Forbidden');
       return {
         status: 403,
         body: { body: 'Forbidden' },
@@ -1426,7 +1365,6 @@ export const router = s.router(apiContract, {
     }
     
     if (!projectUser) {
-      res.status(404).send('Assignment not found');
       return {
         status: 404,
         body: { body: 'Assignment not found' },
@@ -1435,26 +1373,23 @@ export const router = s.router(apiContract, {
     
     projectUserModel.delete(id);
     const html = renderProjectWorkers(projectUser.project_id);
-    res.status(200).send(html);
     return {
       status: 200,
-      body: undefined,
+      body: html,
     };
   },
   
   // Admin system reports routes
-  adminSystemReports: async ({ req, res  }) => {
+  adminSystemReports: async ({ req, }) => {
     const authReq = req as unknown as AuthStubRequest;
     
     if (!authReq.currentUser) {
-      res.status(401).send('Unauthorized');
       return {
         status: 401,
         body: undefined,
       };
     }
     if (!authReq.currentUser.roles.includes('admin')) {
-      res.status(403).send('Forbidden');
       return {
         status: 403,
         body: { body: 'Forbidden' },
@@ -1462,25 +1397,22 @@ export const router = s.router(apiContract, {
     }
     
     const html = renderSystemReportsPage(authReq);
-    res.status(200).send(html);
     return {
       status: 200,
-      body: undefined,
+      body: html,
     };
   },
   
-  adminSystemReportsData: async ({ req, res  }) => {
+  adminSystemReportsData: async ({ req, }) => {
     const authReq = req as unknown as AuthStubRequest;
     
     if (!authReq.currentUser) {
-      res.status(401).send('Unauthorized');
       return {
         status: 401,
         body: undefined,
       };
     }
     if (!authReq.currentUser.roles.includes('admin')) {
-      res.status(403).send('Forbidden');
       return {
         status: 403,
         body: { body: 'Forbidden' },
@@ -1488,10 +1420,9 @@ export const router = s.router(apiContract, {
     }
     
     const html = renderSystemReports();
-    res.status(200).send(html);
     return {
       status: 200,
-      body: undefined,
+      body: html,
     };
   },
 });

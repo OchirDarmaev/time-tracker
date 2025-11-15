@@ -36,8 +36,9 @@ export const apiContract = c.router({
     method: 'GET',
     path: '/worker/time',
     query: c.type<{ date?: string }>(),
+    // headers: c.type<{ 'Content-Type': 'text/html' }>(),
     responses: {
-      200: c.type<{ body: string }>(),
+      200: z.any(),
     },
   },
   workerTimeEntries: {
@@ -45,7 +46,7 @@ export const apiContract = c.router({
     path: '/worker/time/entries',
     query: c.type<{ date: string }>(),
     responses: {
-      200: c.type<{ body: string }>(),
+      200: z.any(),
       400: c.type<{ body: string }>(),
     },
   },
@@ -54,7 +55,7 @@ export const apiContract = c.router({
     path: '/worker/time/entries',
     body: z.object({ project_id: z.string(), date: z.string(), hours: z.string(), comment: z.string().optional() }),
     responses: {
-      200: c.type<{ body: string }>(),
+      200: z.any(),
       400: c.type<{ body: string }>(),
       403: c.type<{ body: string }>(),
     },
@@ -64,7 +65,7 @@ export const apiContract = c.router({
     path: '/worker/time/entries/:id',
     pathParams: z.object({ id: z.string() }),
     responses: {
-      200: c.type<{ body: string }>(),
+      200: z.any(),
       403: c.type<{ body: string }>(),
       404: c.type<{ body: string }>(),
     },
@@ -74,7 +75,7 @@ export const apiContract = c.router({
     path: '/worker/time/summary',
     query: c.type<{ date: string }>(),
     responses: {
-      200: c.type<{ body: string }>(),
+      200: z.any(),
       400: c.type<{ body: string }>(),
     },
   },
@@ -84,7 +85,7 @@ export const apiContract = c.router({
     method: 'GET',
     path: '/manager/reports',
     responses: {
-      200: c.type<{ body: string }>(),
+      200: z.any(),
     },
   },
   managerReportsWorker: {
@@ -92,7 +93,7 @@ export const apiContract = c.router({
     path: '/manager/reports/worker',
     query: c.type<{ worker_id?: string }>(),
     responses: {
-      200: c.type<{ body: string }>(),
+      200: z.any(),
     },
   },
   managerReportsProject: {
@@ -100,7 +101,7 @@ export const apiContract = c.router({
     path: '/manager/reports/project',
     query: c.type<{ project_id?: string }>(),
     responses: {
-      200: c.type<{ body: string }>(),
+      200: z.any(),
     },
   },
   
@@ -109,7 +110,7 @@ export const apiContract = c.router({
     method: 'GET',
     path: '/admin/projects',
     responses: {
-      200: c.type<{ body: string }>(),
+      200: z.any(),
     },
   },
   createProject: {
@@ -117,7 +118,7 @@ export const apiContract = c.router({
     path: '/admin/projects',
     body: z.object({ name: z.string() }),
     responses: {
-      200: c.type<{ body: string }>(),
+      200: z.any(),
       400: c.type<{ body: string }>(),
       500: c.type<{ body: string }>(),
     },
@@ -128,7 +129,7 @@ export const apiContract = c.router({
     pathParams: z.object({ id: z.string() }),
     body: c.noBody(),
     responses: {
-      200: c.type<{ body: string }>(),
+      200: z.any(),
     },
   },
   
@@ -137,7 +138,7 @@ export const apiContract = c.router({
     method: 'GET',
     path: '/admin/users-projects',
     responses: {
-      200: c.type<{ body: string }>(),
+      200: z.any(),
     },
   },
   adminUsersProjectsProject: {
@@ -145,7 +146,7 @@ export const apiContract = c.router({
     path: '/admin/users-projects/project',
     query: c.type<{ project_id?: string }>(),
     responses: {
-      200: c.type<{ body: string }>(),
+      200: z.any(),
     },
   },
   assignWorkerToProject: {
@@ -153,7 +154,7 @@ export const apiContract = c.router({
     path: '/admin/users-projects',
     body: z.object({ project_id: z.string(), user_id: z.coerce.number() }),
     responses: {
-      200: c.type<{ body: string }>(),
+      200: z.any(),
       400: c.type<{ body: string }>(),
       500: c.type<{ body: string }>(),
     },
@@ -163,7 +164,7 @@ export const apiContract = c.router({
     path: '/admin/users-projects/:id',
     pathParams: z.object({ id: z.string() }),
     responses: {
-      200: c.type<{ body: string }>(),
+      200: z.any(),
       404: c.type<{ body: string }>(),
     },
   },
@@ -173,14 +174,14 @@ export const apiContract = c.router({
     method: 'GET',
     path: '/admin/system-reports',
     responses: {
-      200: c.type<{ body: string }>(),
+      200: z.any(),
     },
   },
   adminSystemReportsData: {
     method: 'GET',
     path: '/admin/system-reports/data',
     responses: {
-      200: c.type<{ body: string }>(),
+      200: z.any(),
     },
   },
 });

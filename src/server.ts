@@ -3,13 +3,13 @@ import session from 'express-session';
 import cookieParser from 'cookie-parser';
 import { initializeDatabase } from './config/database.js';
 import { authStubMiddleware } from './middleware/auth_stub.js';
-import { router } from './handlers/index.js';
+import { router } from './router.js';
 import { apiContract } from './contracts/api.js';
 import { createExpressEndpoints } from '@ts-rest/express';
 import type { Request, RequestHandler, Response } from 'express';
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3002;
 
 // Initialize database
 try {

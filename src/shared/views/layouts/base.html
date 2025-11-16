@@ -454,22 +454,25 @@
 </head>
 <body>
     <!-- Top Navigation Bar -->
-    <nav class="px-6 flex items-center justify-between bg-gray-100 dark:bg-gray-800 border-b border-gray-300 dark:border-gray-700 backdrop-blur-sm sticky top-0 z-[100]" style="view-transition-name: nav-bar;">
-        <div class="flex-1 max-w-5xl mx-auto">
-            <div class="flex items-center justify-between h-16" id="nav-bar-content">
-                <div class="flex items-center gap-1">
-                    {{nav_buttons}}
-                </div>
-                <div class="flex items-center gap-3">
-                    {{role_selector}}
-                    {{project_selector}}
-                </div>
+    <nav class="px-6 flex items-center justify-between bg-gray-100 dark:bg-gray-800 border-b border-gray-300 dark:border-gray-700 backdrop-blur-sm sticky top-0 z-[100] h-16" style="view-transition-name: nav-bar;">
+        <div class="flex items-center">
+            <a href="/" class="text-lg font-semibold text-gray-900 dark:text-gray-100 hover:text-indigo-600 dark:hover:text-indigo-400 no-underline">
+                TimeTrack
+            </a>
+        </div>
+        <div class="flex-1 flex items-center justify-start" id="nav-bar-content">
+            <div class="flex items-center gap-1 ml-8">
+                {{nav_buttons}}
             </div>
         </div>
-        <button onclick="toggleTheme()" class="bg-gray-200 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 cursor-pointer text-xs text-gray-600 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-600 hover:text-gray-900 dark:hover:text-gray-100">
-                    <span id="theme-icon">🌙</span>
-        </button>
-        
+        <div class="flex items-center gap-3">
+            {{role_selector}}
+            {{project_selector}}
+            <button onclick="toggleTheme()" class="bg-gray-200 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 cursor-pointer text-xs text-gray-600 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-600 hover:text-gray-900 dark:hover:text-gray-100">
+                <span id="theme-icon">🌙</span>
+            </button>
+            {{logout_button}}
+        </div>
     </nav>
 
     <!-- Content -->

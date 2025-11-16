@@ -6,6 +6,7 @@ import { userModel } from "../models/user.js";
 import { html } from "./html.js";
 import { tsBuildUrl } from "./paths.js";
 import { accountDashboardContract } from "../../features/account/dashboard/contract.js";
+import { authContract } from "../../features/auth/contract.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -78,6 +79,17 @@ export function renderBaseLayout(content: string, req: AuthContext, activeNav: s
   // const userId = "id" in currentUser ? currentUser.id : undefined;
   // const projectSelector = getProjectSelector(availableRoles, userId);
   const emptyProjectSelector = "";
+  const logoutUrl = tsBuildUrl(authContract.logout, {});
+  const logoutButton = html`
+    <form method="POST" action="${logoutUrl}" class="inline">
+      <button
+        type="submit"
+        class="text-gray-600 dark:text-gray-400 text-sm font-medium px-3 py-2 rounded-md hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-700"
+      >
+        Logout
+      </button>
+    </form>
+  `;
 
   // Replace all placeholders
   layout = layout.replace(/\{\{user_options\}\}/g, userOptions || "");
@@ -86,6 +98,7 @@ export function renderBaseLayout(content: string, req: AuthContext, activeNav: s
   layout = layout.replace("{{nav_buttons}}", navButtons);
   layout = layout.replace("{{role_selector}}", "");
   layout = layout.replace("{{project_selector}}", emptyProjectSelector);
+  layout = layout.replace("{{logout_button}}", logoutButton);
   layout = layout.replace("{{content}}", content);
 
   return layout;

@@ -14,11 +14,11 @@ VALUES ('office-manager@mail.com', '["account","office-manager"]', 1);
 
 -- Admin
 INSERT OR IGNORE INTO users (email, roles, active) 
-VALUES ('admin@mail.com', '["admin"]', 1);
+VALUES ('admin@mail.com', '["account", "admin"]', 1);
 
 -- All roles user
 INSERT OR IGNORE INTO users (email, roles, active) 
-VALUES ('all-roles@mail.com', '["account","office-manager","admin"]', 1);
+VALUES ('all-roles@mail.com', '["account", "office-manager","admin"]', 1);
 
 -- Projects
 INSERT OR IGNORE INTO projects (name, suppressed) 
@@ -51,4 +51,10 @@ INSERT OR IGNORE INTO project_users (user_id, project_id, suppressed)
 SELECT u.id, p.id, 0
 FROM users u, projects p
 WHERE u.email = 'all-roles@mail.com' AND p.name IN ('jupiter', 'mars');
+
+-- Assign jupiter and mars to admin@mail.com (has account and admin roles)
+INSERT OR IGNORE INTO project_users (user_id, project_id, suppressed)
+SELECT u.id, p.id, 0
+FROM users u, projects p
+WHERE u.email = 'admin@mail.com' AND p.name IN ('jupiter', 'mars');
 

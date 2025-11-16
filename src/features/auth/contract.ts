@@ -36,4 +36,12 @@ export const authContract = c.router({
       200: htmlResponse,
     },
   },
+  logout: {
+    method: "POST",
+    path: "/auth/logout",
+    body: c.noBody(),
+    responses: {
+      302: z.any(),
+    },
+  },
 });

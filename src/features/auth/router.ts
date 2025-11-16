@@ -84,4 +84,25 @@ export const authRouter = s.router(authContract, {
       body: html,
     };
   },
+  logout: async ({ req, res }) => {
+    const authReq = req as unknown as AuthContext;
+    if (authReq.session) {
+      authReq.session.userId = undefined;
+      authReq.session.userRole = undefined;
+      return new Promise((resolve) => {
+        authReq.session!.save(() => {
+          res.setHeader("Location", "/auth");
+          resolve({
+            status: 302,
+            body: undefined,
+          });
+        });
+      });
+    }
+    res.setHeader("Location", "/auth");
+    return {
+      status: 302,
+      body: undefined,
+    };
+  },
 });

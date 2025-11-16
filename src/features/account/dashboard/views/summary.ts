@@ -32,9 +32,7 @@ export function renderSummary(
     <div>
       <div class="text-[10px] font-medium mb-0.5 text-gray-600 dark:text-gray-400">Monthly</div>
       <div class="flex items-baseline gap-1.5 flex-wrap">
-        <span class="text-sm font-bold ${hoursColor}"
-            >${monthlyTotalHours.toFixed(1)}</span
-          >
+        <span class="text-sm font-bold ${hoursColor}">${monthlyTotalHours.toFixed(1)}</span>
         <span class="text-xs text-gray-500 dark:text-gray-400">/ ${requiredMonthlyHours}h</span>
         ${statusBadge}
       </div>

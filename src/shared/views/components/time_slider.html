@@ -333,7 +333,8 @@
 </style>
 
 <script>
-  class TimeSlider {
+  if (!window.TimeSlider) {
+    class TimeSlider {
     constructor(containerId, options = {}) {
       this.container = document.getElementById(containerId);
       if (!this.container) {
@@ -1017,5 +1018,6 @@
 
   // Export for use
   window.TimeSlider = TimeSlider;
+  }
 </script>
 

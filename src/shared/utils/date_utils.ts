@@ -44,18 +44,27 @@ export function hoursToMinutes(hours: number): number {
   return Math.round(hours * 60);
 }
 
-export function getAllDaysInMonth(
-  dateString: string
-): Array<{ date: string; dayNumber: number; dayName: string; isWeekend: boolean; dayOfWeek: number }> {
+export function getAllDaysInMonth(dateString: string): Array<{
+  date: string;
+  dayNumber: number;
+  dayName: string;
+  isWeekend: boolean;
+  dayOfWeek: number;
+}> {
   const baseDate = parseDate(dateString);
   const year = baseDate.getFullYear();
   const month = baseDate.getMonth();
 
-  const firstDay = new Date(year, month, 1);
   const lastDay = new Date(year, month + 1, 0);
   const daysInMonth = lastDay.getDate();
 
-  const days: Array<{ date: string; dayNumber: number; dayName: string; isWeekend: boolean; dayOfWeek: number }> = [];
+  const days: Array<{
+    date: string;
+    dayNumber: number;
+    dayName: string;
+    isWeekend: boolean;
+    dayOfWeek: number;
+  }> = [];
   const dayNames = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]; // Monday first
 
   for (let day = 1; day <= daysInMonth; day++) {

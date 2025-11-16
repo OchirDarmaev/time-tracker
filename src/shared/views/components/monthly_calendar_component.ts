@@ -1,6 +1,8 @@
 import { html } from "../../utils/html";
 import { getAllDaysInMonth, formatDate } from "../../utils/date_utils";
 
+const REQUIRED_DAILY_HOURS = 8;
+
 export interface Project {
   id: number;
   name: string;
@@ -12,6 +14,8 @@ export interface DayProjectBreakdown {
   minutes: number;
 }
 
+export type DayType = "workday" | "public_holiday" | "weekend";
+
 export interface MonthlyCalendarProps {
   selectedDate: string;
   hxGet: string;
@@ -19,6 +23,7 @@ export interface MonthlyCalendarProps {
   dayHoursMap: Record<string, number>; // date -> hours
   dayProjectBreakdown: Record<string, DayProjectBreakdown[]>; // date -> project breakdown
   projects: Project[]; // list of projects for color mapping
+  dayConfigurations?: Record<string, DayType>; // date -> day_type mapping
 }
 
 // Default color fallback
@@ -44,10 +49,9 @@ function renderCircleDiagram(
     return "";
   }
 
-  const requiredHours = 8;
-  // Calculate how much of the 8-hour goal is completed (cap at 100%)
-  const completionRatio = Math.min(totalHours / requiredHours, 1);
-  // Total angle to fill based on 8-hour goal
+  // Calculate how much of the required hours goal is completed (cap at 100%)
+  const completionRatio = Math.min(totalHours / REQUIRED_DAILY_HOURS, 1);
+  // Total angle to fill based on required hours goal
   const totalFillAngle = completionRatio * 2 * Math.PI;
 
   const center = size / 2;
@@ -107,7 +111,15 @@ function renderCircleDiagram(
 }
 
 export function renderMonthlyCalendar(props: MonthlyCalendarProps): string {
-  const { selectedDate, hxGet, hxTarget, dayHoursMap, dayProjectBreakdown, projects } = props;
+  const {
+    selectedDate,
+    hxGet,
+    hxTarget,
+    dayHoursMap,
+    dayProjectBreakdown,
+    projects,
+    dayConfigurations = {},
+  } = props;
   const days = getAllDaysInMonth(selectedDate);
 
   const today = formatDate(new Date());
@@ -179,18 +191,22 @@ export function renderMonthlyCalendar(props: MonthlyCalendarProps): string {
     const isSelected = day.date === selectedDate;
     const isToday = day.date === today;
     const hasHours = hours > 0;
-    const isOverLimit = hours > 8;
+    const isOverLimit = hours > REQUIRED_DAILY_HOURS;
+    const dayType = dayConfigurations[day.date];
+    const isPublicHoliday = dayType === "public_holiday";
+    const isWeekend = dayType === "weekend";
+    const isWorkday = dayType === "workday";
 
     // Circle diagram showing project proportions (ring around number)
     // Ring fills proportionally to 8-hour goal
     const breakdown = dayProjectBreakdown[day.date] || [];
     const circleDiagram = hasHours ? renderCircleDiagram(breakdown, projects, hours, 48) : "";
 
-    // Small orange circle indicator when hours exceed 8
+    // Small orange circle indicator when hours exceed required
     const overLimitIndicator = isOverLimit
       ? html`<span
           class="absolute top-1 right-1 w-2 h-2 rounded-full bg-orange-500 z-20"
-          title="Over 8 hours"
+          title="Over ${REQUIRED_DAILY_HOURS} hours"
         ></span>`
       : "";
 
@@ -201,23 +217,39 @@ export function renderMonthlyCalendar(props: MonthlyCalendarProps): string {
         ? "bg-gray-100 dark:bg-gray-800"
         : "";
 
-    // Text color
+    // Text color based on day type
     const textClass = isSelected
       ? ""
-      : day.isWeekend
-        ? "text-gray-400 dark:text-gray-600"
-        : "text-gray-700 dark:text-gray-300";
+      : isPublicHoliday
+        ? "text-red-600 dark:text-red-400 font-medium"
+        : isWeekend
+          ? "text-gray-400 dark:text-gray-600"
+          : isWorkday
+            ? "text-blue-600 dark:text-blue-400 font-medium"
+            : day.isWeekend
+              ? "text-gray-400 dark:text-gray-600"
+              : "text-gray-700 dark:text-gray-300";
+
+    // Title with day type information
+    let title = `${day.date} - ${hours.toFixed(1)}h`;
+    if (isPublicHoliday) {
+      title += " - Public Holiday";
+    } else if (isWeekend) {
+      title += " - Weekend";
+    } else if (isWorkday) {
+      title += " - Workday";
+    }
 
     return html`
       <button
         type="button"
-        class="relative flex items-center justify-center aspect-square rounded-lg ${bgClass} ${textClass} hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-150 focus:outline-none focus:ring-1 focus:ring-gray-400 dark:focus:ring-gray-600"
+        class="relative flex items-center justify-center aspect-square rounded-lg border border-transparent ${bgClass} ${textClass} hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-150 focus:outline-none focus:ring-1 focus:ring-gray-400 dark:focus:ring-gray-600"
         ${hxGet ? `hx-get="${hxGet}?date=${day.date}"` : ""}
         ${hxTarget ? `hx-target="${hxTarget}"` : ""}
         ${hxGet ? `hx-swap="outerHTML transition:true"` : ""}
         hx-trigger="click"
         hx-scroll="false"
-        title="${day.date} - ${hours.toFixed(1)}h"
+        title="${title}"
       >
         ${circleDiagram}
         <span class="text-sm font-light relative z-10">${day.dayNumber}</span>

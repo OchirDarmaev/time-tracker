@@ -11,7 +11,8 @@ CREATE TABLE IF NOT EXISTS projects (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL UNIQUE,
     suppressed INTEGER NOT NULL DEFAULT 0,
-    color TEXT NOT NULL DEFAULT '#14b8a6'
+    color TEXT NOT NULL DEFAULT '#14b8a6',
+    isSystem INTEGER NOT NULL DEFAULT 0
 );
 
 -- Project users (many-to-many)
@@ -37,8 +38,18 @@ CREATE TABLE IF NOT EXISTS time_entries (
     FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
 );
 
+-- Calendar (workday, public_holiday, weekend)
+CREATE TABLE IF NOT EXISTS calendar (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    date TEXT NOT NULL UNIQUE,
+    day_type TEXT NOT NULL CHECK(day_type IN ('workday', 'public_holiday', 'weekend')),
+    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
 -- Indexes
 CREATE INDEX IF NOT EXISTS idx_time_entries_user_date ON time_entries(user_id, date);
 CREATE INDEX IF NOT EXISTS idx_time_entries_project_date ON time_entries(project_id, date);
 CREATE INDEX IF NOT EXISTS idx_project_users_user_project ON project_users(user_id, project_id);
+CREATE INDEX IF NOT EXISTS idx_calendar_date ON calendar(date);
+CREATE INDEX IF NOT EXISTS idx_calendar_type ON calendar(day_type);
 

@@ -4,21 +4,19 @@ import { AuthContext } from "../../../shared/middleware/auth_stub.js";
 import { isAuthContext } from "../../../shared/middleware/isAuthContext.js";
 import { timeEntryModel } from "../../../shared/models/time_entry.js";
 import { projectModel } from "../../../shared/models/project.js";
-import {
-  formatDate,
-  getMonthFromDate,
-  minutesToHours,
-  getWorkingDaysInMonth,
-  parseDate,
-} from "../../../shared/utils/date_utils.js";
+import { calendarModel } from "../../../shared/models/calendar.js";
+import { formatDate, getMonthFromDate, minutesToHours } from "../../../shared/utils/date_utils.js";
 import { validateDate, validateMinutes } from "../../../shared/utils/validation.js";
 import { renderSummary } from "./views/summary.js";
 import { renderEntriesTable } from "./views/entries_table.js";
 import { renderTimeTrackingPage } from "./views/time_tracking_page.js";
 import { renderBaseLayout } from "../../../shared/utils/layout.js";
 
+const REQUIRED_DAILY_HOURS = 8;
+
 const s = initServer();
 
+const HOLIDAY_PROJECT_NAME = "Holiday";
 export const accountTimeRouter = s.router(accountDashboardContract, {
   dashboard: async (req) => {
     if (!isAuthContext(req.req)) {
@@ -288,27 +286,43 @@ export const accountTimeRouter = s.router(accountDashboardContract, {
       };
     }
 
-    const totalMinutes = timeEntryModel.getTotalMinutesByUserAndDate(currentUser.id, date);
-    const totalHours = minutesToHours(totalMinutes);
-
     const month = getMonthFromDate(date);
-    const monthlyTotalMinutes = timeEntryModel.getTotalMinutesByUserAndMonth(currentUser.id, month);
-    const monthlyTotalHours = minutesToHours(monthlyTotalMinutes);
+    const monthlyEntries = timeEntryModel.getByUserIdAndMonth(currentUser.id, month);
+    const projects = projectModel.getByUserId(currentUser.id);
 
-    const dateObj = parseDate(date);
-    const workingDays = getWorkingDaysInMonth(dateObj.getFullYear(), dateObj.getMonth() + 1);
-    const requiredMonthlyHours = workingDays * 8;
+    const reported = monthlyEntries.reduce(
+      (acc, entry) => {
+        const project = projects.find((p) => p.id === entry.project_id);
+        if (project?.name === HOLIDAY_PROJECT_NAME) {
+          acc.public_holidaysMinutes += entry.minutes;
+        } else {
+          acc.workdaysMinutes += entry.minutes;
+        }
+        acc.totalMinutes += entry.minutes;
 
-    const monthlyWarning = monthlyTotalHours < requiredMonthlyHours;
-    const monthlyOverLimit = monthlyTotalHours > requiredMonthlyHours;
-
-    const html = renderSummary(
-      totalHours,
-      monthlyTotalHours,
-      requiredMonthlyHours,
-      monthlyWarning,
-      monthlyOverLimit
+        return acc;
+      },
+      { workdaysMinutes: 0, public_holidaysMinutes: 0, totalMinutes: 0 }
     );
+    // Get calendar days for the month
+    const calendarDays = calendarModel.getByMonth(month);
+
+    const expected = calendarDays.reduce(
+      (acc, day) => {
+        if (day.day_type === "workday") {
+          acc.workdaysMinutes += REQUIRED_DAILY_HOURS * 60;
+        } else if (day.day_type === "public_holiday") {
+          acc.public_holidaysMinutes += REQUIRED_DAILY_HOURS * 60;
+        }
+        return acc;
+      },
+      {
+        workdaysMinutes: 0,
+        public_holidaysMinutes: 0,
+      }
+    );
+
+    const html = renderSummary(reported, expected);
     return {
       status: 200,
       body: html,

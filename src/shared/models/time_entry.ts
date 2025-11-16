@@ -119,19 +119,6 @@ export const timeEntryModel = {
     return result.total;
   },
 
-  getTotalMinutesByUserAndMonth(userId: number, month: string): number {
-    const result = db
-      .prepare(
-        `
-      SELECT COALESCE(SUM(minutes), 0) as total
-      FROM time_entries
-      WHERE user_id = ? AND date LIKE ?
-    `
-      )
-      .get(userId, `${month}%`) as { total: number };
-    return result.total;
-  },
-
   getAll(startDate?: string, endDate?: string): TimeEntry[] {
     if (startDate && endDate) {
       return db

@@ -1,158 +1,51 @@
-# 📝 **Internal Time Reporting Tool — Groomed Specification (POC)**
+# **Internal Time Reporting Tool — Groomed Specification (POC)**
 
-## 🎯 **Purpose**
+## **Purpose**
 
 Build a simple internal tool that lets users track daily time across multiple projects, surface warnings when daily/monthly hours are insufficient, and allow office-managers/admins to review time reports.
 Authentication is out of scope — the user role and user identity are chosen via “DATA stub” panel.
 
 ---
 
-# 👥 **User Roles**
+ **User Roles**
 
-| Role               | Capabilities                                                                                    |
-| ------------------ | ----------------------------------------------------------------------------------------------- |
-| **user**         | Log hours, assign tags/projects, view own monthly/daily totals                                  |
+
+| Role               | Capabilities                                                                                  |
+| -------------------- | ----------------------------------------------------------------------------------------------- |
+| **user**           | Log hours, assign tags/projects, view own monthly/daily totals                                |
 | **Office-manager** | See aggregated reports across users/projects                                                  |
 | **Admin**          | Add/remove/suppress projects, add/remove/suppress users in projects, view admin-level reports |
 
 ---
 
-# 📌 **Core User Stories**
+# **Core User Stories**
 
-## 👤 **user Stories**
+User stories have been split into separate feature files in the `/feature` directory:
 
-### 1. Track time per project
+## **User Stories**
 
-> **As a user**
-> I need to track time for a working day across multiple projects
-> **so that** I can reach 8 hours total per day.
+* [Track time per project](./feature/track_time.feature) - Story 1
+* [Tag activities per project](./feature/tag_activities.feature) - Story 2
+* [Warning for insufficient time](./feature/time_warnings.feature) - Story 3
 
-**Acceptance Criteria:**
+## **Office-Manager Stories**
 
-* user can enter entries like:
+* [View reports per user/project](./feature/view_reports.feature) - Story 4
 
-  * Project: *jupiter*
-  * Duration: *0.5 h* (or 30 min)
-  * Comment/tags: `#infra #setup`
-* user can add multiple entries per day.
-* UI shows running total for the selected day.
+## **Admin Stories**
 
-> **As a user**
-> When I track time
-> I want to see all days of current month with with hours in one row view
-
-> **As a user**
-> When I track time
-> I want to easy navigate to day in range of month with one click
-
-> **As a user**
-> When I track time
-> I want to see status of full filling of each day with hours
-
-
+* [Manage projects](./feature/manage_projects.feature) - Story 5
+* [Manage users in projects](./feature/manage_project_users.feature) - Story 6
+* [View admin-level report](./feature/admin_reports.feature) - Story 7
 
 ---
 
-### 2. Tag activities per project
-
-> **As a user**
-> When I track time, I need tags to associate activity to project
-> **so that** activities are categorized.
-
-**Acceptance Criteria:**
-
-* Comment field supports hashtags (e.g., `#jupiter #meeting`).
-* System extracts tags implicitly from text or stores raw comment as-is.
-* Tag filtering/searching is optional at POC stage.
-
----
-
-### 3. Warning for insufficient time
-
-> **As a user**
-> I need to see a warning if my report does not cover 8 hours per day
-> **or 8 × number of working days in the current month**
-> **so that** I know where I am behind.
-
-**Acceptance Criteria:**
-
-* Daily total < 8 → red warning.
-* Monthly total < (workingDays × 8) → yellow warning.
-* Working days = weekdays minus weekends; holidays optional.
-
----
-
-## 🧾 **Office-Manager Stories**
-
-### 4. View reports per user/project
-
-> **As an office-manager**
-> I need to see the time tracking report of each user by project
-> **so that** I understand project workloads and team utilization.
-
-**Acceptance Criteria:**
-
-* Select user → see breakdown by project/day.
-* Select project → see list of users + hours.
-* Export (optional in POC).
-
----
-
-## 🛠️ **Admin Stories**
-
-### 5. Manage projects
-
-> **As an admin**
-> I want to add/remove/mark-suppress projects
-> **so that** users can track time against valid project list.
-
-**Acceptance Criteria:**
-
-* Create project
-* Rename/edit
-* Soft-suppress (hidden but history preserved)
-* Hard delete (optional — POC: no)
-
----
-
-### 6. Manage users in projects
-
-> **As an admin**
-> I want to add/remove/mark-suppress users **in projects**
-> **so that** only relevant users appear for each project.
-
-**Acceptance Criteria:**
-
-* Assign user → project
-* Remove user → project
-* Mark user inactive (soft suppression)
-
----
-
-### 7. View admin-level report
-
-> **As an admin**
-> I want to see the global system-wide reporting
-> **so that** I can check utilization across all projects.
-
-**Acceptance Criteria:**
-
-* Aggregated view:
-
-  * Projects → total hours by all users
-  * users → total hours by project
-* Possible CSV export
-
----
-
-# 🧩 **Non-Functional Requirements**
+# **Non-Functional Requirements**
 
 * **No authentication** — use DATA stub panel:
 
   * current user selector
-
 * **Database:** SQLite (Node native)
-
 * **Stack:**
 
   * Node 22
@@ -161,9 +54,7 @@ Authentication is out of scope — the user role and user identity are chosen vi
   * Tailwind 4
   * TypeScript
   * yarn v4
-
 * **Performance:** small dataset, no issues expected.
-
 * **Data Integrity:** editing past days allowed; deletion optional.
 
 ---
@@ -184,61 +75,6 @@ Authentication is out of scope — the user role and user identity are chosen vi
 
 ---
 
-## 🧍 user UI
-
-### Page: "My Time Tracking"
-
-* Date picker
-* Table of entries:
-
-  * Project (select)
-  * Hours (number or 0.5 steps)
-  * Comment (with tags)
-* Button: "Add Entry"
-* Daily summary
-* Warning indicators:
-
-  * Daily hours < 8 → ❗ red
-  * Monthly hours < target → ⚠️ yellow
-
----
-
-## 🧑‍💼 Office-Manager UI
-
-### Page: "Reports"
-
-* Select user → Table by day and project
-* Select Project → Table by user and day
-* Summary totals
-
----
-
-## 🛡️ Admin UI
-
-### Page: "Manage Projects"
-
-* List projects
-
-  * Active / Suppressed
-  * Button: Add project
-  * Button: Suppress
-
-### Page: "Manage users in Projects"
-
-* For each project:
-
-  * users assigned
-  * Add/remove users
-
-### Page: "System Reports"
-
-* Global totals:
-
-  * Hours per user
-  * Hours per project
-  * Hours per month
-
----
 
 # 🗄️ **Data Model (SQLite)**
 
@@ -246,16 +82,18 @@ Authentication is out of scope — the user role and user identity are chosen vi
 
 ### `users`
 
-| id | email  | role                                | active  |
-| -- | ------ | ----------------------------------- | ------- |
+
+| id | email  | role                              | active  |
+| ---- | -------- | ----------------------------------- | --------- |
 | PK | string | enum(user, office-manager, admin) | boolean |
 
 ---
 
 ### `projects`
 
+
 | id | name | suppressed |
-| -- | ---- | ---------- |
+| ---- | ------ | ------------ |
 | PK | text | boolean    |
 
 ---
@@ -264,8 +102,9 @@ Authentication is out of scope — the user role and user identity are chosen vi
 
 (many-to-many)
 
+
 | id | user_id | project_id | suppressed |
-| -- | ------- | ---------- | ---------- |
+| ---- | --------- | ------------ | ------------ |
 
 ---
 
@@ -285,12 +124,13 @@ Authentication is out of scope — the user role and user identity are chosen vi
 ### Monthly required hours
 
 ```
+workingDaysInMonth = setedManualyByManager
 requiredMonthly = workingDaysInMonth * 8
 ```
 
 ### Working days calculation
 
-Count weekdays (Mon-Fri) of current month.
+Provided by system
 
 ---
 
@@ -299,10 +139,7 @@ Count weekdays (Mon-Fri) of current month.
 1. DB schema + migrations
 2. Express routes:
 
-   * `/user/time`
-   * `/manager/reports`
-   * `/admin/projects`
-   * `/admin/users-projects`
+   * `/accont/dashboard`
 3. UI layouts with HTMX
 4. Warnings logic
 5. CRUD: projects, users-in-projects, time entries

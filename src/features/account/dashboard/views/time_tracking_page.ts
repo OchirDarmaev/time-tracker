@@ -114,8 +114,18 @@ export function renderTimeTrackingPage(req: Request, authContext: AuthContext) {
           ? "text-red-600 dark:text-red-400"
           : "text-gray-600 dark:text-gray-400";
 
+  // Add HTMX trigger to refresh calendar when entries change
+  const dashboardUrl = tsBuildUrl(accountDashboardContract.dashboard, {});
+
   const content = html`
-    <div id="time-tracking-content" class="space-y-4">
+    <div
+      id="time-tracking-content"
+      class="space-y-4"
+      hx-get="${dashboardUrl}?date=${selectedDate}"
+      hx-target="this"
+      hx-swap="outerHTML transition:true"
+      hx-trigger="entries-changed from:body"
+    >
       <!-- Enhanced Status Bar -->
       <div
         class="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-3 shadow-sm"

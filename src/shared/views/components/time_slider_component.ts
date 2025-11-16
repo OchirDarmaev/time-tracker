@@ -51,13 +51,6 @@ export function renderTimeSlider(props: TimeSliderProps = {}): string {
 
       <div class="flex justify-end items-center mb-3">
         <div class="flex items-center gap-3">
-          <div id="time-slider-sync-status" class="flex items-center gap-1.5 mr-2">
-            <span
-              id="time-slider-sync-icon"
-              class="text-xs text-green-500 dark:text-green-400 block"
-              >Synced</span
-            >
-          </div>
           <label
             class="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400 font-medium"
           >

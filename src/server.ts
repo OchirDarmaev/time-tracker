@@ -42,6 +42,7 @@ createExpressEndpoints(authContract, authRouter, app, {
 createExpressEndpoints(rootContract, rootRouter, app, {
   responseValidation: false,
   jsonQuery: true,
+  globalMiddleware: [authStubMiddleware],
 });
 
 createExpressEndpoints(accountDashboardContract, accountTimeRouter, app, {

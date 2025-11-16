@@ -3,10 +3,19 @@ import { authContract } from "./contract.js";
 import { AuthContext } from "../../shared/middleware/auth_stub.js";
 import { userModel, UserRole } from "../../shared/models/user.js";
 import { renderNavBar } from "../../shared/utils/layout.js";
+import { renderAuth } from "./views/renderAuth.js";
 
 const s = initServer();
 
 export const authRouter = s.router(authContract, {
+  auth: async ({ req }) => {
+    const authReq = req as unknown as AuthContext;
+    const html = renderAuth(authReq);
+    return {
+      status: 200,
+      body: html,
+    };
+  },
   setUser: async ({ body, req, res }) => {
     const authReq = req as unknown as AuthContext;
     const userId = body.user_id;

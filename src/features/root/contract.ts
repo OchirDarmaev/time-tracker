@@ -1,5 +1,5 @@
 import { initContract } from "@ts-rest/core";
-import { z } from "zod";
+import { htmlResponse } from "../../shared/contracts/html_response";
 
 const c = initContract();
 
@@ -8,7 +8,7 @@ export const rootContract = c.router({
     method: "GET",
     path: "/",
     responses: {
-      302: z.any(),
+      200: htmlResponse,
     },
   },
 });

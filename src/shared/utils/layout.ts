@@ -3,7 +3,6 @@ import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { AuthContext } from "../middleware/auth_stub.js";
 import { userModel } from "../models/user.js";
-import { projectModel } from "../models/project.js";
 import { html } from "./html.js";
 import { tsBuildUrl } from "./paths.js";
 import { accountDashboardContract } from "../../features/account/dashboard/contract.js";
@@ -55,50 +54,6 @@ function getNavButtons(availableRoles: string[], activeNav: string): string {
     .join("");
 }
 
-function getRoleSelector(availableRoles: string[], currentRole: string | undefined): string {
-  if (availableRoles.length <= 1) return "";
-
-  return html`
-    <select
-      hx-post="/auth-stub/set-role"
-      hx-target="body"
-      hx-swap="outerHTML transition:true"
-      hx-trigger="change"
-      hx-include="[name='role']"
-      name="role"
-      class="bg-gray-200 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-lg px-3 py-2 text-sm cursor-pointer hover:border-indigo-500 dark:hover:border-indigo-500 hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:border-indigo-500 focus:ring-3 focus:ring-indigo-500/10 min-w-[140px]"
-    >
-      ${availableRoles
-        .map((role) => {
-          const selected = currentRole === role ? "selected" : "";
-          return `<option value="${role}" ${selected}>${roleLabels[role] || role}</option>`;
-        })
-        .join("")}
-    </select>
-  `;
-}
-
-function getProjectSelector(availableRoles: string[], userId: number | undefined): string {
-  if (!availableRoles.includes("account") || !userId) return "";
-
-  const userProjects = projectModel.getByUserId(userId);
-  if (userProjects.length === 0) return "";
-
-  return html`
-    <select
-      class="bg-gray-200 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-lg px-3 py-2 text-sm cursor-pointer hover:border-indigo-500 dark:hover:border-indigo-500 hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:border-indigo-500 focus:ring-3 focus:ring-indigo-500/10 min-w-[160px]"
-      onchange="if(this.value) window.location.href='/account/time?project=' + this.value"
-    >
-      <option value="">All Projects</option>
-      ${userProjects
-        .map((project) => {
-          return `<option value="${project.id}">${project.name}</option>`;
-        })
-        .join("")}
-    </select>
-  `;
-}
-
 export function renderBaseLayout(content: string, req: AuthContext, activeNav: string = "") {
   const layoutPath = join(__dirname, "../views/layouts/base.html");
   let layout = readFileSync(layoutPath, "utf-8");
@@ -120,8 +75,6 @@ export function renderBaseLayout(content: string, req: AuthContext, activeNav: s
 
   // Generate nav bar components
   const navButtons = getNavButtons(availableRoles, activeNav);
-  const currentRole = req.session?.userRole as string | undefined;
-  const roleSelector = getRoleSelector(availableRoles, currentRole);
   // const userId = "id" in currentUser ? currentUser.id : undefined;
   // const projectSelector = getProjectSelector(availableRoles, userId);
   const emptyProjectSelector = "";
@@ -131,7 +84,7 @@ export function renderBaseLayout(content: string, req: AuthContext, activeNav: s
   layout = layout.replace(/\{\{current_user_email\}\}/g, currentUser.email || "Unknown");
   layout = layout.replace(/\{\{all_roles\}\}/g, allRolesDisplay);
   layout = layout.replace("{{nav_buttons}}", navButtons);
-  layout = layout.replace("{{role_selector}}", roleSelector);
+  layout = layout.replace("{{role_selector}}", "");
   layout = layout.replace("{{project_selector}}", emptyProjectSelector);
   layout = layout.replace("{{content}}", content);
 
@@ -143,13 +96,6 @@ export function renderNavBar(req: AuthContext, activeNav: string = ""): string {
   const availableRoles: string[] = currentUser.roles || ["account"];
 
   const navButtons = getNavButtons(availableRoles, activeNav);
-  const currentRole = req.session?.userRole as string | undefined;
-  const roleSelector = getRoleSelector(availableRoles, currentRole);
-  const userId = "id" in currentUser ? currentUser.id : undefined;
-  const projectSelector = getProjectSelector(availableRoles, userId);
 
-  return html`
-    <div class="flex items-center gap-1">${navButtons}</div>
-    <div class="flex items-center gap-3">${roleSelector} ${projectSelector}</div>
-  `;
+  return html` <div class="flex items-center gap-1">${navButtons}</div> `;
 }

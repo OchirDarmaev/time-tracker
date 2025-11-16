@@ -449,67 +449,13 @@
             updateThemeIcon();
         })();
         
-        // Get active nav from current pathname
-        function getActiveNav() {
-            const path = window.location.pathname;
-            if (path.includes('/admin/projects')) return 'admin_projects';
-            if (path.includes('/admin/users-projects')) return 'admin_users';
-            if (path.includes('/admin/system-reports')) return 'admin_reports';
-            if (path.includes('/manager/reports')) return 'manager';
-            if (path.includes('/account/time')) return 'account';
-            return '';
-        }
         
-        // Update nav bar with new user's RBAC
-        window.updateNavBar = function() {
-            const activeNav = getActiveNav();
-            const navBarContent = document.getElementById('nav-bar-content');
-            if (navBarContent) {
-                htmx.ajax('GET', '/auth-stub/nav-bar?active_nav=' + activeNav, {
-                    target: '#nav-bar-content',
-                    swap: 'innerHTML'
-                });
-            }
-        };
     </script>
 </head>
 <body>
-    <!-- DATA Stub Panel -->
-    <div class="bg-gray-200 dark:bg-gray-700 border-b border-gray-300 dark:border-gray-600 py-3 text-xs" style="view-transition-name: stub-panel;">
-        <div class="max-w-5xl mx-auto px-6">
-            <div class="flex items-center justify-between gap-4">
-                <div class="flex items-center gap-4">
-                    <div>
-                        <label class="block text-xs font-medium mb-1 text-gray-500 dark:text-gray-400">Current User</label>
-                        <select 
-                            id="user-select"
-                            hx-post="/auth-stub/set-user"
-                            hx-target="body"
-                            hx-swap="outerHTML transition:true"
-                            hx-trigger="change"
-                            hx-include="[name='user_id']"
-                            hx-on::after-request="updateNavBar()"
-                            name="user_id"
-                            class="bg-gray-200 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-lg px-3 py-2 text-sm cursor-pointer hover:border-indigo-500 dark:hover:border-indigo-500 hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:border-indigo-500 focus:ring-3 focus:ring-indigo-500/10 min-w-[200px]"
-                        >
-                            {{user_options}}
-                        </select>
-                    </div>
-                    <div class="text-xs text-gray-600 dark:text-gray-400">
-                        <div>User: <span class="text-gray-900 dark:text-gray-100 font-medium">{{current_user_email}}</span></div>
-                        <div>Roles: <span class="text-gray-900 dark:text-gray-100 font-medium">{{all_roles}}</span></div>
-                    </div>
-                </div>
-                <button onclick="toggleTheme()" class="bg-gray-200 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 cursor-pointer text-xs text-gray-600 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-600 hover:text-gray-900 dark:hover:text-gray-100">
-                    <span id="theme-icon">🌙</span>
-                </button>
-            </div>
-        </div>
-    </div>
-
     <!-- Top Navigation Bar -->
-    <nav class="bg-gray-100 dark:bg-gray-800 border-b border-gray-300 dark:border-gray-700 backdrop-blur-sm sticky top-0 z-[100]" style="view-transition-name: nav-bar;">
-        <div class="max-w-5xl mx-auto px-6">
+    <nav class="px-6 flex items-center justify-between bg-gray-100 dark:bg-gray-800 border-b border-gray-300 dark:border-gray-700 backdrop-blur-sm sticky top-0 z-[100]" style="view-transition-name: nav-bar;">
+        <div class="flex-1 max-w-5xl mx-auto">
             <div class="flex items-center justify-between h-16" id="nav-bar-content">
                 <div class="flex items-center gap-1">
                     {{nav_buttons}}
@@ -520,6 +466,10 @@
                 </div>
             </div>
         </div>
+        <button onclick="toggleTheme()" class="bg-gray-200 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 cursor-pointer text-xs text-gray-600 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-600 hover:text-gray-900 dark:hover:text-gray-100">
+                    <span id="theme-icon">🌙</span>
+        </button>
+        
     </nav>
 
     <!-- Content -->

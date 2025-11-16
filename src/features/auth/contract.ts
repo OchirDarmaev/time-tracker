@@ -5,6 +5,13 @@ import { htmlResponse } from "../../shared/contracts/html_response.js";
 const c = initContract();
 
 export const authContract = c.router({
+  auth: {
+    method: "GET",
+    path: "/auth",
+    responses: {
+      200: htmlResponse,
+    },
+  },
   setUser: {
     method: "POST",
     path: "/auth-stub/set-user",

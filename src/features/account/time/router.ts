@@ -302,8 +302,15 @@ export const accountTimeRouter = s.router(accountTimeContract, {
     const requiredMonthlyHours = workingDays * 8;
 
     const monthlyWarning = monthlyTotalHours < requiredMonthlyHours;
+    const monthlyOverLimit = monthlyTotalHours > requiredMonthlyHours;
 
-    const html = renderSummary(totalHours, monthlyTotalHours, requiredMonthlyHours, monthlyWarning);
+    const html = renderSummary(
+      totalHours,
+      monthlyTotalHours,
+      requiredMonthlyHours,
+      monthlyWarning,
+      monthlyOverLimit
+    );
     return {
       status: 200,
       body: html,

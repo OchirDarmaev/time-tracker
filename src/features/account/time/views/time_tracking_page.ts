@@ -34,16 +34,34 @@ export function renderTimeTrackingPage(req: AuthStubRequest, includeLayout: bool
   const monthEntries = timeEntryModel.getByUserIdAndMonth(currentUser.id, month);
   const allDaysInMonth = getAllDaysInMonth(selectedDate);
   const dayHoursMap: Record<string, number> = {};
+  const dayProjectBreakdown: Record<string, Array<{ project_id: number; minutes: number }>> = {};
 
-  // Initialize all days with 0 hours
+  // Initialize all days with 0 hours and empty breakdown
   allDaysInMonth.forEach((day) => {
     dayHoursMap[day.date] = 0;
+    dayProjectBreakdown[day.date] = [];
   });
 
-  // Calculate hours for each day from entries
+  // Calculate hours and project breakdown for each day from entries
   monthEntries.forEach((entry) => {
     const hours = minutesToHours(entry.minutes);
     dayHoursMap[entry.date] = (dayHoursMap[entry.date] || 0) + hours;
+
+    // Add to project breakdown
+    if (!dayProjectBreakdown[entry.date]) {
+      dayProjectBreakdown[entry.date] = [];
+    }
+    const existingProject = dayProjectBreakdown[entry.date].find(
+      (p) => p.project_id === entry.project_id
+    );
+    if (existingProject) {
+      existingProject.minutes += entry.minutes;
+    } else {
+      dayProjectBreakdown[entry.date].push({
+        project_id: entry.project_id,
+        minutes: entry.minutes,
+      });
+    }
   });
 
   // Monthly totals are now handled by time-summary component
@@ -108,25 +126,34 @@ export function renderTimeTrackingPage(req: AuthStubRequest, includeLayout: bool
           </div>
         </div>
       </div>
-      <div class="w-1/2">
-        ${renderMonthlyCalendar({
-          selectedDate: selectedDate,
-          hxGet: "/account/time",
-          hxTarget: "#time-tracking-content",
-          dayHoursMap: dayHoursMap,
-        })}
+      <div class="flex flex-row gap-4 w-full">
+        <div class="w-1/2">
+          ${renderMonthlyCalendar({
+            selectedDate: selectedDate,
+            hxGet: "/account/time",
+            hxTarget: "#time-tracking-content",
+            dayHoursMap: dayHoursMap,
+            dayProjectBreakdown: dayProjectBreakdown,
+            projects: projects.map((p) => ({
+              id: p.id,
+              name: p.name,
+            })),
+          })}
+        </div>
+        <div class="w-1/2">
+          ${renderTimeSlider({
+            totalHours: sliderTotalHours,
+            segments: segments,
+            projects: projects.map((p) => ({
+              id: p.id,
+              name: p.name,
+              suppressed: p.suppressed || false,
+            })),
+            date: selectedDate,
+            syncUrl: "/account/time/sync",
+          })}
+        </div>
       </div>
-      ${renderTimeSlider({
-        totalHours: sliderTotalHours,
-        segments: segments,
-        projects: projects.map((p) => ({
-          id: p.id,
-          name: p.name,
-          suppressed: p.suppressed || false,
-        })),
-        date: selectedDate,
-        syncUrl: "/account/time/sync",
-      })}
     </div>
 
     <!-- Load TimeSlider class definition -->

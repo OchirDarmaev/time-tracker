@@ -185,6 +185,7 @@ export function renderTimeTrackingPage(req: Request, authContext: AuthContext) {
               name: p.name,
               suppressed: p.suppressed || false,
               color: p.color,
+              isSystem: p.isSystem || false,
             })),
             date: selectedDate,
             syncUrl: tsBuildUrl(accountDashboardContract.syncDashboardEntries, {}),

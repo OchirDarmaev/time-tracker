@@ -717,7 +717,19 @@
 
       chipsContainer.innerHTML = '';
 
-      this.projects.forEach(project => {
+      // Sort projects: regular projects first, then system projects
+      const sortedProjects = [...this.projects].sort((a, b) => {
+        const aIsSystem = a.isSystem || false;
+        const bIsSystem = b.isSystem || false;
+        // Regular projects (isSystem = false) come first
+        if (aIsSystem !== bIsSystem) {
+          return aIsSystem ? 1 : -1;
+        }
+        // Within same category, sort alphabetically by name
+        return a.name.localeCompare(b.name);
+      });
+
+      sortedProjects.forEach(project => {
         const chip = document.createElement('div');
         chip.className = 'time-slider-project-chip';
         chip.textContent = project.name;

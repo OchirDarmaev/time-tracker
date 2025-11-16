@@ -40,9 +40,8 @@ export function renderTimeSlider(props: TimeSliderProps = {}): string {
     >
       <div class="mb-4 pb-3 border-b border-gray-300 dark:border-gray-700">
         <div class="mb-2">
-          <span
-            class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide block"
-            >Available Projects</span
+          <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 tracking-wide block"
+            >Projects</span
           >
         </div>
         <div id="time-slider-project-chips" class="flex flex-wrap gap-1.5">

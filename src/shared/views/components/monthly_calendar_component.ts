@@ -123,6 +123,12 @@ export function renderMonthlyCalendar(props: MonthlyCalendarProps): string {
   const year = baseDate.getFullYear();
   const month = baseDate.getMonth();
 
+  // Calculate previous and next month dates
+  const prevMonthDate = new Date(year, month - 1, 1);
+  const nextMonthDate = new Date(year, month + 1, 1);
+  const prevMonthDateStr = formatDate(prevMonthDate);
+  const nextMonthDateStr = formatDate(nextMonthDate);
+
   // Format month name
   const monthNames = [
     "January",
@@ -232,9 +238,48 @@ export function renderMonthlyCalendar(props: MonthlyCalendarProps): string {
 
   return html`
     <div class="mb-6">
-      <h3 class="text-lg font-light mb-4 text-gray-900 dark:text-gray-100 tracking-wide">
-        ${monthName} ${year}
-      </h3>
+      <div class="flex justify-between items-center">
+        <div class="flex items-center justify-between mb-4">
+          <button
+            type="button"
+            class="px-3 py-1 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors duration-150 focus:outline-none focus:ring-1 focus:ring-gray-400 dark:focus:ring-gray-600"
+            ${hxGet ? `hx-get="${hxGet}?date=${prevMonthDateStr}"` : ""}
+            ${hxTarget ? `hx-target="${hxTarget}"` : ""}
+            ${hxGet ? `hx-swap="outerHTML transition:true"` : ""}
+            hx-trigger="click"
+            hx-scroll="false"
+          >
+            &lt;
+          </button>
+          <h3 class="text-lg font-light text-gray-900 dark:text-gray-100 tracking-wide">
+            ${monthName} ${year}
+          </h3>
+          <button
+            type="button"
+            class="px-3 py-1 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors duration-150 focus:outline-none focus:ring-1 focus:ring-gray-400 dark:focus:ring-gray-600"
+            ${hxGet ? `hx-get="${hxGet}?date=${nextMonthDateStr}"` : ""}
+            ${hxTarget ? `hx-target="${hxTarget}"` : ""}
+            ${hxGet ? `hx-swap="outerHTML transition:true"` : ""}
+            hx-trigger="click"
+            hx-scroll="false"
+          >
+            &gt;
+          </button>
+        </div>
+        <div class="flex justify-center mb-4">
+          <button
+            type="button"
+            class="px-4 py-1 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors duration-150 focus:outline-none focus:ring-1 focus:ring-gray-400 dark:focus:ring-gray-600"
+            ${hxGet ? `hx-get="${hxGet}?date=${today}"` : ""}
+            ${hxTarget ? `hx-target="${hxTarget}"` : ""}
+            ${hxGet ? `hx-swap="outerHTML transition:true"` : ""}
+            hx-trigger="click"
+            hx-scroll="false"
+          >
+            Today
+          </button>
+        </div>
+      </div>
       <div class="grid grid-cols-7 gap-2">
         ${weekDayHeaders
           .map(

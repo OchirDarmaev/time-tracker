@@ -4,6 +4,7 @@ import { getAllDaysInMonth, formatDate } from "../../utils/date_utils";
 export interface Project {
   id: number;
   name: string;
+  color?: string;
 }
 
 export interface DayProjectBreakdown {
@@ -20,21 +21,12 @@ export interface MonthlyCalendarProps {
   projects: Project[]; // list of projects for color mapping
 }
 
-// Project colors matching the time slider
-const PROJECT_COLORS = [
-  "#14b8a6", // teal
-  "#06b6d4", // cyan
-  "#3b82f6", // blue
-  "#8b5cf6", // purple
-  "#ec4899", // pink
-  "#f59e0b", // amber
-  "#10b981", // green
-  "#6366f1", // indigo
-];
+// Default color fallback
+const DEFAULT_PROJECT_COLOR = "#14b8a6";
 
 function getProjectColor(projectId: number, projects: Project[]): string {
-  const index = projects.findIndex((p) => p.id === projectId);
-  return PROJECT_COLORS[index >= 0 ? index % PROJECT_COLORS.length : 0];
+  const project = projects.find((p) => p.id === projectId);
+  return project?.color || DEFAULT_PROJECT_COLOR;
 }
 
 function renderCircleDiagram(

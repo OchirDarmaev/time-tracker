@@ -10,6 +10,7 @@ export interface Project {
   id: number;
   name: string;
   suppressed?: boolean;
+  color?: string;
 }
 
 export interface TimeSliderProps {

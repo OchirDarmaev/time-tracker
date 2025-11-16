@@ -10,7 +10,8 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS projects (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL UNIQUE,
-    suppressed INTEGER NOT NULL DEFAULT 0
+    suppressed INTEGER NOT NULL DEFAULT 0,
+    color TEXT NOT NULL DEFAULT '#14b8a6'
 );
 
 -- Project users (many-to-many)

@@ -141,6 +141,7 @@ export function renderTimeTrackingPage(req: Request, authContext: AuthContext) {
             projects: projects.map((p) => ({
               id: p.id,
               name: p.name,
+              color: p.color,
             })),
           })}
         </div>
@@ -152,6 +153,7 @@ export function renderTimeTrackingPage(req: Request, authContext: AuthContext) {
               id: p.id,
               name: p.name,
               suppressed: p.suppressed || false,
+              color: p.color,
             })),
             date: selectedDate,
             syncUrl: tsBuildUrl(accountDashboardContract.syncDashboardEntries, {}),

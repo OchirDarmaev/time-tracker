@@ -362,7 +362,9 @@
     }
 
     generateProjectColors() {
-      const colors = [
+      // This method is kept for backward compatibility but is no longer used
+      // Colors are now stored in project.color
+      const defaultColors = [
         { bg: 'linear-gradient(135deg, #14b8a6 0%, #0d9488 100%)', solid: '#14b8a6' },
         { bg: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)', solid: '#06b6d4' },
         { bg: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', solid: '#3b82f6' },
@@ -372,12 +374,33 @@
         { bg: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', solid: '#10b981' },
         { bg: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)', solid: '#6366f1' },
       ];
-      return colors;
+      return defaultColors;
     }
 
     getProjectColor(projectId) {
+      const project = this.projects.find(p => p.id === projectId);
+      if (project && project.color) {
+        // Convert hex color to RGB for darker shade calculation
+        const hex = project.color.replace('#', '');
+        const r = parseInt(hex.substring(0, 2), 16);
+        const g = parseInt(hex.substring(2, 4), 16);
+        const b = parseInt(hex.substring(4, 6), 16);
+        // Create darker shade (reduce by ~15%)
+        const darkerR = Math.max(0, Math.floor(r * 0.85));
+        const darkerG = Math.max(0, Math.floor(g * 0.85));
+        const darkerB = Math.max(0, Math.floor(b * 0.85));
+        const darkerHex = '#' + [darkerR, darkerG, darkerB].map(x => {
+          const hex = x.toString(16);
+          return hex.length === 1 ? '0' + hex : hex;
+        }).join('');
+        return {
+          bg: `linear-gradient(135deg, ${project.color} 0%, ${darkerHex} 100%)`,
+          solid: project.color
+        };
+      }
+      // Fallback to default colors if project color is not available
       const index = this.projects.findIndex(p => p.id === projectId);
-      return this.projectColors[index % this.projectColors.length];
+      return this.projectColors[index >= 0 ? index % this.projectColors.length : 0];
     }
 
     init() {
@@ -700,9 +723,23 @@
         chip.textContent = project.name;
         chip.dataset.projectId = project.id;
 
+        // Apply project color to chip
+        if (project.color) {
+          const color = this.getProjectColor(project.id);
+          chip.style.borderColor = color.solid;
+          chip.style.color = color.solid;
+        }
+
         const isUsed = this.segments.some(s => s.project_id === project.id);
         if (isUsed) {
           chip.classList.add('active');
+          // Apply active state with project color
+          if (project.color) {
+            const color = this.getProjectColor(project.id);
+            chip.style.background = color.bg;
+            chip.style.borderColor = color.solid;
+            chip.style.color = 'white';
+          }
         }
 
         if (project.suppressed) {

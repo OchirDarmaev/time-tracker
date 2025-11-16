@@ -4,6 +4,7 @@ export interface Project {
   id: number;
   name: string;
   suppressed: boolean;
+  color: string;
 }
 
 export const projectModel = {
@@ -20,8 +21,10 @@ export const projectModel = {
     return db.prepare("SELECT * FROM projects WHERE id = ?").get(id) as Project | undefined;
   },
 
-  create(name: string): Project {
-    const result = db.prepare("INSERT INTO projects (name, suppressed) VALUES (?, 0)").run(name);
+  create(name: string, color: string = "#14b8a6"): Project {
+    const result = db
+      .prepare("INSERT INTO projects (name, suppressed, color) VALUES (?, 0, ?)")
+      .run(name, color);
     return this.getById(result.lastInsertRowid as number)!;
   },
 

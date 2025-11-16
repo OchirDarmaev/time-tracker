@@ -21,11 +21,11 @@ INSERT OR IGNORE INTO users (email, roles, active)
 VALUES ('all-roles@mail.com', '["account", "office-manager","admin"]', 1);
 
 -- Projects
-INSERT OR IGNORE INTO projects (name, suppressed) 
-VALUES ('jupiter', 0);
+INSERT OR IGNORE INTO projects (name, suppressed, color) 
+VALUES ('jupiter', 0, '#14b8a6');
 
-INSERT OR IGNORE INTO projects (name, suppressed) 
-VALUES ('mars', 0);
+INSERT OR IGNORE INTO projects (name, suppressed, color) 
+VALUES ('mars', 0, '#06b6d4');
 
 -- Assign projects to accounts
 -- Assign jupiter and mars to account-1@mail.com

@@ -5,9 +5,9 @@ import { htmlResponse } from "../../../shared/contracts/html_response.js";
 const c = initContract();
 
 export const accountTimeContract = c.router({
-  accountTime: {
+  dashboard: {
     method: "GET",
-    path: "/account/time",
+    path: "/account/dashboard",
     query: z.any(),
     responses: {
       200: htmlResponse,

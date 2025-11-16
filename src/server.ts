@@ -10,14 +10,6 @@ import { rootContract } from "./features/root/contract.js";
 import { rootRouter } from "./features/root/router.js";
 import { accountTimeContract } from "./features/account/time/contract.js";
 import { accountTimeRouter } from "./features/account/time/router.js";
-import { managerReportsContract } from "./features/manager/reports/contract.js";
-import { managerReportsRouter } from "./features/manager/reports/router.js";
-import { adminProjectsContract } from "./features/admin/projects/contract.js";
-import { adminProjectsRouter } from "./features/admin/projects/router.js";
-import { adminUsersProjectsContract } from "./features/admin/users_projects/contract.js";
-import { adminUsersProjectsRouter } from "./features/admin/users_projects/router.js";
-import { adminSystemReportsContract } from "./features/admin/system_reports/contract.js";
-import { adminSystemReportsRouter } from "./features/admin/system_reports/router.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -54,26 +46,6 @@ createExpressEndpoints(rootContract, rootRouter, app, {
 });
 
 createExpressEndpoints(accountTimeContract, accountTimeRouter, app, {
-  responseValidation: false,
-  jsonQuery: true,
-});
-
-createExpressEndpoints(managerReportsContract, managerReportsRouter, app, {
-  responseValidation: false,
-  jsonQuery: true,
-});
-
-createExpressEndpoints(adminProjectsContract, adminProjectsRouter, app, {
-  responseValidation: false,
-  jsonQuery: true,
-});
-
-createExpressEndpoints(adminUsersProjectsContract, adminUsersProjectsRouter, app, {
-  responseValidation: false,
-  jsonQuery: true,
-});
-
-createExpressEndpoints(adminSystemReportsContract, adminSystemReportsRouter, app, {
   responseValidation: false,
   jsonQuery: true,
 });

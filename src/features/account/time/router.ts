@@ -18,7 +18,7 @@ import { renderTimeTrackingPage } from "./views/time_tracking_page.js";
 const s = initServer();
 
 export const accountTimeRouter = s.router(accountTimeContract, {
-  accountTime: async ({ req }) => {
+  dashboard: async ({ req }) => {
     const authReq = req as unknown as AuthStubRequest;
 
     if (!authReq.currentUser) {

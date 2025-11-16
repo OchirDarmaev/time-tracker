@@ -5,6 +5,8 @@ import { AuthStubRequest } from "../middleware/auth_stub.js";
 import { userModel } from "../models/user.js";
 import { projectModel } from "../models/project.js";
 import { html } from "./html.js";
+import { tsSubPath } from "./paths.js";
+import { accountTimeContract } from "../../features/account/time/contract.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -14,38 +16,14 @@ const roleLabels: Record<string, string> = {
   "office-manager": "Office Manager",
   admin: "Admin",
 };
-
+// accountTimeContract.accountTime.path;
 function getNavButtons(availableRoles: string[], activeNav: string): string {
   const navItems = [
     {
-      href: "/account/time",
-      label: "My Time",
+      href: tsSubPath<typeof accountTimeContract>(accountTimeContract.dashboard.path),
+      label: "Dashboard",
       requiredRoles: ["account"],
       activeNav: "account",
-    },
-    {
-      href: "/manager/reports",
-      label: "Reports",
-      requiredRoles: ["office-manager", "admin"],
-      activeNav: "manager",
-    },
-    {
-      href: "/admin/projects",
-      label: "Projects",
-      requiredRoles: ["admin"],
-      activeNav: "admin_projects",
-    },
-    {
-      href: "/admin/users-projects",
-      label: "Assign Accounts",
-      requiredRoles: ["admin"],
-      activeNav: "admin_users",
-    },
-    {
-      href: "/admin/system-reports",
-      label: "System Reports",
-      requiredRoles: ["admin"],
-      activeNav: "admin_reports",
     },
   ];
 
@@ -144,8 +122,9 @@ export function renderBaseLayout(content: string, req: AuthStubRequest, activeNa
   const navButtons = getNavButtons(availableRoles, activeNav);
   const currentRole = req.session?.userRole as string | undefined;
   const roleSelector = getRoleSelector(availableRoles, currentRole);
-  const userId = "id" in currentUser ? currentUser.id : undefined;
-  const projectSelector = getProjectSelector(availableRoles, userId);
+  // const userId = "id" in currentUser ? currentUser.id : undefined;
+  // const projectSelector = getProjectSelector(availableRoles, userId);
+  const emptyProjectSelector = "";
 
   // Replace all placeholders
   layout = layout.replace(/\{\{user_options\}\}/g, userOptions || "");
@@ -153,7 +132,7 @@ export function renderBaseLayout(content: string, req: AuthStubRequest, activeNa
   layout = layout.replace(/\{\{all_roles\}\}/g, allRolesDisplay);
   layout = layout.replace("{{nav_buttons}}", navButtons);
   layout = layout.replace("{{role_selector}}", roleSelector);
-  layout = layout.replace("{{project_selector}}", projectSelector);
+  layout = layout.replace("{{project_selector}}", emptyProjectSelector);
   layout = layout.replace("{{content}}", content);
 
   return layout;

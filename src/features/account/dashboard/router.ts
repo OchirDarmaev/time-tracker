@@ -1,6 +1,7 @@
 import { initServer } from "@ts-rest/express";
-import { accountTimeContract } from "./contract.js";
-import { AuthStubRequest } from "../../../shared/middleware/auth_stub.js";
+import { accountDashboardContract } from "./contract.js";
+import { AuthContext } from "../../../shared/middleware/auth_stub.js";
+import { isAuthContext } from "../../../shared/middleware/isAuthContext.js";
 import { timeEntryModel } from "../../../shared/models/time_entry.js";
 import { projectModel } from "../../../shared/models/project.js";
 import {
@@ -14,48 +15,45 @@ import { validateDate, validateMinutes } from "../../../shared/utils/validation.
 import { renderSummary } from "./views/summary.js";
 import { renderEntriesTable } from "./views/entries_table.js";
 import { renderTimeTrackingPage } from "./views/time_tracking_page.js";
+import { renderBaseLayout } from "../../../shared/utils/layout.js";
 
 const s = initServer();
 
-export const accountTimeRouter = s.router(accountTimeContract, {
-  dashboard: async ({ req }) => {
-    const authReq = req as unknown as AuthStubRequest;
-
-    if (!authReq.currentUser) {
+export const accountTimeRouter = s.router(accountDashboardContract, {
+  dashboard: async (req) => {
+    if (!isAuthContext(req.req)) {
       return {
         status: 401,
         body: { body: "Unauthorized" },
       };
     }
-    if (!authReq.currentUser.roles.includes("account")) {
+
+    if (!req.req.currentUser) {
+      return {
+        status: 401,
+        body: { body: "Unauthorized" },
+      };
+    }
+    if (!req.req.currentUser.roles.includes("account")) {
       return {
         status: 403,
         body: { body: "Forbidden" },
       };
     }
-
-    // Check if this is an HTMX request - if so, return only the content
-    const isHtmxRequest = authReq.headers["hx-request"] === "true";
-
-    if (isHtmxRequest) {
-      // Return only the content for HTMX requests
-      const content = renderTimeTrackingPage(authReq, false);
+    if (req.headers["hx-request"] === "true") {
       return {
         status: 200,
-        body: content,
-      };
-    } else {
-      // Return full page for regular requests
-      const html = renderTimeTrackingPage(authReq, true);
-      return {
-        status: 200,
-        body: html,
+        body: renderTimeTrackingPage(req, req.req),
       };
     }
-  },
 
-  accountTimeEntries: async ({ query, req }) => {
-    const authReq = req as unknown as AuthStubRequest;
+    return {
+      status: 200,
+      body: renderBaseLayout(renderTimeTrackingPage(req, req.req), req.req, "account"),
+    };
+  },
+  accountDashboardEntries: async ({ query, req }) => {
+    const authReq = req as unknown as AuthContext;
 
     if (!authReq.currentUser) {
       return {
@@ -89,8 +87,8 @@ export const accountTimeRouter = s.router(accountTimeContract, {
     };
   },
 
-  createTimeEntry: async ({ body, req }) => {
-    const authReq = req as unknown as AuthStubRequest;
+  createDashboardEntry: async ({ body, req }) => {
+    const authReq = req as unknown as AuthContext;
 
     if (!authReq.currentUser) {
       return {
@@ -150,8 +148,8 @@ export const accountTimeRouter = s.router(accountTimeContract, {
     };
   },
 
-  deleteTimeEntry: async ({ params, req }) => {
-    const authReq = req as unknown as AuthStubRequest;
+  deleteDashboardEntry: async ({ params, req }) => {
+    const authReq = req as unknown as AuthContext;
 
     if (!authReq.currentUser) {
       return {
@@ -196,8 +194,8 @@ export const accountTimeRouter = s.router(accountTimeContract, {
     };
   },
 
-  syncTimeEntries: async ({ body, req }) => {
-    const authReq = req as unknown as AuthStubRequest;
+  syncDashboardEntries: async ({ body, req }) => {
+    const authReq = req as unknown as AuthContext;
 
     if (!authReq.currentUser) {
       return {
@@ -264,8 +262,8 @@ export const accountTimeRouter = s.router(accountTimeContract, {
     };
   },
 
-  accountTimeSummary: async ({ query, req }) => {
-    const authReq = req as unknown as AuthStubRequest;
+  accountDashboardSummary: async ({ query, req }) => {
+    const authReq = req as unknown as AuthContext;
 
     if (!authReq.currentUser) {
       return {

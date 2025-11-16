@@ -1,12 +1,12 @@
 import { readFileSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
-import { AuthStubRequest } from "../middleware/auth_stub.js";
+import { AuthContext } from "../middleware/auth_stub.js";
 import { userModel } from "../models/user.js";
 import { projectModel } from "../models/project.js";
 import { html } from "./html.js";
-import { tsSubPath } from "./paths.js";
-import { accountTimeContract } from "../../features/account/time/contract.js";
+import { tsBuildUrl } from "./paths.js";
+import { accountDashboardContract } from "../../features/account/dashboard/contract.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -20,7 +20,7 @@ const roleLabels: Record<string, string> = {
 function getNavButtons(availableRoles: string[], activeNav: string): string {
   const navItems = [
     {
-      href: tsSubPath<typeof accountTimeContract>(accountTimeContract.dashboard.path),
+      href: tsBuildUrl(accountDashboardContract.dashboard, {}),
       label: "Dashboard",
       requiredRoles: ["account"],
       activeNav: "account",
@@ -99,7 +99,7 @@ function getProjectSelector(availableRoles: string[], userId: number | undefined
   `;
 }
 
-export function renderBaseLayout(content: string, req: AuthStubRequest, activeNav: string = "") {
+export function renderBaseLayout(content: string, req: AuthContext, activeNav: string = "") {
   const layoutPath = join(__dirname, "../views/layouts/base.html");
   let layout = readFileSync(layoutPath, "utf-8");
 
@@ -138,7 +138,7 @@ export function renderBaseLayout(content: string, req: AuthStubRequest, activeNa
   return layout;
 }
 
-export function renderNavBar(req: AuthStubRequest, activeNav: string = ""): string {
+export function renderNavBar(req: AuthContext, activeNav: string = ""): string {
   const currentUser = req.currentUser || { email: "Unknown", role: "account", roles: ["account"] };
   const availableRoles: string[] = currentUser.roles || ["account"];
 

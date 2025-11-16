@@ -2,6 +2,8 @@ import { html } from "../../../../shared/utils/html.js";
 import { Project } from "../../../../shared/models/project.js";
 import { TimeEntry } from "../../../../shared/models/time_entry.js";
 import { minutesToHours } from "../../../../shared/utils/date_utils.js";
+import { accountDashboardContract } from "../contract.js";
+import { tsBuildUrl } from "../../../../shared/utils/paths.js";
 
 export function renderEntriesTable(entries: TimeEntry[], projects: Project[]): string {
   if (entries.length === 0) {
@@ -66,7 +68,7 @@ export function renderEntriesTable(entries: TimeEntry[], projects: Project[]): s
             </td>
             <td class="px-5 py-4 text-right">
               <button 
-                hx-delete="/account/time/entries/${entry.id}"
+                hx-delete-"${tsBuildUrl(accountDashboardContract.deleteDashboardEntry, { entryId: entry.id.toString() })}
                 hx-target="#entries-container"
                 hx-swap="innerHTML transition:true"
                 hx-confirm="Delete this entry?"

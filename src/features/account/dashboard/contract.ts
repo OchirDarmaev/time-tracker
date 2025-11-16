@@ -4,27 +4,32 @@ import { htmlResponse } from "../../../shared/contracts/html_response.js";
 
 const c = initContract();
 
-export const accountTimeContract = c.router({
+export const accountDashboardContract = c.router({
   dashboard: {
     method: "GET",
     path: "/account/dashboard",
-    query: z.any(),
+    headers: z.object({
+      "hx-request": z.literal("true").optional(),
+    }),
+    query: z.object({
+      date: z.string().date().optional(),
+    }),
     responses: {
       200: htmlResponse,
     },
   },
-  accountTimeEntries: {
+  accountDashboardEntries: {
     method: "GET",
-    path: "/account/time/entries",
+    path: "/account/dashboard/entries",
     query: z.any(),
     responses: {
       200: htmlResponse,
       400: z.any(),
     },
   },
-  createTimeEntry: {
+  createDashboardEntry: {
     method: "POST",
-    path: "/account/time/entries",
+    path: "/account/dashboard/entries",
     body: z.object({
       project_id: z.string(),
       date: z.string(),
@@ -37,9 +42,9 @@ export const accountTimeContract = c.router({
       403: z.any(),
     },
   },
-  deleteTimeEntry: {
+  deleteDashboardEntry: {
     method: "DELETE",
-    path: "/account/time/entries/:id",
+    path: "/account/dashboard/entries/:entryId",
     pathParams: z.object({ id: z.string() }),
     responses: {
       200: htmlResponse,
@@ -47,9 +52,9 @@ export const accountTimeContract = c.router({
       404: z.any(),
     },
   },
-  syncTimeEntries: {
+  syncDashboardEntries: {
     method: "POST",
-    path: "/account/time/sync",
+    path: "/account/dashboard/sync",
     body: z.object({
       date: z.string(),
       segments: z.array(
@@ -66,9 +71,9 @@ export const accountTimeContract = c.router({
       403: z.any(),
     },
   },
-  accountTimeSummary: {
+  accountDashboardSummary: {
     method: "GET",
-    path: "/account/time/summary",
+    path: "/account/dashboard/summary",
     query: z.any(),
     responses: {
       200: htmlResponse,

@@ -1,6 +1,6 @@
 import { initServer } from "@ts-rest/express";
 import { authContract } from "./contract.js";
-import { AuthStubRequest } from "../../shared/middleware/auth_stub.js";
+import { AuthContext } from "../../shared/middleware/auth_stub.js";
 import { userModel, UserRole } from "../../shared/models/user.js";
 import { renderNavBar } from "../../shared/utils/layout.js";
 
@@ -8,7 +8,7 @@ const s = initServer();
 
 export const authRouter = s.router(authContract, {
   setUser: async ({ body, req, res }) => {
-    const authReq = req as unknown as AuthStubRequest;
+    const authReq = req as unknown as AuthContext;
     const userId = body.user_id;
     if (userId) {
       authReq.session!.userId = userId;
@@ -44,7 +44,7 @@ export const authRouter = s.router(authContract, {
   },
 
   setRole: async ({ body, req, res }) => {
-    const authReq = req as unknown as AuthStubRequest;
+    const authReq = req as unknown as AuthContext;
     const role = body.role;
     if (role && ["account", "office-manager", "admin"].includes(role)) {
       const userId = authReq.session!.userId as number | undefined;
@@ -67,7 +67,7 @@ export const authRouter = s.router(authContract, {
   },
 
   getNavBar: async ({ query, req }) => {
-    const authReq = req as unknown as AuthStubRequest;
+    const authReq = req as unknown as AuthContext;
     const activeNav = (query?.active_nav as string) || "";
     const html = renderNavBar(authReq, activeNav);
     return {

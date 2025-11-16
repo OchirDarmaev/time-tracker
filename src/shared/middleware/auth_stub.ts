@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import { userModel, UserRole } from "../models/user.js";
 
-export interface AuthStubRequest extends Request {
-  currentUser?: {
+export interface AuthContext extends Request {
+  currentUser: {
     id: number;
     email: string;
     role: UserRole;
@@ -10,14 +10,14 @@ export interface AuthStubRequest extends Request {
   };
 }
 
-export function authStubMiddleware(req: AuthStubRequest, res: Response, next: NextFunction) {
+export function authStubMiddleware(req: Request, res: Response, next: NextFunction) {
   const selectedUserId = req.session?.userId as number | undefined;
   const selectedRole = req.session?.userRole as UserRole | undefined;
 
   if (selectedUserId && selectedRole) {
     const user = userModel.getById(selectedUserId);
     if (user && user.roles.includes(selectedRole)) {
-      req.currentUser = {
+      (req as unknown as AuthContext).currentUser = {
         id: user.id,
         email: user.email,
         role: selectedRole,
@@ -27,11 +27,11 @@ export function authStubMiddleware(req: AuthStubRequest, res: Response, next: Ne
   }
 
   // Default to first account if no user selected
-  if (!req.currentUser) {
+  if (!(req as unknown as AuthContext).currentUser) {
     const accounts = userModel.getAccounts();
     if (accounts.length > 0) {
       const account = accounts[0];
-      req.currentUser = {
+      (req as unknown as AuthContext).currentUser = {
         id: account.id,
         email: account.email,
         role: account.roles[0] || "account",
@@ -44,7 +44,7 @@ export function authStubMiddleware(req: AuthStubRequest, res: Response, next: Ne
 }
 
 export function requireRole(...roles: UserRole[]) {
-  return (req: AuthStubRequest, res: Response, next: NextFunction) => {
+  return (req: AuthContext, res: Response, next: NextFunction) => {
     if (!req.currentUser) {
       return res.status(401).send("Unauthorized");
     }

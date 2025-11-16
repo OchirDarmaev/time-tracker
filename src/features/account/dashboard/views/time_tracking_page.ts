@@ -1,6 +1,6 @@
 import { readFileSync } from "fs";
 import { html } from "../../../../shared/utils/html.js";
-import { AuthStubRequest } from "../../../../shared/middleware/auth_stub.js";
+import { AuthContext } from "../../../../shared/middleware/auth_stub.js";
 import { projectModel } from "../../../../shared/models/project.js";
 import { timeEntryModel } from "../../../../shared/models/time_entry.js";
 import {
@@ -9,20 +9,23 @@ import {
   getAllDaysInMonth,
   getMonthFromDate,
 } from "../../../../shared/utils/date_utils.js";
-import { renderBaseLayout } from "../../../../shared/utils/layout.js";
 import { renderTimeSlider } from "../../../../shared/views/components/time_slider_component.js";
 import { renderTimeSummary } from "../../../../shared/views/components/time_summary_component.js";
 import { renderMonthlyCalendar } from "../../../../shared/views/components/monthly_calendar_component.js";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
+import { tsBuildUrl } from "../../../../shared/utils/paths.js";
+import { accountDashboardContract } from "../contract.js";
+import { ClientInferRequest } from "@ts-rest/core";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-export function renderTimeTrackingPage(req: AuthStubRequest, includeLayout: boolean = true) {
-  const currentUser = req.currentUser!;
-  const today = formatDate(new Date());
-  const selectedDate = (req.query.date as string) || today;
+type Request = ClientInferRequest<typeof accountDashboardContract.dashboard>;
+
+export function renderTimeTrackingPage(req: Request, authContext: AuthContext) {
+  const { currentUser } = authContext;
+  const selectedDate = req.query.date || formatDate(new Date());
 
   const projects = projectModel.getByUserId(currentUser.id);
   const entries = timeEntryModel.getByUserIdAndDate(currentUser.id, selectedDate);
@@ -119,8 +122,9 @@ export function renderTimeTrackingPage(req: AuthStubRequest, includeLayout: bool
           <div class="h-12 w-px bg-gray-300 dark:bg-gray-600 self-stretch"></div>
           <div class="flex-1 min-w-[160px]">
             ${renderTimeSummary({
-              date: selectedDate,
-              hxGet: "/account/time/summary",
+              hxGet: tsBuildUrl(accountDashboardContract.accountDashboardSummary, {
+                date: selectedDate,
+              }),
               hxTrigger: "load, entries-changed from:body",
             })}
           </div>
@@ -130,7 +134,7 @@ export function renderTimeTrackingPage(req: AuthStubRequest, includeLayout: bool
         <div class="w-1/2">
           ${renderMonthlyCalendar({
             selectedDate: selectedDate,
-            hxGet: "/account/time",
+            hxGet: tsBuildUrl(accountDashboardContract.dashboard, {}),
             hxTarget: "#time-tracking-content",
             dayHoursMap: dayHoursMap,
             dayProjectBreakdown: dayProjectBreakdown,
@@ -150,7 +154,7 @@ export function renderTimeTrackingPage(req: AuthStubRequest, includeLayout: bool
               suppressed: p.suppressed || false,
             })),
             date: selectedDate,
-            syncUrl: "/account/time/sync",
+            syncUrl: tsBuildUrl(accountDashboardContract.syncDashboardEntries, {}),
           })}
         </div>
       </div>
@@ -160,9 +164,5 @@ export function renderTimeTrackingPage(req: AuthStubRequest, includeLayout: bool
     ${timeSliderHtml}
   `;
 
-  if (includeLayout) {
-    return renderBaseLayout(content, req, "account");
-  } else {
-    return content;
-  }
+  return content;
 }

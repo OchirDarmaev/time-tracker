@@ -1,22 +1,16 @@
 import { html } from "../../utils/html";
 
 export interface TimeSummaryProps {
-  date?: string;
-  hxGet?: string;
+  hxGet: string;
   hxTrigger?: string;
 }
 
-export function renderTimeSummary(props: TimeSummaryProps = {}): string {
-  const date = props.date || "";
-  const hxGet = props.hxGet || "";
+export function renderTimeSummary(props: TimeSummaryProps): string {
+  const hxGet = props.hxGet;
   const hxTrigger = props.hxTrigger || "load";
 
   // Build the URL with date parameter if provided
-  const url = hxGet
-    ? hxGet.includes("?")
-      ? `${hxGet}&date=${date}`
-      : `${hxGet}?date=${date}`
-    : "";
+  const url = hxGet;
 
   // Determine the trigger attribute
   let triggerAttr = "";

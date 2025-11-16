@@ -2,14 +2,15 @@ import express from "express";
 import session from "express-session";
 import cookieParser from "cookie-parser";
 import { initializeDatabase } from "./shared/config/database.js";
-import { authStubMiddleware } from "./shared/middleware/auth_stub.js";
+// import { authStubMiddleware } from "./shared/middleware/auth_stub.js";
 import { createExpressEndpoints } from "@ts-rest/express";
 import { authContract } from "./features/auth/contract.js";
 import { authRouter } from "./features/auth/router.js";
 import { rootContract } from "./features/root/contract.js";
 import { rootRouter } from "./features/root/router.js";
-import { accountTimeContract } from "./features/account/time/contract.js";
-import { accountTimeRouter } from "./features/account/time/router.js";
+import { accountDashboardContract } from "./features/account/dashboard/contract.js";
+import { accountTimeRouter } from "./features/account/dashboard/router.js";
+import { authStubMiddleware } from "./shared/middleware/auth_stub.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -21,10 +22,10 @@ try {
   console.error("Error initializing database:", error);
 }
 
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-app.use(cookieParser());
 app.use(
+  express.urlencoded({ extended: true }),
+  express.json(),
+  cookieParser(),
   session({
     secret: "timetrack-secret-key-change-in-production",
     resave: false,
@@ -32,8 +33,6 @@ app.use(
     cookie: { secure: false },
   })
 );
-
-app.use(authStubMiddleware);
 
 createExpressEndpoints(authContract, authRouter, app, {
   responseValidation: false,
@@ -45,9 +44,10 @@ createExpressEndpoints(rootContract, rootRouter, app, {
   jsonQuery: true,
 });
 
-createExpressEndpoints(accountTimeContract, accountTimeRouter, app, {
+createExpressEndpoints(accountDashboardContract, accountTimeRouter, app, {
   responseValidation: false,
   jsonQuery: true,
+  globalMiddleware: [authStubMiddleware],
 });
 
 app.listen(PORT, () => {

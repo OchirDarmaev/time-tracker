@@ -40,7 +40,10 @@ export function renderAuth(req: AuthContext): string {
 
   const setUserUrl = tsBuildUrl(authContract.setUser, {});
   const setRoleUrl = tsBuildUrl(authContract.setRole, {});
-  const dashboardUrl = tsBuildUrl(accountDashboardContract.dashboard, {});
+  const dashboardUrl = tsBuildUrl(accountDashboardContract.dashboard, {
+    headers: {},
+    query: {},
+  });
 
   return html`
     <!DOCTYPE html>

@@ -384,6 +384,15 @@
   .h-16 {
     height: calc(var(--spacing) * 16);
   }
+  .h-20 {
+    height: calc(var(--spacing) * 20);
+  }
+  .h-25 {
+    height: calc(var(--spacing) * 25);
+  }
+  .h-40 {
+    height: calc(var(--spacing) * 40);
+  }
   .h-full {
     height: 100%;
   }
@@ -392,6 +401,9 @@
   }
   .min-h-\[64px\] {
     min-height: 64px;
+  }
+  .min-h-\[140px\] {
+    min-height: 140px;
   }
   .min-h-screen {
     min-height: 100vh;

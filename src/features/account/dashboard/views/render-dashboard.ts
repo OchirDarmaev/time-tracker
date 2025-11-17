@@ -19,7 +19,7 @@ import { ClientInferRequest } from "@ts-rest/core";
 
 type Request = ClientInferRequest<typeof accountDashboardContract.dashboard>;
 
-export function renderTimeTrackingPage(req: Request, authContext: AuthContext) {
+export function renderDashboard(req: Request, authContext: AuthContext) {
   const { currentUser } = authContext;
   const selectedDate = req.query.date || formatDate(new Date());
 
@@ -106,7 +106,7 @@ export function renderTimeTrackingPage(req: Request, authContext: AuthContext) {
       class="space-y-4"
       hx-get="${dashboardUrl}"
       hx-target="this"
-      hx-swap="outerHTML transition:true"
+      hx-swap="innerHTML transition:true"
       hx-trigger="entries-changed from:body"
     >
       <!-- Enhanced Status Bar -->
@@ -157,7 +157,7 @@ export function renderTimeTrackingPage(req: Request, authContext: AuthContext) {
         </div>
       </div>
       <div class="flex flex-row gap-4 w-full">
-        <div class="w-1/2 min-w-0">
+        <div class="w-1/2">
           ${renderMonthlyCalendar({
             selectedDate: selectedDate,
             hxTarget: "#time-tracking-content",
@@ -181,7 +181,7 @@ export function renderTimeTrackingPage(req: Request, authContext: AuthContext) {
               },
             })}"
             hx-trigger="load, entries-changed from:body"
-            hx-swap="innerHTML transition:true"
+            hx-swap="innerHTML"
             hx-target="this"
           ></div>
         </div>

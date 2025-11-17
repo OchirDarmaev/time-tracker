@@ -58,7 +58,7 @@ export function renderEntriesTable(entries: TimeEntry[], projects: Project[]): s
             const commentWithoutTags = entry.comment
               ? entry.comment.replace(/#\w+/g, "").trim()
               : "";
-            return `
+            return html`
           <tr id="entry-${entry.id}" class="hover:bg-gray-200 dark:hover:bg-gray-700">
             <td class="px-5 py-4 font-medium text-gray-900 dark:text-gray-100 text-sm">${projectMap.get(entry.project_id) || "Unknown"}</td>
             <td class="px-5 py-4 font-semibold text-indigo-600 dark:text-indigo-400 text-sm">${minutesToHours(entry.minutes).toFixed(1)}h</td>

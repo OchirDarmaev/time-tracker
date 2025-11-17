@@ -33,7 +33,7 @@ export function renderRoot(): string {
       <body class="bg-gray-950 text-gray-100 min-h-screen flex items-center justify-center">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
           <h1
-            class="text-6xl font-bold mb-6 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent"
+            class="text-6xl font-bold mb-6 bg-linear-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent"
           >
             TimeTrack
           </h1>

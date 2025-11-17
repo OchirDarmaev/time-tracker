@@ -133,7 +133,7 @@ export function renderTimeTrackingPage(req: Request, authContext: AuthContext) {
     >
       <!-- Enhanced Status Bar -->
       <div
-        class="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-3 shadow-sm"
+        class="bg-linear-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-3 shadow-sm"
       >
         <div class="flex items-start gap-4 flex-wrap">
           <div class="flex-1 min-w-[140px]">

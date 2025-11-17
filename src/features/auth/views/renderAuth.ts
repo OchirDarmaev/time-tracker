@@ -75,7 +75,7 @@ export function renderAuth(req: AuthContext): string {
         <div class="max-w-md w-full mx-auto px-4 sm:px-6 lg:px-8">
           <div class="bg-gray-900 rounded-lg p-8 border border-gray-800 shadow-xl">
             <h1
-              class="text-3xl font-bold mb-2 text-center bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent"
+              class="text-3xl font-bold mb-2 text-center bg-linear-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent"
             >
               Select User
             </h1>

@@ -71,7 +71,7 @@ export function renderTimeSlider(props: TimeSliderProps = {}): string {
       <div class="relative my-4">
         <div
           id="time-slider-track"
-          class="relative h-16 bg-gradient-to-r from-gray-200 via-teal-50/5 to-gray-200 dark:from-gray-700 dark:via-teal-900/5 dark:to-gray-700 rounded-md border border-gray-300 dark:border-gray-600 overflow-visible cursor-pointer min-h-[64px]"
+          class="relative h-16 bg-linear-to-r from-gray-200 via-teal-50/5 to-gray-200 dark:from-gray-700 dark:via-teal-900/5 dark:to-gray-700 rounded-md border border-gray-300 dark:border-gray-600 overflow-visible cursor-pointer min-h-[64px]"
         >
           <!-- Segments and handles will be dynamically inserted here -->
         </div>

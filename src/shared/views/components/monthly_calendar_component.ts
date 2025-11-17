@@ -100,10 +100,8 @@ function renderCircleDiagram(
 
   return html`
     <svg
-      width="${size}"
-      height="${size}"
       viewBox="0 0 ${size} ${size}"
-      class="absolute inset-0 m-auto pointer-events-none"
+      class="absolute inset-0 m-auto pointer-events-none w-full h-full"
       style="z-index: 0;"
     >
       ${paths.join("")}

@@ -11,7 +11,6 @@ import {
 } from "@/shared/utils/date_utils.js";
 
 const REQUIRED_DAILY_HOURS = 8;
-import { renderTimeSlider } from "@/shared/views/components/time_slider_component.js";
 import { renderTimeSummary } from "@/shared/views/components/time_summary_component.js";
 import { renderMonthlyCalendar } from "@/shared/views/components/monthly_calendar_component.js";
 import { tsBuildUrl } from "@/shared/utils/paths.js";
@@ -25,7 +24,6 @@ export function renderTimeTrackingPage(req: Request, authContext: AuthContext) {
   const selectedDate = req.query.date || formatDate(new Date());
 
   const projects = projectModel.getByUserId(currentUser.id);
-  const entries = timeEntryModel.getByUserIdAndDate(currentUser.id, selectedDate);
   const totalMinutes = timeEntryModel.getTotalMinutesByUserAndDate(currentUser.id, selectedDate);
   const totalHours = minutesToHours(totalMinutes);
 
@@ -77,16 +75,6 @@ export function renderTimeTrackingPage(req: Request, authContext: AuthContext) {
   });
 
   // Monthly totals are now handled by time-summary component
-  // Convert entries to segments format for the time slider
-  const segments = entries.map((entry) => ({
-    project_id: entry.project_id,
-    minutes: entry.minutes,
-    comment: entry.comment || null,
-  }));
-
-  // Calculate total hours from entries, default to required hours if no entries
-  const sliderTotalHours =
-    totalHours > 0 ? Math.max(totalHours, REQUIRED_DAILY_HOURS) : REQUIRED_DAILY_HOURS;
 
   // Calculate remaining hours needed (only if day requires hours)
   const remainingHours = requiresDailyHours ? Math.max(0, REQUIRED_DAILY_HOURS - totalHours) : 0;
@@ -169,7 +157,7 @@ export function renderTimeTrackingPage(req: Request, authContext: AuthContext) {
         </div>
       </div>
       <div class="flex flex-row gap-4 w-full">
-        <div class="w-1/2">
+        <div class="w-1/2 min-w-0">
           ${renderMonthlyCalendar({
             selectedDate: selectedDate,
             hxTarget: "#time-tracking-content",
@@ -184,19 +172,18 @@ export function renderTimeTrackingPage(req: Request, authContext: AuthContext) {
           })}
         </div>
         <div class="w-1/2">
-          ${renderTimeSlider({
-            totalHours: sliderTotalHours,
-            segments: segments,
-            projects: projects.map((p) => ({
-              id: p.id,
-              name: p.name,
-              suppressed: p.suppressed || false,
-              color: p.color,
-              isSystem: p.isSystem || false,
-            })),
-            date: selectedDate,
-            syncUrl: tsBuildUrl(accountDashboardContract.syncDashboardEntries, {}),
-          })}
+          <div
+            id="time-slider-wrapper"
+            hx-get="${tsBuildUrl(accountDashboardContract.timeSlider, {
+              headers: {},
+              query: {
+                date: selectedDate,
+              },
+            })}"
+            hx-trigger="load, entries-changed from:body"
+            hx-swap="innerHTML transition:true"
+            hx-target="this"
+          ></div>
         </div>
       </div>
     </div>

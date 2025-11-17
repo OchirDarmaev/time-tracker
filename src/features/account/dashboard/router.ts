@@ -352,4 +352,61 @@ export const accountTimeRouter = s.router(accountDashboardContract, {
       body: html,
     };
   },
+  timeSlider: async ({ query, req }) => {
+    const authReq = req as unknown as AuthContext;
+
+    if (!authReq.currentUser) {
+      return {
+        status: 401,
+        body: { body: "Unauthorized" },
+      };
+    }
+    if (!authReq.currentUser.roles.includes("account")) {
+      return {
+        status: 403,
+        body: { body: "Forbidden" },
+      };
+    }
+
+    const currentUser = authReq.currentUser;
+    const date = (query?.date as string) || formatDate(new Date());
+
+    if (!validateDate(date)) {
+      return {
+        status: 400,
+        body: { body: "Invalid date" },
+      };
+    }
+
+    const projects = projectModel.getByUserId(currentUser.id);
+    const entries = timeEntryModel.getByUserIdAndDate(currentUser.id, date);
+    const totalMinutes = timeEntryModel.getTotalMinutesByUserAndDate(currentUser.id, date);
+    const totalHours = minutesToHours(totalMinutes);
+    const sliderTotalHours = Math.max(totalHours, REQUIRED_DAILY_HOURS);
+
+    const segments = entries.map((entry) => ({
+      project_id: entry.project_id,
+      minutes: entry.minutes,
+      comment: entry.comment || null,
+    }));
+
+    const html = renderTimeSlider({
+      totalHours: sliderTotalHours,
+      segments: segments,
+      projects: projects.map((p) => ({
+        id: p.id,
+        name: p.name,
+        suppressed: p.suppressed || false,
+        color: p.color,
+        isSystem: p.isSystem || false,
+      })),
+      date: date,
+      syncUrl: tsBuildUrl(accountDashboardContract.syncDashboardEntries, {}),
+    });
+
+    return {
+      status: 200,
+      body: html,
+    };
+  },
 });

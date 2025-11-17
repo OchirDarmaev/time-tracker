@@ -232,7 +232,7 @@ export function renderMonthlyCalendar(props: MonthlyCalendarProps): string {
               : "text-gray-700 dark:text-gray-300";
 
     // Title with day type information
-    let title = `${day.date} - ${hours.toFixed(1)}h`;
+    let title = `${hours.toFixed(1)}h`;
     if (isPublicHoliday) {
       title += " - Public Holiday";
     } else if (isWeekend) {

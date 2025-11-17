@@ -5,12 +5,14 @@ import { isAuthContext } from "@/shared/middleware/isAuthContext.js";
 import { timeEntryModel } from "@/shared/models/time_entry.js";
 import { projectModel } from "@/shared/models/project.js";
 import { calendarModel } from "@/shared/models/calendar.js";
-import { formatDate, getMonthFromDate } from "@/shared/utils/date_utils.js";
+import { formatDate, getMonthFromDate, minutesToHours } from "@/shared/utils/date_utils.js";
 import { validateDate, validateMinutes } from "@/shared/utils/validation.js";
 import { renderSummary } from "./views/summary.js";
 import { renderEntriesTable } from "./views/entries_table.js";
 import { renderTimeTrackingPage } from "./views/time_tracking_page.js";
 import { renderBaseLayout } from "@/shared/utils/layout.js";
+import { renderTimeSlider } from "@/shared/views/components/time_slider_component.js";
+import { tsBuildUrl } from "../../../shared/utils/paths.js";
 
 const REQUIRED_DAILY_HOURS = 8;
 
@@ -221,18 +223,20 @@ export const accountTimeRouter = s.router(accountDashboardContract, {
     const userProjects = projectModel.getByUserId(currentUser.id);
     const projectIds = new Set(userProjects.map((p) => p.id));
 
-    for (const segment of segments) {
-      if (!projectIds.has(segment.project_id)) {
-        return {
-          status: 403,
-          body: { success: false },
-        };
-      }
-      if (!validateMinutes(segment.minutes)) {
-        return {
-          status: 400,
-          body: { success: false },
-        };
+    if (segments) {
+      for (const segment of segments) {
+        if (!projectIds.has(segment.project_id)) {
+          return {
+            status: 403,
+            body: { success: false },
+          };
+        }
+        if (!validateMinutes(segment.minutes)) {
+          return {
+            status: 400,
+            body: { success: false },
+          };
+        }
       }
     }
 
@@ -241,21 +245,42 @@ export const accountTimeRouter = s.router(accountDashboardContract, {
     for (const entry of existingEntries) {
       timeEntryModel.delete(entry.id);
     }
-
-    // Create new entries from segments
-    for (const segment of segments) {
-      timeEntryModel.create(
-        currentUser.id,
-        segment.project_id,
-        date,
-        segment.minutes,
-        segment.comment || null
-      );
+    if (segments) {
+      // Create new entries from segments
+      for (const segment of segments) {
+        timeEntryModel.create(
+          currentUser.id,
+          segment.project_id,
+          date,
+          segment.minutes,
+          segment.comment || null
+        );
+      }
     }
+    // Re-fetch entries and projects to render updated slider
+    const entries = timeEntryModel.getByUserIdAndDate(currentUser.id, date);
+    const projects = projectModel.getByUserId(currentUser.id);
+    const totalMinutes = timeEntryModel.getTotalMinutesByUserAndDate(currentUser.id, date);
+    const totalHours = minutesToHours(totalMinutes);
+    const sliderTotalHours = Math.max(totalHours, REQUIRED_DAILY_HOURS);
+
+    const segmentsForSlider = entries.map((entry) => ({
+      project_id: entry.project_id,
+      minutes: entry.minutes,
+      comment: entry.comment || null,
+    }));
+
+    const html = renderTimeSlider({
+      totalHours: sliderTotalHours,
+      segments: segmentsForSlider,
+      projects,
+      date,
+      syncUrl: tsBuildUrl(accountDashboardContract.syncDashboardEntries, {}),
+    });
 
     return {
       status: 200,
-      body: { success: true },
+      body: html,
     };
   },
 

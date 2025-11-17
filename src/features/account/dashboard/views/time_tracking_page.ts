@@ -1,4 +1,3 @@
-import { readFileSync } from "fs";
 import { html } from "@/shared/utils/html.js";
 import { AuthContext } from "@/shared/middleware/auth_stub.js";
 import { projectModel } from "@/shared/models/project.js";
@@ -15,14 +14,9 @@ const REQUIRED_DAILY_HOURS = 8;
 import { renderTimeSlider } from "@/shared/views/components/time_slider_component.js";
 import { renderTimeSummary } from "@/shared/views/components/time_summary_component.js";
 import { renderMonthlyCalendar } from "@/shared/views/components/monthly_calendar_component.js";
-import { join, dirname } from "path";
-import { fileURLToPath } from "url";
 import { tsBuildUrl } from "@/shared/utils/paths.js";
 import { accountDashboardContract } from "@/features/account/dashboard/contract.js";
 import { ClientInferRequest } from "@ts-rest/core";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
 type Request = ClientInferRequest<typeof accountDashboardContract.dashboard>;
 
@@ -93,10 +87,6 @@ export function renderTimeTrackingPage(req: Request, authContext: AuthContext) {
   // Calculate total hours from entries, default to required hours if no entries
   const sliderTotalHours =
     totalHours > 0 ? Math.max(totalHours, REQUIRED_DAILY_HOURS) : REQUIRED_DAILY_HOURS;
-
-  // Read time slider HTML template (still needed for TimeSlider class definition)
-  const timeSliderPath = join(__dirname, "../../../../shared/views/components/time_slider.html");
-  const timeSliderHtml = readFileSync(timeSliderPath, "utf-8");
 
   // Calculate remaining hours needed (only if day requires hours)
   const remainingHours = requiresDailyHours ? Math.max(0, REQUIRED_DAILY_HOURS - totalHours) : 0;
@@ -210,9 +200,6 @@ export function renderTimeTrackingPage(req: Request, authContext: AuthContext) {
         </div>
       </div>
     </div>
-
-    <!-- Load TimeSlider class definition -->
-    ${timeSliderHtml}
   `;
 
   return content;

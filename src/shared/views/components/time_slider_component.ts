@@ -11,6 +11,7 @@ export interface Project {
   name: string;
   suppressed?: boolean;
   color?: string;
+  isSystem?: boolean;
 }
 
 export interface TimeSliderProps {
@@ -21,22 +22,98 @@ export interface TimeSliderProps {
   syncUrl?: string;
 }
 
+function getProjectColor(project: Project): { bg: string; solid: string } {
+  if (project.color) {
+    const hex = project.color.replace("#", "");
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    const darkerR = Math.max(0, Math.floor(r * 0.85));
+    const darkerG = Math.max(0, Math.floor(g * 0.85));
+    const darkerB = Math.max(0, Math.floor(b * 0.85));
+    const darkerHex =
+      "#" +
+      [darkerR, darkerG, darkerB]
+        .map((x) => {
+          const hex = x.toString(16);
+          return hex.length === 1 ? "0" + hex : hex;
+        })
+        .join("");
+    return {
+      bg: `linear-gradient(135deg, ${project.color} 0%, ${darkerHex} 100%)`,
+      solid: project.color,
+    };
+  }
+  return {
+    bg: "linear-gradient(135deg, #14b8a6 0%, #0d9488 100%)",
+    solid: "#14b8a6",
+  };
+}
+
+function minutesToHours(minutes: number): number {
+  return minutes / 60;
+}
+
+function hoursToMinutes(hours: number): number {
+  return Math.round(hours * 60);
+}
+
 export function renderTimeSlider(props: TimeSliderProps = {}): string {
   const totalHours = props.totalHours || 8;
-  const segmentsJson = JSON.stringify(props.segments || []);
-  const projectsJson = JSON.stringify(props.projects || []);
+  const segments = props.segments || [];
+  const projects = props.projects || [];
   const date = props.date || new Date().toISOString().split("T")[0];
   const syncUrl = props.syncUrl || "";
 
+  const totalMinutes = hoursToMinutes(totalHours);
+
+  // Sort projects: regular projects first, then system projects
+  const sortedProjects = [...projects].sort((a, b) => {
+    const aIsSystem = a.isSystem || false;
+    const bIsSystem = b.isSystem || false;
+    if (aIsSystem !== bIsSystem) {
+      return aIsSystem ? 1 : -1;
+    }
+    return a.name.localeCompare(b.name);
+  });
+
+  // Render segments as visual bars
+  let currentPosition = 0;
+  const segmentElements: string[] = [];
+
+  segments.forEach((segment) => {
+    const segmentMinutes = segment.minutes || 0;
+    const segmentWidth = totalMinutes > 0 ? (segmentMinutes / totalMinutes) * 100 : 0;
+    const leftPercent = totalMinutes > 0 ? (currentPosition / totalMinutes) * 100 : 0;
+
+    const project = projects.find((p) => p.id === segment.project_id);
+    const color = project ? getProjectColor(project) : { bg: "#14b8a6", solid: "#14b8a6" };
+
+    segmentElements.push(html`
+      <div
+        class="absolute top-0 h-full rounded-md flex items-center justify-center overflow-hidden"
+        style="left: ${leftPercent}%; width: ${segmentWidth}%; background: ${color.bg};"
+      >
+        <div class="text-center pointer-events-none">
+          <div class="text-xs font-semibold text-white drop-shadow-sm">
+            ${project ? project.name : "Unknown"}
+          </div>
+          <div class="text-[10px] text-white/90 drop-shadow-sm">
+            ${minutesToHours(segmentMinutes).toFixed(1)}h
+          </div>
+        </div>
+      </div>
+    `);
+
+    currentPosition += segmentMinutes;
+  });
+
   return html`
     <div
-      id="time-slider-container"
       class="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-3 shadow-sm my-4 w-full max-w-full box-border"
-      data-total-hours="${totalHours}"
-      data-segments="${segmentsJson.replace(/"/g, "&quot;")}"
-      data-projects="${projectsJson.replace(/"/g, "&quot;")}"
-      data-date="${date}"
-      data-sync-url="${syncUrl}"
+      id="time-slider-container"
+      hx-target="this"
+      hx-swap="outerHTML"
     >
       <div class="mb-4 pb-3 border-b border-gray-300 dark:border-gray-700">
         <div class="mb-2">
@@ -44,8 +121,127 @@ export function renderTimeSlider(props: TimeSliderProps = {}): string {
             >Projects</span
           >
         </div>
-        <div id="time-slider-project-chips" class="flex flex-wrap gap-1.5">
-          <!-- Project chips will be dynamically inserted here -->
+        <div class="flex flex-wrap gap-1.5">
+          ${sortedProjects
+            .map((project) => {
+              const isUsed = segments.some((s) => s.project_id === project.id);
+              const color = getProjectColor(project);
+              const isActive = isUsed;
+              const isDisabled = project.suppressed || false;
+
+              if (isDisabled) {
+                return html`
+                  <div
+                    class="px-2 py-1 text-xs font-medium rounded-md border cursor-not-allowed opacity-40"
+                    style="border-color: ${color.solid}; color: ${color.solid};"
+                  >
+                    ${project.name}
+                  </div>
+                `;
+              }
+
+              if (isActive) {
+                const filteredSegments = segments.filter((s) => s.project_id !== project.id);
+                return html`
+                  <form
+                    hx-post="${syncUrl}"
+                    hx-target="#time-slider-container"
+                    hx-swap="outerHTML"
+                    hx-trigger="click"
+                    class="inline-block"
+                  >
+                    <input type="hidden" name="date" value="${date}" />
+                    ${filteredSegments
+                      .map(
+                        (segment, idx) => html`
+                          <input
+                            type="hidden"
+                            name="segments[${idx}][project_id]"
+                            value="${segment.project_id}"
+                          />
+                          <input
+                            type="hidden"
+                            name="segments[${idx}][minutes]"
+                            value="${segment.minutes}"
+                          />
+                          ${segment.comment
+                            ? html`<input
+                                type="hidden"
+                                name="segments[${idx}][comment]"
+                                value="${segment.comment}"
+                              />`
+                            : ""}
+                        `
+                      )
+                      .join("")}
+                    <button
+                      type="submit"
+                      class="px-2 py-1 text-xs font-medium rounded-md border text-white"
+                      style="background: ${color.bg}; border-color: ${color.solid};"
+                    >
+                      ${project.name}
+                    </button>
+                  </form>
+                `;
+              }
+
+              const newSegmentMinutes =
+                segments.length === 0
+                  ? totalMinutes
+                  : Math.floor(totalMinutes / (segments.length + 1));
+              return html`
+                <form
+                  hx-post="${syncUrl}"
+                  hx-target="#time-slider-container"
+                  hx-swap="outerHTML"
+                  hx-trigger="click"
+                  class="inline-block"
+                >
+                  <input type="hidden" name="date" value="${date}" />
+                  ${segments
+                    .map(
+                      (segment, idx) => html`
+                        <input
+                          type="hidden"
+                          name="segments[${idx}][project_id]"
+                          value="${segment.project_id}"
+                        />
+                        <input
+                          type="hidden"
+                          name="segments[${idx}][minutes]"
+                          value="${segment.minutes}"
+                        />
+                        ${segment.comment
+                          ? html`<input
+                              type="hidden"
+                              name="segments[${idx}][comment]"
+                              value="${segment.comment}"
+                            />`
+                          : ""}
+                      `
+                    )
+                    .join("")}
+                  <input
+                    type="hidden"
+                    name="segments[${segments.length}][project_id]"
+                    value="${project.id}"
+                  />
+                  <input
+                    type="hidden"
+                    name="segments[${segments.length}][minutes]"
+                    value="${newSegmentMinutes}"
+                  />
+                  <button
+                    type="submit"
+                    class="px-2 py-1 text-xs font-medium rounded-md border"
+                    style="border-color: ${color.solid}; color: ${color.solid};"
+                  >
+                    ${project.name}
+                  </button>
+                </form>
+              `;
+            })
+            .join("")}
         </div>
       </div>
 
@@ -55,93 +251,112 @@ export function renderTimeSlider(props: TimeSliderProps = {}): string {
             class="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400 font-medium"
           >
             <span class="block">Total Hours:</span>
-            <input
-              type="number"
-              id="total-hours-input"
-              class="bg-gray-200 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-md px-2 py-1 text-xs w-[60px] focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10 block"
-              min="1"
-              max="24"
-              step="0.5"
-              value="${totalHours}"
-            />
+            <div
+              class="text-gray-900 dark:text-gray-100 rounded-md px-2 py-1 text-xs w-[60px] block"
+            >
+              ${totalHours}
+            </div>
           </label>
         </div>
       </div>
 
       <div class="relative my-4">
         <div
-          id="time-slider-track"
-          class="relative h-16 bg-linear-to-r from-gray-200 via-teal-50/5 to-gray-200 dark:from-gray-700 dark:via-teal-900/5 dark:to-gray-700 rounded-md border border-gray-300 dark:border-gray-600 overflow-visible cursor-pointer min-h-[64px]"
+          class="relative h-16 bg-linear-to-r from-gray-200 via-teal-50/5 to-gray-200 dark:from-gray-700 dark:via-teal-900/5 dark:to-gray-700 rounded-md border border-gray-300 dark:border-gray-600 overflow-visible min-h-[64px]"
         >
-          <!-- Segments and handles will be dynamically inserted here -->
+          ${segments.length === 0
+            ? html`
+                <div
+                  class="flex items-center justify-center h-full w-full text-xs text-gray-500 dark:text-gray-400"
+                >
+                  Click a project chip to add a time segment
+                </div>
+              `
+            : segmentElements.join("")}
         </div>
         <div class="flex justify-between mt-1 text-[10px] text-gray-500 dark:text-gray-400">
           <span class="font-medium">0h</span>
-          <span class="font-medium" id="time-slider-end-label">${totalHours}h</span>
+          <span class="font-medium">${totalHours}h</span>
         </div>
       </div>
 
-      <div
-        id="time-slider-segments-info"
-        class="mt-4 pt-3 border-t border-gray-300 dark:border-gray-700"
-      >
-        <!-- Segment information will be displayed here -->
+      <div class="mt-4 pt-3 border-t border-gray-300 dark:border-gray-700">
+        ${segments.length === 0
+          ? ""
+          : segments
+              .map((segment, index) => {
+                const project = projects.find((p) => p.id === segment.project_id);
+                const color = project
+                  ? getProjectColor(project)
+                  : { bg: "#14b8a6", solid: "#14b8a6" };
+                const hours = minutesToHours(segment.minutes);
+
+                return html`
+                  <div
+                    class="flex justify-between items-center p-2 bg-gray-50 dark:bg-gray-900 rounded-md mb-2 border border-gray-200 dark:border-gray-700"
+                  >
+                    <div class="flex items-center gap-3 flex-1">
+                      <div class="w-4 h-4 rounded" style="background: ${color.solid};"></div>
+                      <div class="flex-1">
+                        <div class="text-xs font-medium text-gray-900 dark:text-gray-100">
+                          ${project ? project.name : "Unknown"}
+                        </div>
+                        ${segment.comment
+                          ? html`
+                              <div class="text-[10px] text-gray-600 dark:text-gray-400 italic mt-1">
+                                ${segment.comment}
+                              </div>
+                            `
+                          : ""}
+                      </div>
+                      <div class="text-xs font-semibold text-gray-700 dark:text-gray-300">
+                        ${hours.toFixed(1)}h
+                      </div>
+                    </div>
+                    <form
+                      hx-post="${syncUrl}"
+                      hx-target="#time-slider-container"
+                      hx-swap="outerHTML"
+                      hx-trigger="click"
+                      class="ml-3"
+                    >
+                      <input type="hidden" name="date" value="${date}" />
+                      ${segments
+                        .filter((_, i) => i !== index)
+                        .map(
+                          (segment, idx) => html`
+                            <input
+                              type="hidden"
+                              name="segments[${idx}][project_id]"
+                              value="${segment.project_id}"
+                            />
+                            <input
+                              type="hidden"
+                              name="segments[${idx}][minutes]"
+                              value="${segment.minutes}"
+                            />
+                            ${segment.comment
+                              ? html`<input
+                                  type="hidden"
+                                  name="segments[${idx}][comment]"
+                                  value="${segment.comment}"
+                                />`
+                              : ""}
+                          `
+                        )
+                        .join("")}
+                      <button
+                        type="submit"
+                        class="text-xs text-red-600 dark:text-red-400 hover:underline"
+                      >
+                        Remove
+                      </button>
+                    </form>
+                  </div>
+                `;
+              })
+              .join("")}
       </div>
     </div>
-    <script>
-      (function () {
-        const container = document.getElementById("time-slider-container");
-        if (!container) return;
-
-        const tryInit = () => {
-          if (window.TimeSlider) {
-            try {
-              const totalHours = parseFloat(container.getAttribute("data-total-hours") || "8");
-              const segments = JSON.parse(container.getAttribute("data-segments") || "[]");
-              const projects = JSON.parse(container.getAttribute("data-projects") || "[]");
-              const date =
-                container.getAttribute("data-date") || new Date().toISOString().split("T")[0];
-              const syncUrl = container.getAttribute("data-sync-url") || "";
-
-              const uniqueId =
-                "time-slider-" + Date.now() + "-" + Math.random().toString(36).substring(2, 11);
-              container.id = uniqueId;
-
-              window.timeSliderInstance = new window.TimeSlider(uniqueId, {
-                totalHours: totalHours,
-                segments: segments,
-                projects: projects,
-                date: date,
-                onChange: (data) => {
-                  if (syncUrl) {
-                    fetch(syncUrl, {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({
-                        date: data.date,
-                        segments: data.segments,
-                      }),
-                    })
-                      .then((response) => response.json())
-                      .then((result) => {
-                        if (result.success && window.htmx) {
-                          window.htmx.trigger("body", "entries-changed");
-                        }
-                      })
-                      .catch((error) => console.error("Sync error:", error));
-                  }
-                },
-              });
-            } catch (error) {
-              console.error("Error initializing TimeSlider:", error);
-            }
-          } else {
-            setTimeout(tryInit, 50);
-          }
-        };
-
-        tryInit();
-      })();
-    </script>
   `;
 }

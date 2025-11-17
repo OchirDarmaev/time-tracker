@@ -56,17 +56,19 @@ export const accountDashboardContract = c.router({
     method: "POST",
     path: "/account/dashboard/sync",
     body: z.object({
-      date: z.string(),
-      segments: z.array(
-        z.object({
-          project_id: z.number(),
-          minutes: z.number(),
-          comment: z.string().nullable().optional(),
-        })
-      ),
+      date: z.string().date(),
+      segments: z
+        .array(
+          z.object({
+            project_id: z.coerce.number(),
+            minutes: z.coerce.number().min(0),
+            comment: z.string().optional(),
+          })
+        )
+        .optional(),
     }),
     responses: {
-      200: z.object({ success: z.boolean() }),
+      200: htmlResponse,
       400: z.any(),
       403: z.any(),
     },

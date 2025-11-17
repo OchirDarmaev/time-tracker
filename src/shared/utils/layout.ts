@@ -1,12 +1,12 @@
 import { readFileSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
-import { AuthContext } from "../middleware/auth_stub.js";
-import { userModel } from "../models/user.js";
-import { html } from "./html.js";
-import { tsBuildUrl } from "./paths.js";
-import { accountDashboardContract } from "../../features/account/dashboard/contract.js";
-import { authContract } from "../../features/auth/contract.js";
+import { AuthContext } from "@/shared/middleware/auth_stub.js";
+import { userModel } from "@/shared/models/user.js";
+import { html } from "@/shared/utils/html.js";
+import { tsBuildUrl } from "@/shared/utils/paths.js";
+import { accountDashboardContract } from "@/features/account/dashboard/contract.js";
+import { authContract } from "@/features/auth/contract.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

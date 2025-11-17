@@ -1,4 +1,4 @@
-import { db } from "../config/database.js";
+import { db } from "@/shared/config/database.js";
 
 export type DayType = "workday" | "public_holiday" | "weekend";
 

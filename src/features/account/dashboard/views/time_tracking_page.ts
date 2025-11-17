@@ -1,24 +1,24 @@
 import { readFileSync } from "fs";
-import { html } from "../../../../shared/utils/html.js";
-import { AuthContext } from "../../../../shared/middleware/auth_stub.js";
-import { projectModel } from "../../../../shared/models/project.js";
-import { timeEntryModel } from "../../../../shared/models/time_entry.js";
-import { calendarModel } from "../../../../shared/models/calendar.js";
+import { html } from "@/shared/utils/html.js";
+import { AuthContext } from "@/shared/middleware/auth_stub.js";
+import { projectModel } from "@/shared/models/project.js";
+import { timeEntryModel } from "@/shared/models/time_entry.js";
+import { calendarModel } from "@/shared/models/calendar.js";
 import {
   formatDate,
   minutesToHours,
   getAllDaysInMonth,
   getMonthFromDate,
-} from "../../../../shared/utils/date_utils.js";
+} from "@/shared/utils/date_utils.js";
 
 const REQUIRED_DAILY_HOURS = 8;
-import { renderTimeSlider } from "../../../../shared/views/components/time_slider_component.js";
-import { renderTimeSummary } from "../../../../shared/views/components/time_summary_component.js";
-import { renderMonthlyCalendar } from "../../../../shared/views/components/monthly_calendar_component.js";
+import { renderTimeSlider } from "@/shared/views/components/time_slider_component.js";
+import { renderTimeSummary } from "@/shared/views/components/time_summary_component.js";
+import { renderMonthlyCalendar } from "@/shared/views/components/monthly_calendar_component.js";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
-import { tsBuildUrl } from "../../../../shared/utils/paths.js";
-import { accountDashboardContract } from "../contract.js";
+import { tsBuildUrl } from "@/shared/utils/paths.js";
+import { accountDashboardContract } from "@/features/account/dashboard/contract.js";
 import { ClientInferRequest } from "@ts-rest/core";
 
 const __filename = fileURLToPath(import.meta.url);

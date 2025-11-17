@@ -1,4 +1,4 @@
-import { db } from "../config/database.js";
+import { db } from "@/shared/config/database.js";
 
 export type UserRole = "account" | "office-manager" | "admin";
 

@@ -1,7 +1,7 @@
-import { html } from "../../utils/html";
-import { getAllDaysInMonth, formatDate } from "../../utils/date_utils";
-import { accountDashboardContract } from "../../../features/account/dashboard/contract";
-import { tsBuildUrl } from "../../utils/paths";
+import { html } from "@/shared/utils/html";
+import { getAllDaysInMonth, formatDate } from "@/shared/utils/date_utils";
+import { accountDashboardContract } from "@/features/account/dashboard/contract";
+import { tsBuildUrl } from "@/shared/utils/paths";
 
 const REQUIRED_DAILY_HOURS = 8;
 

@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { userModel, UserRole } from "../models/user.js";
+import { userModel, UserRole } from "@/shared/models/user.js";
 
 export interface AuthContext extends Request {
   currentUser: {

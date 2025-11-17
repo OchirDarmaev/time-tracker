@@ -1,5 +1,5 @@
-import { html } from "../../../../shared/utils/html.js";
-import { minutesToHours } from "../../../../shared/utils/date_utils.js";
+import { html } from "@/shared/utils/html.js";
+import { minutesToHours } from "@/shared/utils/date_utils.js";
 
 function getWarningBadge(hours: number, required: number): string {
   if (required === 0) return "";

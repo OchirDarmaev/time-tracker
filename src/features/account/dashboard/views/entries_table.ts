@@ -1,9 +1,9 @@
-import { html } from "../../../../shared/utils/html.js";
-import { Project } from "../../../../shared/models/project.js";
-import { TimeEntry } from "../../../../shared/models/time_entry.js";
-import { minutesToHours } from "../../../../shared/utils/date_utils.js";
-import { accountDashboardContract } from "../contract.js";
-import { tsBuildUrl } from "../../../../shared/utils/paths.js";
+import { html } from "@/shared/utils/html.js";
+import { Project } from "@/shared/models/project.js";
+import { TimeEntry } from "@/shared/models/time_entry.js";
+import { minutesToHours } from "@/shared/utils/date_utils.js";
+import { accountDashboardContract } from "@/features/account/dashboard/contract.js";
+import { tsBuildUrl } from "@/shared/utils/paths.js";
 
 export function renderEntriesTable(entries: TimeEntry[], projects: Project[]): string {
   if (entries.length === 0) {

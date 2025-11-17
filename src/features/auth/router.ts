@@ -1,8 +1,8 @@
 import { initServer } from "@ts-rest/express";
 import { authContract } from "./contract.js";
-import { AuthContext } from "../../shared/middleware/auth_stub.js";
-import { userModel, UserRole } from "../../shared/models/user.js";
-import { renderNavBar } from "../../shared/utils/layout.js";
+import { AuthContext } from "@/shared/middleware/auth_stub.js";
+import { userModel, UserRole } from "@/shared/models/user.js";
+import { renderNavBar } from "@/shared/utils/layout.js";
 import { renderAuth } from "./views/renderAuth.js";
 
 const s = initServer();

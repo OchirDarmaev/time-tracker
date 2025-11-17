@@ -1,6 +1,6 @@
 import { initContract } from "@ts-rest/core";
 import { z } from "zod";
-import { htmlResponse } from "../../../shared/contracts/html_response.js";
+import { htmlResponse } from "@/shared/contracts/html_response.js";
 
 const c = initContract();
 

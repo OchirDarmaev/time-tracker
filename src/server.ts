@@ -1,16 +1,16 @@
 import express from "express";
 import session from "express-session";
 import cookieParser from "cookie-parser";
-import { initializeDatabase } from "./shared/config/database.js";
-// import { authStubMiddleware } from "./shared/middleware/auth_stub.js";
+import { initializeDatabase } from "@/shared/config/database.js";
+// import { authStubMiddleware } from "@/shared/middleware/auth_stub.js";
 import { createExpressEndpoints } from "@ts-rest/express";
-import { authContract } from "./features/auth/contract.js";
-import { authRouter } from "./features/auth/router.js";
-import { rootContract } from "./features/root/contract.js";
-import { rootRouter } from "./features/root/router.js";
-import { accountDashboardContract } from "./features/account/dashboard/contract.js";
-import { accountTimeRouter } from "./features/account/dashboard/router.js";
-import { authStubMiddleware } from "./shared/middleware/auth_stub.js";
+import { authContract } from "@/features/auth/contract.js";
+import { authRouter } from "@/features/auth/router.js";
+import { rootContract } from "@/features/root/contract.js";
+import { rootRouter } from "@/features/root/router.js";
+import { accountDashboardContract } from "@/features/account/dashboard/contract.js";
+import { accountTimeRouter } from "@/features/account/dashboard/router.js";
+import { authStubMiddleware } from "@/shared/middleware/auth_stub.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;

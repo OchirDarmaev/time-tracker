@@ -1,9 +1,9 @@
-import { html } from "../../../shared/utils/html";
-import { tsBuildUrl } from "../../../shared/utils/paths";
-import { authContract } from "../contract";
-import { accountDashboardContract } from "../../account/dashboard/contract";
-import { AuthContext } from "../../../shared/middleware/auth_stub";
-import { userModel, UserRole } from "../../../shared/models/user";
+import { html } from "@/shared/utils/html";
+import { tsBuildUrl } from "@/shared/utils/paths";
+import { authContract } from "@/features/auth/contract";
+import { accountDashboardContract } from "@/features/account/dashboard/contract";
+import { AuthContext } from "@/shared/middleware/auth_stub";
+import { userModel, UserRole } from "@/shared/models/user";
 
 const roleLabels: Record<UserRole, string> = {
   account: "User",

@@ -1,6 +1,6 @@
-import { html } from "../../../shared/utils/html";
-import { tsBuildUrl } from "../../../shared/utils/paths";
-import { authContract } from "../../auth/contract";
+import { html } from "@/shared/utils/html";
+import { tsBuildUrl } from "@/shared/utils/paths";
+import { authContract } from "@/features/auth/contract";
 
 export function renderRoot(): string {
   const authUrl = tsBuildUrl(authContract.auth, {});

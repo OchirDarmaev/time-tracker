@@ -1,4 +1,4 @@
-import { html } from "../../utils/html";
+import { html } from "@/shared/utils/html";
 
 export interface TimeSummaryProps {
   hxGet: string;

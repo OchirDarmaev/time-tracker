@@ -1,10 +1,10 @@
-# **AGENT.md — Architecture Guide for HTMX + Eta + Express + TypeScript**
+# **AGENT.md — Architecture Guide for HTMX + Express + TypeScript**
 
 ## **1. Core Philosophy**
 
 1. Server-driven UI.
 2. Feature-first folder structure.
-3. Eta = server components.
+3. TypeScript functions return HTML strings (server components).
 4. Minimal client JS.
 5. Thin controllers → thick services → isolated data layer.
 6. Fast SSR → fast UX.
@@ -14,109 +14,189 @@
 
 # **2. Project Structure (Feature-First)**
 
-```
+```text
 /src
-  /users
-    controller.ts
-    service.ts
-    model.ts
-    /views
-      pages/
-      components/
-  /orders
-    controller.ts
-    service.ts
-    model.ts
-    /views
-      pages/
-      components/
-  /common
-    /views
-      layouts/
-      components/
-    /lib
-      logger.ts
-      http.ts
+  /features
+    /account
+      /dashboard
+        contract.ts
+        router.ts
+        /views
+          entries_table.ts
+          summary.ts
+          time_tracking_page.ts
+      /controller
+      /model
+      /service
+      /views
+        /components
+        /pages
+    /auth
+      contract.ts
+      router.ts
+      /views
+        /components
+        /pages
+        renderAuth.ts
+    /root
+      contract.ts
+      router.ts
+      /views
+        /pages
+        render-root.ts
+  /shared
+    /config
+      database.ts
+    /contracts
+      html_response.ts
+    /middleware
+      auth_stub.ts
+      isAuthContext.ts
+    /models
+      calendar.ts
+      project_user.ts
+      project.ts
+      public_holiday.ts
+      time_entry.ts
+      user.ts
+    /types
+      session.d.ts
+    /utils
+      date_utils.ts
+      html.ts
+      layout.ts
+      paths.ts
       validation.ts
-  app.ts
+      web_components.ts
+    /views
+      /components
+        monthly_calendar_component.ts
+        time_slider_component.ts
+        time_summary_component.ts
+      /layouts
+        base.html
+  /common
+    /config
+    /contracts
+    /lib
+    /middleware
+    /models
+    /types
+    /utils
+    /views
+      /components
+      /layouts
+  /db
+    schema.sql
+  /styles
+    input.css
+  server.ts
+  sandbox.ts
 ```
 
 ### **Rules**
 
-* Each domain owns its **controller + service + model + pages + components**.
-* `/common` only contains **shared layouts, shared components, utilities**.
-* No cross-domain imports of templates or internal services.
-* Domain pages can use:
+* Each feature owns its **contract + router + views (pages + components)**.
+* `/shared` contains **shared models, utilities, views, middleware, config, contracts, types** used across features.
+* `/common` is reserved for **common layouts, common components, utilities** (currently minimal usage).
+* No cross-feature imports of templates or internal services.
+* Feature pages can use:
 
   * their own components
+  * shared components
+  * shared layouts
   * common components
   * common layouts
-* Never import `/orders/...` inside `/users/...`.
+* Never import `/features/auth/...` inside `/features/account/...`.
+* Features can have sub-features (e.g., `/account/dashboard/`).
+* All database models are in `/shared/models/`.
+* All shared utilities are in `/shared/utils/`.
 
 ---
 
-# **3. View & Component Architecture (Eta)**
+# **3. View & Component Architecture**
 
-### **Page templates (`views/pages/`)**
+### **Page templates (`views/pages/` or `views/*.ts`)**
 
+TypeScript functions that return HTML strings.
 Full HTML sections rendered via a layout.
 Contain **composition only** — no business logic.
 
 Example:
 
-```eta
-<%~ include('../../common/views/layouts/main', { title: 'Users' }) %>
-
-<h1>Users</h1>
-
-<table>
-  <% for (const u of it.users) { %>
-    <%~ include('../components/user-row', { user: u }) %>
-  <% } %>
-</table>
-
-<%~ include('../../common/views/components/pagination', it.pagination) %>
+```typescript
+export function renderUsersPage(users: User[]): string {
+  return html`
+    <h1>Users</h1>
+    <table>
+      ${users.map(u => renderUserRow(u)).join('')}
+    </table>
+    ${renderPagination(pagination)}
+  `;
+}
 ```
 
-### **Domain components (`views/components/`)**
+### **Feature components (`views/components/`)**
 
-* Specific to one domain.
-* Can assume domain-specific view models.
+* TypeScript functions that return HTML strings.
+* Specific to one feature.
+* Can assume feature-specific view models.
 * Encapsulate markup for lists, rows, cards, forms.
+
+### **Shared components (`/shared/views/components/`)**
+
+* TypeScript functions that return HTML strings.
+* Shared UI elements:
+  monthly calendar, time slider, time summary, etc.
+* Must accept **generic props** (no feature-specific assumptions).
 
 ### **Common components (`/common/views/components/`)**
 
-* Shared UI elements:
+* TypeScript functions that return HTML strings.
+* Common UI elements (currently minimal usage):
   navbar, footer, flash messages, modal shell, pagination, table shell.
-* Must accept **generic props** (no domain-specific assumptions).
+* Must accept **generic props** (no feature-specific assumptions).
 
-### **Layouts (`/common/views/layouts/`)**
+### **Layouts (`/shared/views/layouts/` or `/common/views/layouts/`)**
 
-* Define base frames:
-  `main.eta`, `auth.eta`, `blank.eta`.
+* TypeScript functions or HTML files that define base frames:
+  `base.html`, `auth.html`, `blank.html`.
+* Currently using `/shared/views/layouts/base.html`.
 
 ---
 
 # **4. Server-Side Logic Layering**
 
-### **Controller**
+### **Router (Feature Router)**
 
-* Validate input.
-* Call service.
-* Choose template.
+* Uses `@ts-rest/express` for type-safe routing.
+* Validate input (query params, body, params).
+* Call models/services.
+* Choose template/view function.
 * Pass view model.
+* Handle authentication/authorization checks.
+* Return HTML strings or JSON responses.
 * No business logic.
 
-### **Service (Domain)**
+### **Contract (ts-rest Contract)**
 
-* All business logic.
+* Defines API endpoints with Zod schemas.
+* Type-safe request/response contracts.
+* Located in feature folder: `contract.ts`.
+
+### **Service (Feature Service - Optional)**
+
+* All business logic (if needed).
 * Combine data, apply rules, transformations.
 * Independent of HTTP.
+* Currently minimal usage - logic often in router.
 
-### **Model / Repository**
+### **Model / Repository (`/shared/models/`)**
 
-* DB queries or external APIs.
+* DB queries using `better-sqlite3`.
+* All database models are in `/shared/models/`.
 * No business decisions here.
+* Pure data access layer.
 
 ---
 
@@ -215,8 +295,8 @@ DX Rule: **readability > abstraction**.
 
 # **10. Hard Anti-Patterns**
 
-* Business logic in controllers.
-* Domain mixing (cross imports).
+* Business logic in routers (should be in services if complex).
+* Feature mixing (cross imports between features).
 * DOM manipulation to render HTML.
 * Writing custom client rendering.
 * Template logic explosion (no big if-trees).
@@ -230,9 +310,37 @@ DX Rule: **readability > abstraction**.
 
 Always:
 
-* Place new features inside their **domain folder**.
-* Add UI via **pages + components**.
-* Keep controllers thin, services smart.
-* Produce clean Eta templates with small partials.
+* Place new features inside `/src/features/` folder.
+* Create `contract.ts` and `router.ts` for each feature.
+* Add UI via **views (pages + components)**.
+* Keep routers thin, services smart (if needed).
+* Use shared models from `/shared/models/`.
+* Use shared utilities from `/shared/utils/`.
+* Produce clean TypeScript view functions with small, reusable components.
 * Prefer composition over duplication.
 * Output English comments + docs.
+* Use `@ts-rest/express` for type-safe routing.
+* Follow snake_case for file names (e.g., `time_tracking_page.ts`).
+
+# **12. Technology Stack**
+
+* **Runtime**: Node.js 22+
+* **Framework**: Express 5.1.0
+* **Type Safety**: TypeScript 5.3+
+* **API Contracts**: @ts-rest/express with Zod
+* **Database**: SQLite (better-sqlite3)
+* **Styling**: Tailwind CSS 4
+* **UI Interactions**: HTMX
+* **Package Manager**: Yarn v4
+* **Session**: express-session
+* **Build**: TypeScript compiler + PostCSS
+
+# **13. Key Patterns**
+
+* **Contracts**: Define endpoints with Zod schemas in `contract.ts`.
+* **Routers**: Implement contract handlers in `router.ts` using `initServer()`.
+* **Views**: TypeScript functions returning HTML strings.
+* **Models**: Database access layer in `/shared/models/`.
+* **Middleware**: Authentication/authorization in `/shared/middleware/`.
+* **Layouts**: Base HTML templates in `/shared/views/layouts/`.
+* **HTMX**: Server-driven partial updates, no client-side state management.

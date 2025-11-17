@@ -17,12 +17,7 @@ export function renderRoot(): string {
           href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
           rel="stylesheet"
         />
-        <script src="https://cdn.tailwindcss.com"></script>
-        <script>
-          tailwind.config = {
-            darkMode: "class",
-          };
-        </script>
+        <link href="/public/styles/output.css" rel="stylesheet" />
         <style>
           * {
             font-family:

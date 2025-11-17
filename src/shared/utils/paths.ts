@@ -1,20 +1,15 @@
-import { AppRoute, ParamsFromUrl } from "@ts-rest/core";
+import {
+  AppRoute,
+  ClientInferRequest,
+  convertQueryParamsToUrlString,
+  insertParamsIntoPath,
+} from "@ts-rest/core";
 
-export function tsBuildUrl<TRoute extends AppRoute, TParams extends ParamsFromUrl<TRoute["path"]>>(
-  route: TRoute,
-  params: TParams
-): string {
-  let path = route.path;
-
-  // Replace :paramName and :paramName? with actual values
-  // This regex matches :paramName or :paramName? and replaces with the param value
-  path = path.replace(/\/?:([^/?]+)\??/g, (matched, paramName) => {
-    const value = params[paramName as keyof TParams];
-    if (value !== undefined && value !== null) {
-      return matched.startsWith("/") ? `/${String(value)}` : String(value);
-    }
-    return matched;
-  });
-
-  return path;
+export function tsBuildUrl<
+  TRoute extends AppRoute,
+  TRequest extends Omit<ClientInferRequest<TRoute>, "body">,
+>(route: TRoute, request: TRequest): string {
+  const path = insertParamsIntoPath({ path: route.path, params: request.params });
+  const query = convertQueryParamsToUrlString(request.query);
+  return path + query;
 }

@@ -5,6 +5,8 @@
   "scripts": {
     "dev": "tsc && tsx src/server.ts",
     "dev:watch": "tsc --watch & tsx watch src/server.ts",
+    "sandbox": "tsx src/sandbox.ts",
+    "sandbox:watch": "tsc --watch & tsx watch src/sandbox.ts",
     "build": "tsc",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

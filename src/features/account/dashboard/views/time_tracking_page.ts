@@ -115,13 +115,18 @@ export function renderTimeTrackingPage(req: Request, authContext: AuthContext) {
           : "text-gray-600 dark:text-gray-400";
 
   // Add HTMX trigger to refresh calendar when entries change
-  const dashboardUrl = tsBuildUrl(accountDashboardContract.dashboard, {});
+  const dashboardUrl = tsBuildUrl(accountDashboardContract.dashboard, {
+    headers: {},
+    query: {
+      date: req.query.date,
+    },
+  });
 
   const content = html`
     <div
       id="time-tracking-content"
       class="space-y-4"
-      hx-get="${dashboardUrl}?date=${selectedDate}"
+      hx-get="${dashboardUrl}"
       hx-target="this"
       hx-swap="outerHTML transition:true"
       hx-trigger="entries-changed from:body"
@@ -163,7 +168,10 @@ export function renderTimeTrackingPage(req: Request, authContext: AuthContext) {
           <div class="flex-1 min-w-[160px]">
             ${renderTimeSummary({
               hxGet: tsBuildUrl(accountDashboardContract.accountDashboardSummary, {
-                date: selectedDate,
+                headers: {},
+                query: {
+                  date: selectedDate,
+                },
               }),
               hxTrigger: "load, entries-changed from:body",
             })}
@@ -174,7 +182,12 @@ export function renderTimeTrackingPage(req: Request, authContext: AuthContext) {
         <div class="w-1/2">
           ${renderMonthlyCalendar({
             selectedDate: selectedDate,
-            hxGet: tsBuildUrl(accountDashboardContract.dashboard, {}),
+            hxGet: tsBuildUrl(accountDashboardContract.dashboard, {
+              headers: {},
+              query: {
+                date: selectedDate,
+              },
+            }),
             hxTarget: "#time-tracking-content",
             dayHoursMap: dayHoursMap,
             dayProjectBreakdown: dayProjectBreakdown,

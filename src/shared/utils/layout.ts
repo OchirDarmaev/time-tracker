@@ -20,7 +20,10 @@ const roleLabels: Record<string, string> = {
 function getNavButtons(availableRoles: string[], activeNav: string): string {
   const navItems = [
     {
-      href: tsBuildUrl(accountDashboardContract.dashboard, {}),
+      href: tsBuildUrl(accountDashboardContract.dashboard, {
+        headers: {},
+        query: {},
+      }),
       label: "Dashboard",
       requiredRoles: ["account"],
       activeNav: "account",

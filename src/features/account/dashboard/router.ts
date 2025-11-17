@@ -5,7 +5,7 @@ import { isAuthContext } from "../../../shared/middleware/isAuthContext.js";
 import { timeEntryModel } from "../../../shared/models/time_entry.js";
 import { projectModel } from "../../../shared/models/project.js";
 import { calendarModel } from "../../../shared/models/calendar.js";
-import { formatDate, getMonthFromDate, minutesToHours } from "../../../shared/utils/date_utils.js";
+import { formatDate, getMonthFromDate } from "../../../shared/utils/date_utils.js";
 import { validateDate, validateMinutes } from "../../../shared/utils/validation.js";
 import { renderSummary } from "./views/summary.js";
 import { renderEntriesTable } from "./views/entries_table.js";
@@ -163,9 +163,8 @@ export const accountTimeRouter = s.router(accountDashboardContract, {
     }
 
     const currentUser = authReq.currentUser;
-    const entryId = parseInt(params.id);
 
-    const entry = timeEntryModel.getById(entryId);
+    const entry = timeEntryModel.getById(params.entryId);
     if (!entry) {
       return {
         status: 404,
@@ -180,7 +179,7 @@ export const accountTimeRouter = s.router(accountDashboardContract, {
       };
     }
 
-    timeEntryModel.delete(entryId);
+    timeEntryModel.delete(params.entryId);
 
     const date = entry.date;
     const projects = projectModel.getByUserId(currentUser.id);

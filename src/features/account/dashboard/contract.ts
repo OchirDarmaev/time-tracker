@@ -45,7 +45,7 @@ export const accountDashboardContract = c.router({
   deleteDashboardEntry: {
     method: "DELETE",
     path: "/account/dashboard/entries/:entryId",
-    pathParams: z.object({ id: z.string() }),
+    pathParams: z.object({ entryId: z.coerce.number() }),
     responses: {
       200: htmlResponse,
       403: z.any(),
@@ -74,7 +74,9 @@ export const accountDashboardContract = c.router({
   accountDashboardSummary: {
     method: "GET",
     path: "/account/dashboard/summary",
-    query: z.any(),
+    query: z.object({
+      date: z.string().date().optional(),
+    }),
     responses: {
       200: htmlResponse,
       400: z.any(),

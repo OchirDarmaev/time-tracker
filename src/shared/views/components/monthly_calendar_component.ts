@@ -1,5 +1,7 @@
 import { html } from "../../utils/html";
 import { getAllDaysInMonth, formatDate } from "../../utils/date_utils";
+import { accountDashboardContract } from "../../../features/account/dashboard/contract";
+import { tsBuildUrl } from "../../utils/paths";
 
 const REQUIRED_DAILY_HOURS = 8;
 
@@ -18,7 +20,6 @@ export type DayType = "workday" | "public_holiday" | "weekend";
 
 export interface MonthlyCalendarProps {
   selectedDate: string;
-  hxGet: string;
   hxTarget: string;
   dayHoursMap: Record<string, number>; // date -> hours
   dayProjectBreakdown: Record<string, DayProjectBreakdown[]>; // date -> project breakdown
@@ -113,7 +114,7 @@ function renderCircleDiagram(
 export function renderMonthlyCalendar(props: MonthlyCalendarProps): string {
   const {
     selectedDate,
-    hxGet,
+
     hxTarget,
     dayHoursMap,
     dayProjectBreakdown,
@@ -244,9 +245,14 @@ export function renderMonthlyCalendar(props: MonthlyCalendarProps): string {
       <button
         type="button"
         class="relative flex items-center justify-center aspect-square rounded-lg border border-transparent ${bgClass} ${textClass} hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-150 focus:outline-none focus:ring-1 focus:ring-gray-400 dark:focus:ring-gray-600"
-        ${hxGet ? `hx-get="${hxGet}?date=${day.date}"` : ""}
+        hx-get="${tsBuildUrl(accountDashboardContract.dashboard, {
+          headers: {},
+          query: {
+            date: day.date,
+          },
+        })}"
         ${hxTarget ? `hx-target="${hxTarget}"` : ""}
-        ${hxGet ? `hx-swap="outerHTML transition:true"` : ""}
+        hx-swap="outerHTML transition:true"
         hx-trigger="click"
         hx-scroll="false"
         title="${title}"
@@ -267,9 +273,14 @@ export function renderMonthlyCalendar(props: MonthlyCalendarProps): string {
           <button
             type="button"
             class="px-3 py-1 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors duration-150 focus:outline-none focus:ring-1 focus:ring-gray-400 dark:focus:ring-gray-600"
-            ${hxGet ? `hx-get="${hxGet}?date=${prevMonthDateStr}"` : ""}
+            hx-get="${tsBuildUrl(accountDashboardContract.dashboard, {
+              headers: {},
+              query: {
+                date: prevMonthDateStr,
+              },
+            })}"
             ${hxTarget ? `hx-target="${hxTarget}"` : ""}
-            ${hxGet ? `hx-swap="outerHTML transition:true"` : ""}
+            hx-swap="outerHTML transition:true"
             hx-trigger="click"
             hx-scroll="false"
           >
@@ -281,9 +292,14 @@ export function renderMonthlyCalendar(props: MonthlyCalendarProps): string {
           <button
             type="button"
             class="px-3 py-1 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors duration-150 focus:outline-none focus:ring-1 focus:ring-gray-400 dark:focus:ring-gray-600"
-            ${hxGet ? `hx-get="${hxGet}?date=${nextMonthDateStr}"` : ""}
+            hx-get="${tsBuildUrl(accountDashboardContract.dashboard, {
+              headers: {},
+              query: {
+                date: nextMonthDateStr,
+              },
+            })}"
             ${hxTarget ? `hx-target="${hxTarget}"` : ""}
-            ${hxGet ? `hx-swap="outerHTML transition:true"` : ""}
+            hx-swap="outerHTML transition:true"
             hx-trigger="click"
             hx-scroll="false"
           >
@@ -294,9 +310,14 @@ export function renderMonthlyCalendar(props: MonthlyCalendarProps): string {
           <button
             type="button"
             class="px-4 py-1 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors duration-150 focus:outline-none focus:ring-1 focus:ring-gray-400 dark:focus:ring-gray-600"
-            ${hxGet ? `hx-get="${hxGet}?date=${today}"` : ""}
+            hx-get="${tsBuildUrl(accountDashboardContract.dashboard, {
+              headers: {},
+              query: {
+                date: today,
+              },
+            })}"
             ${hxTarget ? `hx-target="${hxTarget}"` : ""}
-            ${hxGet ? `hx-swap="outerHTML transition:true"` : ""}
+            hx-swap="outerHTML transition:true"
             hx-trigger="click"
             hx-scroll="false"
           >

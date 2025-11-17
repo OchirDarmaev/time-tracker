@@ -182,12 +182,6 @@ export function renderTimeTrackingPage(req: Request, authContext: AuthContext) {
         <div class="w-1/2">
           ${renderMonthlyCalendar({
             selectedDate: selectedDate,
-            hxGet: tsBuildUrl(accountDashboardContract.dashboard, {
-              headers: {},
-              query: {
-                date: selectedDate,
-              },
-            }),
             hxTarget: "#time-tracking-content",
             dayHoursMap: dayHoursMap,
             dayProjectBreakdown: dayProjectBreakdown,

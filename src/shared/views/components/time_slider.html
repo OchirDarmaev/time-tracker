@@ -823,11 +823,10 @@
       if (this.syncTimeout) {
         clearTimeout(this.syncTimeout);
       }
-      
-      // Schedule sync after 1.5 seconds
+      const SYNC_DELAY = 1000;  
       this.syncTimeout = setTimeout(() => {
         this.sync();
-      }, 1500);
+      }, SYNC_DELAY);
     }
 
     sync() {

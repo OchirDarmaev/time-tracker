@@ -252,7 +252,7 @@ export function renderMonthlyCalendar(props: MonthlyCalendarProps): string {
           },
         })}"
         ${hxTarget ? `hx-target="${hxTarget}"` : ""}
-        hx-swap="outerHTML transition:true"
+        hx-swap="outerHTML"
         hx-trigger="click"
         hx-scroll="false"
         title="${title}"

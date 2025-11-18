@@ -11,8 +11,8 @@ import {
 } from "@/shared/utils/date_utils.js";
 
 const REQUIRED_DAILY_HOURS = 8;
-import { renderTimeSummary } from "@/shared/views/components/time_summary_component.js";
-import { renderMonthlyCalendar } from "@/shared/views/components/monthly_calendar_component.js";
+import { renderTimeSummary } from "@/features/account/dashboard/components/render-time-summary.js";
+import { renderMonthlyCalendar } from "@/features/account/dashboard/components/monthly_calendar_component.js";
 import { tsBuildUrl } from "@/shared/utils/paths.js";
 import { accountDashboardContract } from "@/features/account/dashboard/contract.js";
 import { ClientInferRequest } from "@ts-rest/core";

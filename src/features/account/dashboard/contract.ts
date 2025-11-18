@@ -66,6 +66,7 @@ export const accountDashboardContract = c.router({
           })
         )
         .optional(),
+      // planned_hours: z.coerce.number().min(8).max(24),
     }),
     responses: {
       200: htmlResponse,

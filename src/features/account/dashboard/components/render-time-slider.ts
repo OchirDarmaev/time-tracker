@@ -1,4 +1,6 @@
 import { html } from "@/shared/utils/html";
+import { tsBuildUrl } from "../../../../shared/utils/paths";
+import { accountDashboardContract } from "../contract";
 
 export interface Segment {
   project_id: number;
@@ -141,54 +143,21 @@ export function renderTimeSlider(props: TimeSliderProps = {}): string {
               }
 
               if (isActive) {
-                const filteredSegments = segments.filter((s) => s.project_id !== project.id);
                 return html`
                   <form
-                    hx-post="${syncUrl}"
+                    hx-post="${tsBuildUrl(accountDashboardContract.createDashboardEntry, {})}"
                     hx-target="#time-slider-container"
                     hx-swap="outerHTML"
                     hx-trigger="click"
                     class="inline-block"
                   >
                     <input type="hidden" name="date" value="${date}" />
-                    ${filteredSegments
-                      .map(
-                        (segment, idx) => html`
-                          <input
-                            type="hidden"
-                            name="segments[${idx}][project_id]"
-                            value="${segment.project_id}"
-                          />
-                          <input
-                            type="hidden"
-                            name="segments[${idx}][minutes]"
-                            value="${segment.minutes}"
-                          />
-                          ${segment.comment
-                            ? html`<input
-                                type="hidden"
-                                name="segments[${idx}][comment]"
-                                value="${segment.comment}"
-                              />`
-                            : ""}
-                        `
-                      )
-                      .join("")}
-                    <button
-                      type="submit"
-                      class="px-2 py-1 text-xs font-medium rounded-md border text-white"
-                      style="background: ${color.bg}; border-color: ${color.solid};"
-                    >
-                      ${project.name}
-                    </button>
+                    <input type="hidden" name="project_id" value="${project.id}" />
+                    <input type="hidden" name="hours" value="${minutesToHours(3600).toFixed(1)}" />
+                    <input type="hidden" name="comment" value="${null}" />
                   </form>
                 `;
               }
-
-              const newSegmentMinutes =
-                segments.length === 0
-                  ? totalMinutes
-                  : Math.floor(totalMinutes / (segments.length + 1));
               return html`
                 <form
                   hx-post="${syncUrl}"
@@ -226,11 +195,7 @@ export function renderTimeSlider(props: TimeSliderProps = {}): string {
                     name="segments[${segments.length}][project_id]"
                     value="${project.id}"
                   />
-                  <input
-                    type="hidden"
-                    name="segments[${segments.length}][minutes]"
-                    value="${newSegmentMinutes}"
-                  />
+                  <input type="hidden" name="segments[${segments.length}][minutes]" value="${60}" />
                   <button
                     type="submit"
                     class="px-2 py-1 text-xs font-medium rounded-md border"

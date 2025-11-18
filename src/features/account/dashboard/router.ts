@@ -11,7 +11,7 @@ import { renderSummary } from "./views/summary.js";
 import { renderEntriesTable } from "./views/entries_table.js";
 import { renderDashboard } from "./views/render-dashboard.js";
 import { renderBaseLayout } from "@/shared/utils/layout.js";
-import { renderTimeSlider } from "@/shared/views/components/time_slider_component.js";
+import { renderTimeSlider } from "@/features/account/dashboard/components/render-time-slider.js";
 import { tsBuildUrl } from "../../../shared/utils/paths.js";
 
 const REQUIRED_DAILY_HOURS = 8;
@@ -210,7 +210,11 @@ export const accountTimeRouter = s.router(accountDashboardContract, {
     }
 
     const currentUser = authReq.currentUser;
-    const { date, segments } = body;
+    const {
+      date,
+      segments,
+      // planned_hours
+    } = body;
 
     if (!validateDate(date)) {
       return {
@@ -245,6 +249,7 @@ export const accountTimeRouter = s.router(accountDashboardContract, {
     for (const entry of existingEntries) {
       timeEntryModel.delete(entry.id);
     }
+
     if (segments) {
       // Create new entries from segments
       for (const segment of segments) {

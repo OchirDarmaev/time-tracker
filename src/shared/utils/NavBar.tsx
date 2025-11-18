@@ -1,7 +1,6 @@
 import { AuthContext } from "../middleware/auth_stub";
 import { NavButtons } from "./NavButtons";
 
-
 export function NavBar(req: AuthContext, activeNav: string = ""): JSX.Element {
   const currentUser = req.currentUser || { email: "Unknown", role: "account", roles: ["account"] };
   const availableRoles: string[] = currentUser.roles || ["account"];

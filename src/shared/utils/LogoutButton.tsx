@@ -1,7 +1,6 @@
 import { authContract } from "../../features/auth/contract";
 import { tsBuildUrl } from "./paths";
 
-
 export function LogoutButton(): JSX.Element {
   return (
     <form method="POST" action={tsBuildUrl(authContract.logout, {})} class="inline">

@@ -1,7 +1,6 @@
 import { AuthContext } from "@/shared/middleware/auth_stub.js";
 import { LogoutButton } from "./LogoutButton";
 import { ThemeToggleButton } from "./ThemeToggleButton";
-import { getTheme } from "./getTheme";
 import { NavButtons } from "./NavButtons";
 
 export const roleLabels: Record<string, string> = {
@@ -17,10 +16,8 @@ export function Layout(
   const currentUser = req.currentUser || { email: "Unknown", role: "account", roles: ["account"] };
   const availableRoles: string[] = currentUser.roles || ["account"];
 
-  const theme = getTheme(req);
-
   return (
-    <html class={theme}>
+    <html>
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <title>TimeTrack</title>
@@ -32,7 +29,7 @@ export function Layout(
       />
       <link href="/public/styles/output.css" rel="stylesheet" />
       <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js"></script>
-
+      <script src="/public/js/theme.js" />
       {/* Top Navigation Bar */}
       <nav
         class="px-6 flex items-center justify-between bg-gray-100 dark:bg-gray-800 border-b border-gray-300 dark:border-gray-700 backdrop-blur-sm sticky top-0 z-100 h-16"
@@ -52,7 +49,7 @@ export function Layout(
           </div>
         </div>
         <div class="flex items-center gap-3">
-          <ThemeToggleButton theme={theme} />
+          <ThemeToggleButton />
           <LogoutButton />
         </div>
       </nav>

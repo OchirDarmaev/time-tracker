@@ -4,7 +4,8 @@ import { tsBuildUrl } from "./paths";
 
 // accountTimeContract.accountTime.path;
 export function NavButtons({
-  availableRoles, activeNav,
+  availableRoles,
+  activeNav,
 }: {
   availableRoles: string[];
   activeNav: string;
@@ -20,6 +21,9 @@ export function NavButtons({
       activeNav: "account",
     },
   ];
+  // todo <div hx-boost="true">
+  // <a href="/blog">Blog</a>
+  // </div>
 
   return (
     <>
@@ -28,7 +32,8 @@ export function NavButtons({
         const isActive = activeNav === item.activeNav;
 
         if (hasAccess) {
-          const baseClasses = "text-gray-600 dark:text-gray-400 no-underline text-sm font-medium px-3 py-2 rounded-md hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-700";
+          const baseClasses =
+            "text-gray-600 dark:text-gray-400 no-underline text-sm font-medium px-3 py-2 rounded-md hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-700";
           const activeClasses = isActive
             ? "text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20"
             : "";

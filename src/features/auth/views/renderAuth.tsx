@@ -26,7 +26,7 @@ export function renderAuth(req: AuthContext): JSX.Element {
   const userOptions = users.map((u) => {
     const selected = currentUserId === u.id ? "selected" : "";
     return (
-      <option value={String(u.id)} selected={selected ? true : undefined}>
+      <option safe value={String(u.id)} selected={selected ? true : undefined}>
         {u.email} {u.roles.map((r) => `(${roleLabels[r]})`).join(", ")}
       </option>
     );
@@ -35,7 +35,7 @@ export function renderAuth(req: AuthContext): JSX.Element {
   const roleOptions = availableRoles.map((role) => {
     const selected = currentRole === role ? "selected" : "";
     return (
-      <option value={role} selected={selected ? true : undefined}>
+      <option safe value={role} selected={selected ? true : undefined}>
         {roleLabels[role]}
       </option>
     );
@@ -61,17 +61,6 @@ export function renderAuth(req: AuthContext): JSX.Element {
           rel="stylesheet"
         />
         <link href="/public/styles/output.css" rel="stylesheet" />
-        <style>
-          {`* {
-            font-family:
-              "Inter",
-              -apple-system,
-              BlinkMacSystemFont,
-              "SF Pro Display",
-              "Segoe UI",
-              sans-serif;
-          }`}
-        </style>
       </head>
       <body class="bg-gray-950 text-gray-100 min-h-screen flex items-center justify-center">
         <div class="max-w-md w-full mx-auto px-4 sm:px-6 lg:px-8">
@@ -131,9 +120,14 @@ export function renderAuth(req: AuthContext): JSX.Element {
             {currentUser.email ? (
               <div class="mt-6 pt-6 border-t border-gray-800">
                 <p class="text-xs text-gray-500 text-center">
-                  Current: <span class="text-gray-400">{currentUser.email}</span>
+                  Current:{" "}
+                  <span safe class="text-gray-400">
+                    {currentUser.email}
+                  </span>
                   {currentUser.role ? (
-                    <span class="text-gray-500"> as {roleLabels[currentUser.role]}</span>
+                    <span safe class="text-gray-500">
+                      {` as ${roleLabels[currentUser.role]}`}
+                    </span>
                   ) : (
                     ""
                   )}

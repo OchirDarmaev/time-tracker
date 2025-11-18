@@ -35,6 +35,7 @@ app.use(
 
 // Serve static CSS files
 app.use("/public/styles", express.static("public/styles"));
+app.use("/public/js", express.static("public/js"));
 
 createExpressEndpoints(authContract, authRouter, app, {
   responseValidation: false,

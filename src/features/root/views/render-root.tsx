@@ -16,17 +16,6 @@ export function renderRoot(): JSX.Element {
           rel="stylesheet"
         />
         <link href="/public/styles/output.css" rel="stylesheet" />
-        <style>
-          {`* {
-            font-family:
-              "Inter",
-              -apple-system,
-              BlinkMacSystemFont,
-              "SF Pro Display",
-              "Segoe UI",
-              sans-serif;
-          }`}
-        </style>
       </head>
       <body class="bg-gray-950 text-gray-100 min-h-screen flex items-center justify-center">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">

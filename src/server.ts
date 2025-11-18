@@ -2,7 +2,6 @@ import express from "express";
 import session from "express-session";
 import cookieParser from "cookie-parser";
 import { initializeDatabase } from "@/shared/config/database.js";
-// import { authStubMiddleware } from "@/shared/middleware/auth_stub.js";
 import { createExpressEndpoints } from "@ts-rest/express";
 import { authContract } from "@/features/auth/contract.js";
 import { authRouter } from "@/features/auth/router.js";
@@ -45,13 +44,13 @@ createExpressEndpoints(authContract, authRouter, app, {
 createExpressEndpoints(rootContract, rootRouter, app, {
   responseValidation: false,
   jsonQuery: true,
-  globalMiddleware: [authStubMiddleware],
+  globalMiddleware: [authStubMiddleware<typeof rootContract>],
 });
 
 createExpressEndpoints(accountDashboardContract, accountTimeRouter, app, {
   responseValidation: false,
   jsonQuery: true,
-  globalMiddleware: [authStubMiddleware],
+  globalMiddleware: [authStubMiddleware<typeof accountDashboardContract>],
 });
 
 app.listen(PORT, () => {

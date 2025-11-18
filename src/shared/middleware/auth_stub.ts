@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { userModel, UserRole } from "@/shared/models/user.js";
+import { TsRestRequest } from "@ts-rest/express";
+import { AppRouter } from "@ts-rest/core";
 
 export interface AuthContext extends Request {
   currentUser: {
@@ -10,7 +12,11 @@ export interface AuthContext extends Request {
   };
 }
 
-export function authStubMiddleware(req: Request, res: Response, next: NextFunction) {
+export function authStubMiddleware<T extends AppRouter>(
+  req: TsRestRequest<T>,
+  res: Response,
+  next: NextFunction
+) {
   const selectedUserId = req.session?.userId as number | undefined;
   const selectedRole = req.session?.userRole as UserRole | undefined;
 

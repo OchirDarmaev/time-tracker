@@ -17,7 +17,7 @@ export const authContract = c.router({
     path: "/auth-stub/set-user",
     body: z.object({ user_id: z.coerce.number() }),
     responses: {
-      302: z.any(),
+      302: z.undefined(),
     },
   },
   setRole: {
@@ -25,7 +25,7 @@ export const authContract = c.router({
     path: "/auth-stub/set-role",
     body: z.object({ role: z.string() }),
     responses: {
-      302: c.noBody(),
+      302: z.undefined(),
     },
   },
   getNavBar: {
@@ -41,7 +41,7 @@ export const authContract = c.router({
     path: "/auth/logout",
     body: c.noBody(),
     responses: {
-      302: z.any(),
+      302: z.undefined(),
     },
   },
 });

@@ -12,4 +12,19 @@ export const rootRouter = s.router(rootContract, {
       body: String(html),
     };
   },
+  toggleTheme: async ({ req, res }) => {
+    const currentTheme = req.cookies?.theme || "dark";
+    const newTheme = currentTheme === "dark" ? "light" : "dark";
+
+    res.cookie("theme", newTheme, {
+      maxAge: 365 * 24 * 60 * 60 * 1000,
+      httpOnly: false,
+    });
+
+    res.setHeader("HX-Refresh", "true");
+    return {
+      status: 204,
+      body: undefined,
+    };
+  },
 });

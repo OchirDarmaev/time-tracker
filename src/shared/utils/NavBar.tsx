@@ -1,5 +1,5 @@
 import { AuthContext } from "../middleware/auth_stub";
-import { NavButtons } from "./layout";
+import { NavButtons } from "./NavButtons";
 
 
 export function NavBar(req: AuthContext, activeNav: string = ""): JSX.Element {

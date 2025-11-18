@@ -1,14 +1,7 @@
-import { readFileSync } from "fs";
-import { join, dirname } from "path";
-import { fileURLToPath } from "url";
 import { AuthContext } from "@/shared/middleware/auth_stub.js";
-import { userModel } from "@/shared/models/user.js";
 import { tsBuildUrl } from "@/shared/utils/paths.js";
 import { accountDashboardContract } from "@/features/account/dashboard/contract.js";
 import { authContract } from "@/features/auth/contract.js";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
 const roleLabels: Record<string, string> = {
   account: "Account",
@@ -16,7 +9,13 @@ const roleLabels: Record<string, string> = {
   admin: "Admin",
 };
 // accountTimeContract.accountTime.path;
-function getNavButtons(availableRoles: string[], activeNav: string): JSX.Element {
+export function NavButtons({
+  availableRoles,
+  activeNav,
+}: {
+  availableRoles: string[];
+  activeNav: string;
+}): JSX.Element {
   const navItems = [
     {
       href: tsBuildUrl(accountDashboardContract.dashboard, {
@@ -42,7 +41,7 @@ function getNavButtons(availableRoles: string[], activeNav: string): JSX.Element
             ? "text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20"
             : "";
           return (
-            <a href={item.href} class={`${baseClasses} ${activeClasses}`}>
+            <a safe href={item.href} class={`${baseClasses} ${activeClasses}`}>
               {item.label}
             </a>
           );
@@ -55,6 +54,7 @@ function getNavButtons(availableRoles: string[], activeNav: string): JSX.Element
             <span
               class="text-gray-500 dark:text-gray-500 cursor-not-allowed px-3 py-2 text-sm"
               title={tooltipText}
+              safe
             >
               {item.label}
             </span>
@@ -69,33 +69,515 @@ export function renderBaseLayout(
   content: string | JSX.Element,
   req: AuthContext,
   activeNav: string = ""
-): string {
-  const layoutPath = join(__dirname, "../views/layouts/base.html");
-  let layout = readFileSync(layoutPath, "utf-8");
-
+): JSX.Element {
   const currentUser = req.currentUser || { email: "Unknown", role: "account", roles: ["account"] };
-  const users = userModel.getAll();
-  const userOptions = users
-    .map((u) => {
-      const selected = req.session?.userId === u.id ? "selected" : "";
-      const rolesJson = JSON.stringify(u.roles);
-      return `<option value="${u.id}" data-roles='${rolesJson}' ${selected}>${u.email}</option>`;
-    })
-    .join("");
-
-  // Get available roles for current user - use currentUser.roles directly (set by middleware)
   const availableRoles: string[] = currentUser.roles || ["account"];
-  const allRolesDisplay =
-    availableRoles.map((role) => roleLabels[role] || role).join(", ") || "None";
 
-  // Generate nav bar components
-  const navButtons = getNavButtons(availableRoles, activeNav);
-  // const userId = "id" in currentUser ? currentUser.id : undefined;
-  // const projectSelector = getProjectSelector(availableRoles, userId);
-  const emptyProjectSelector = "";
-  const logoutUrl = tsBuildUrl(authContract.logout, {});
-  const logoutButton = (
-    <form method="POST" action={logoutUrl} class="inline">
+  return (
+    <html>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>TimeTrack</title>
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" />
+      <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+      />
+      <link href="/public/styles/output.css" rel="stylesheet" />
+      <style>
+        {`
+        
+        * {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+        }
+        
+        :root {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #222222;
+            --bg-tertiary: #2a2a2a;
+            --border: #333333;
+            --text-primary: #e0e0e0;
+            --text-secondary: #999999;
+            --text-tertiary: #777777;
+            --accent: #6b75d8;
+            --accent-hover: #5a64c4;
+            --success: #4ade80;
+            --warning: #fbbf24;
+            --error: #f87171;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.25);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+        
+        .light {
+            --bg-primary: #fafafa;
+            --bg-secondary: #f5f5f5;
+            --bg-tertiary: #f0f0f0;
+            --border: #e0e0e0;
+            --text-primary: #2a2a2a;
+            --text-secondary: #666666;
+            --text-tertiary: #999999;
+            --accent: #6b75d8;
+            --accent-hover: #5a64c4;
+            --success: #4ade80;
+            --warning: #fbbf24;
+            --error: #f87171;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+        }
+        
+        html {
+            overflow-y: auto;
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100%;
+            height: 100%;
+        }
+        
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        
+        .nav-bar {
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .select-modern {
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        .select-modern:hover {
+            border-color: var(--accent);
+            background-color: var(--bg-secondary);
+        }
+        
+        .select-modern:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(107, 117, 216, 0.08);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .btn-primary:hover {
+            box-shadow: var(--shadow-md);
+        }
+        
+        .btn-secondary {
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--bg-secondary);
+            border-color: var(--accent);
+        }
+        
+        .btn-danger {
+            background-color: transparent;
+            color: var(--error);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        
+        .btn-danger:hover {
+            background-color: rgba(248, 113, 113, 0.08);
+            border-color: var(--error);
+        }
+        
+        .table-modern {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background-color: var(--bg-secondary);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .table-modern thead {
+            background-color: var(--bg-tertiary);
+        }
+        
+        .table-modern th {
+            padding: 16px 20px;
+            text-align: left;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .table-modern td {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+        
+        .table-modern tbody tr:hover {
+            background-color: var(--bg-tertiary);
+        }
+        
+        .table-modern tbody tr:nth-child(even) {
+            background-color: rgba(255, 255, 255, 0.015);
+        }
+        
+        .light .table-modern tbody tr:nth-child(even) {
+            background-color: rgba(0, 0, 0, 0.008);
+        }
+        
+        .table-modern tbody tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            background: linear-gradient(135deg, rgba(107, 117, 216, 0.1) 0%, rgba(107, 117, 216, 0.15) 100%);
+            color: var(--accent);
+            border: 1px solid rgba(107, 117, 216, 0.15);
+        }
+        
+        .input-modern {
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 14px;
+            width: 100%;
+        }
+        
+        .input-modern:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(107, 117, 216, 0.08);
+            background-color: var(--bg-secondary);
+        }
+        
+        .input-modern::placeholder {
+            color: var(--text-tertiary);
+        }
+        
+        .card {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .card:hover {
+            box-shadow: var(--shadow-md);
+        }
+        
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
+        
+        .nav-link:hover {
+            color: var(--text-primary);
+            background-color: var(--bg-tertiary);
+        }
+        
+        .nav-link.active {
+            color: var(--accent);
+            background-color: rgba(107, 117, 216, 0.08);
+        }
+        
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .badge-success {
+            background-color: rgba(74, 222, 128, 0.12);
+            color: var(--success);
+        }
+        
+        .badge-warning {
+            background-color: rgba(251, 191, 36, 0.12);
+            color: var(--warning);
+        }
+        
+        .badge-error {
+            background-color: rgba(248, 113, 113, 0.12);
+            color: var(--error);
+        }
+        
+        .badge-neutral {
+            background-color: var(--bg-tertiary);
+            color: var(--text-secondary);
+        }
+        
+        .stub-panel {
+            background-color: var(--bg-tertiary);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 0;
+            font-size: 12px;
+        }
+        
+        .theme-toggle {
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 6px 12px;
+            cursor: pointer;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .theme-toggle:hover {
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+        
+        /* View Transitions API */
+        @view-transition {
+            navigation: auto;
+        }
+        
+        ::view-transition-old(root),
+        ::view-transition-new(root) {
+            animation-duration: 0.2s;
+            animation-timing-function: ease-in-out;
+            overflow: hidden;
+        }
+        
+        ::view-transition-old(body),
+        ::view-transition-new(body) {
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100%;
+        }
+        
+        ::view-transition-old(root) {
+            animation-name: fade-out;
+        }
+        
+        ::view-transition-new(root) {
+            animation-name: fade-in;
+        }
+        
+        @keyframes fade-out {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+            }
+        }
+        
+        @keyframes fade-in {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        ::view-transition-group(*) {
+            animation-duration: 0.2s;
+            animation-timing-function: ease-in-out;
+        }
+        
+        tr[id] {
+            view-transition-name: var(--vt-name, none);
+        }
+        
+        ::view-transition-group(stub-panel),
+        ::view-transition-group(nav-bar) {
+            animation-duration: 0s;
+            z-index: 1000;
+        }
+        
+        ::view-transition-old(stub-panel),
+        ::view-transition-new(stub-panel),
+        ::view-transition-old(nav-bar),
+        ::view-transition-new(nav-bar) {
+            animation: none !important;
+            opacity: 1 !important;
+        }
+        
+        /* Scrollbar styling - minimal CSS for browser-specific styling */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: rgb(107 114 128) rgb(243 244 246);
+        }
+        
+        .dark * {
+            scrollbar-color: rgb(75 85 99) rgb(31 41 55);
+        }
+        
+        *::-webkit-scrollbar {
+            width: 12px;
+            height: 12px;
+        }
+        
+        *::-webkit-scrollbar-track {
+            background: rgb(243 244 246);
+        }
+        
+        .dark *::-webkit-scrollbar-track {
+            background: rgb(31 41 55);
+        }
+        
+        *::-webkit-scrollbar-thumb {
+            background-color: rgb(107 114 128);
+            border-radius: 6px;
+            border: 2px solid rgb(243 244 246);
+        }
+        
+        .dark *::-webkit-scrollbar-thumb {
+            background-color: rgb(75 85 99);
+            border: 2px solid rgb(31 41 55);
+        }
+        
+        *::-webkit-scrollbar-thumb:hover {
+            background-color: rgb(75 85 99);
+        }
+        
+        .dark *::-webkit-scrollbar-thumb:hover {
+            background-color: rgb(107 114 128);
+        }`}
+      </style>
+      <script>
+        {`
+        // Theme management
+        (function() {
+            const theme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.className = theme;
+            
+            const updateThemeIcon = () => {
+                const icon = document.getElementById('theme-icon');
+                if (icon) {
+                    icon.textContent = document.documentElement.className === 'dark' ? '🌙' : '☀️';
+                }
+            };
+            
+            window.toggleTheme = function() {
+                const current = document.documentElement.className;
+                const newTheme = current === 'dark' ? 'light' : 'dark';
+                document.documentElement.className = newTheme;
+                localStorage.setItem('theme', newTheme);
+                updateThemeIcon();
+            };
+            
+            updateThemeIcon();
+        })();
+        `}
+      </script>
+
+      {/* Top Navigation Bar */}
+      <nav
+        class="px-6 flex items-center justify-between bg-gray-100 dark:bg-gray-800 border-b border-gray-300 dark:border-gray-700 backdrop-blur-sm sticky top-0 z-100 h-16"
+        style={{ viewTransitionName: "nav-bar" }}
+      >
+        <div class="flex items-center">
+          <a
+            href="/"
+            class="text-lg font-semibold text-gray-900 dark:text-gray-100 hover:text-indigo-600 dark:hover:text-indigo-400 no-underline"
+          >
+            TimeTrack
+          </a>
+        </div>
+        <div class="flex-1 flex items-center justify-start" id="nav-bar-content">
+          <div class="flex items-center gap-1 ml-8">
+            <NavButtons availableRoles={availableRoles} activeNav={activeNav} />
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <button
+            onclick="toggleTheme()"
+            class="bg-gray-200 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 cursor-pointer text-xs text-gray-600 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-600 hover:text-gray-900 dark:hover:text-gray-100"
+          >
+            <span id="theme-icon">🌙</span>
+          </button>
+          <LogoutButton />
+        </div>
+      </nav>
+      {/* Content */}
+      <main
+        class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen overflow-x-hidden w-full"
+        style={{ viewTransitionName: "main-content" }}
+      >
+        <div class="max-w-5xl mx-auto px-6 py-8 w-full">{content}</div>
+      </main>
+    </html>
+  );
+}
+
+export function renderNavBar(req: AuthContext, activeNav: string = ""): JSX.Element {
+  const currentUser = req.currentUser || { email: "Unknown", role: "account", roles: ["account"] };
+  const availableRoles: string[] = currentUser.roles || ["account"];
+
+  return (
+    <div class="flex items-center gap-1">
+      <NavButtons availableRoles={availableRoles} activeNav={activeNav} />
+    </div>
+  );
+}
+
+export function LogoutButton(): JSX.Element {
+  return (
+    <form method="POST" action={tsBuildUrl(authContract.logout, {})} class="inline">
       <button
         type="submit"
         class="text-gray-600 dark:text-gray-400 text-sm font-medium px-3 py-2 rounded-md hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-700"
@@ -104,30 +586,4 @@ export function renderBaseLayout(
       </button>
     </form>
   );
-
-  // @kitajs/html converts JSX to strings automatically, but we need to ensure they're strings
-  const navButtonsStr = String(navButtons);
-  const logoutButtonStr = String(logoutButton);
-  const contentStr = String(content);
-
-  // Replace all placeholders
-  layout = layout.replace(/\{\{user_options\}\}/g, userOptions || "");
-  layout = layout.replace(/\{\{current_user_email\}\}/g, currentUser.email || "Unknown");
-  layout = layout.replace(/\{\{all_roles\}\}/g, allRolesDisplay);
-  layout = layout.replace("{{nav_buttons}}", navButtonsStr);
-  layout = layout.replace("{{role_selector}}", "");
-  layout = layout.replace("{{project_selector}}", emptyProjectSelector);
-  layout = layout.replace("{{logout_button}}", logoutButtonStr);
-  layout = layout.replace("{{content}}", contentStr);
-
-  return layout;
-}
-
-export function renderNavBar(req: AuthContext, activeNav: string = ""): JSX.Element {
-  const currentUser = req.currentUser || { email: "Unknown", role: "account", roles: ["account"] };
-  const availableRoles: string[] = currentUser.roles || ["account"];
-
-  const navButtons = getNavButtons(availableRoles, activeNav);
-
-  return <div class="flex items-center gap-1">{navButtons}</div>;
 }

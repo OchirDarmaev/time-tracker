@@ -108,7 +108,7 @@ function CircleDiagram(
   );
 }
 
-export function MonthlyCalendar(props: MonthlyCalendarProps): JSX.Element {
+export function MonthlyCalendar({ props }: { props: MonthlyCalendarProps }): JSX.Element {
   const {
     selectedDate,
 

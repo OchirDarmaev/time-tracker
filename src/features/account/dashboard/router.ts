@@ -8,7 +8,7 @@ import { calendarModel } from "@/shared/models/calendar.js";
 import { formatDate, getMonthFromDate, minutesToHours } from "@/shared/utils/date_utils.js";
 import { validateDate, validateMinutes } from "@/shared/utils/validation.js";
 import { renderEntriesTable } from "./views/entries_table.js";
-import { renderDashboard } from "./views/render-dashboard.js";
+import { Dashboard } from "./views/dashboard.js";
 import { renderBaseLayout } from "@/shared/utils/layout.js";
 import { renderTimeSlider } from "@/features/account/dashboard/components/render-time-slider.js";
 import { tsBuildUrl } from "../../../shared/utils/paths.js";
@@ -43,13 +43,13 @@ export const accountTimeRouter = s.router(accountDashboardContract, {
     if (req.headers["hx-request"] === "true") {
       return {
         status: 200,
-        body: String(renderDashboard(req, req.req)),
+        body: String(Dashboard(req, req.req)),
       };
     }
 
     return {
       status: 200,
-      body: renderBaseLayout(renderDashboard(req, req.req), req.req, "account"),
+      body: String(renderBaseLayout(Dashboard(req, req.req), req.req, "account")),
     };
   },
   accountDashboardEntries: async ({ query, req }) => {

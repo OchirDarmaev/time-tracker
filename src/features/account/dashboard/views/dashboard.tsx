@@ -18,7 +18,7 @@ import { ClientInferRequest } from "@ts-rest/core";
 
 type Request = ClientInferRequest<typeof accountDashboardContract.dashboard>;
 
-export function renderDashboard(req: Request, authContext: AuthContext): JSX.Element {
+export function Dashboard(req: Request, authContext: AuthContext): JSX.Element {
   const { currentUser } = authContext;
   const selectedDate = req.query.date || formatDate(new Date());
 
@@ -159,18 +159,20 @@ export function renderDashboard(req: Request, authContext: AuthContext): JSX.Ele
       </div>
       <div class="flex flex-row gap-4 w-full">
         <div class="w-1/2">
-          {MonthlyCalendar({
-            selectedDate: selectedDate,
-            hxTarget: "#time-tracking-content",
-            dayHoursMap: dayHoursMap,
-            dayProjectBreakdown: dayProjectBreakdown,
-            projects: projects.map((p) => ({
-              id: p.id,
-              name: p.name,
-              color: p.color,
-            })),
-            dayConfigurations: dayConfigurations,
-          })}
+          <MonthlyCalendar
+            props={{
+              selectedDate: selectedDate,
+              hxTarget: "#time-tracking-content",
+              dayHoursMap: dayHoursMap,
+              dayProjectBreakdown: dayProjectBreakdown,
+              projects: projects.map((p) => ({
+                id: p.id,
+                name: p.name,
+                color: p.color,
+              })),
+              dayConfigurations: dayConfigurations,
+            }}
+          />
         </div>
         <div class="w-1/2">
           <div

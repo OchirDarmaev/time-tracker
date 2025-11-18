@@ -59,7 +59,7 @@ function hoursToMinutes(hours: number): number {
   return Math.round(hours * 60);
 }
 
-export function renderTimeSlider(props: TimeSliderProps = {}): JSX.Element {
+export function renderTimeSlider(props: TimeSliderProps): JSX.Element {
   const totalHours = props.totalHours || 8;
   const segments = props.segments || [];
   const projects = props.projects || [];

@@ -191,7 +191,6 @@ export const accountTimeRouter = s.router(accountDashboardContract, {
       body: String(html),
     };
   },
-
   syncDashboardEntries: async ({ body, req }) => {
     const authReq = req as unknown as AuthContext;
 
@@ -269,53 +268,6 @@ export const accountTimeRouter = s.router(accountDashboardContract, {
       segments: segmentsForSlider,
       projects,
       date,
-      syncUrl: tsBuildUrl(accountDashboardContract.syncDashboardEntries, {}),
-    });
-
-    return {
-      status: 200,
-      body: String(html),
-    };
-  },
-  timeSlider: async ({ query, req }) => {
-    const authReq = req as unknown as AuthContext;
-
-    if (!authReq.currentUser) {
-      return {
-        status: 401,
-        body: { body: "Unauthorized" },
-      };
-    }
-    if (!authReq.currentUser.roles.includes("account")) {
-      return {
-        status: 403,
-        body: { body: "Forbidden" },
-      };
-    }
-
-    const currentUser = authReq.currentUser;
-    const date = (query?.date as string) || formatDate(new Date());
-
-    if (!validateDate(date)) {
-      return {
-        status: 400,
-        body: { body: "Invalid date" },
-      };
-    }
-
-    const { sliderTotalHours, segmentsForSlider, projects } = getTimeSliderData(currentUser, date);
-
-    const html = TimeSlider({
-      totalHours: sliderTotalHours,
-      segments: segmentsForSlider,
-      projects: projects.map((p) => ({
-        id: p.id,
-        name: p.name,
-        suppressed: p.suppressed || false,
-        color: p.color,
-        isSystem: p.isSystem || false,
-      })),
-      date: date,
       syncUrl: tsBuildUrl(accountDashboardContract.syncDashboardEntries, {}),
     });
 

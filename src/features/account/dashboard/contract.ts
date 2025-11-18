@@ -74,15 +74,4 @@ export const accountDashboardContract = c.router({
       403: z.any(),
     },
   },
-  timeSlider: {
-    method: "GET",
-    path: "/account/dashboard/components/time-slider",
-    query: z.object({
-      date: z.string().date().optional(),
-    }),
-    responses: {
-      200: htmlResponse,
-      400: z.any(),
-    },
-  },
 });

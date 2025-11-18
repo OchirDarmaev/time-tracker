@@ -1,7 +1,7 @@
 import { AuthContext } from "@/shared/middleware/auth_stub.js";
 import { tsBuildUrl } from "@/shared/utils/paths.js";
 import { accountDashboardContract } from "@/features/account/dashboard/contract.js";
-import { authContract } from "@/features/auth/contract.js";
+import { LogoutButton } from "./LogoutButton";
 
 const roleLabels: Record<string, string> = {
   account: "Account",
@@ -74,20 +74,10 @@ export function Layout(
   const availableRoles: string[] = currentUser.roles || ["account"];
 
   return (
-    <html>
-      <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>TimeTrack</title>
-      <link rel="preconnect" href="https://fonts.googleapis.com" />
-      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
-      <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-        rel="stylesheet"
-      />
-      <link href="/public/styles/output.css" rel="stylesheet" />
+    <html class="dark">
       <script>
         {`
-        // Theme management
+        // Theme management - runs immediately to prevent FOUC
         (function() {
             const theme = localStorage.getItem('theme') || 'dark';
             document.documentElement.className = theme;
@@ -111,6 +101,16 @@ export function Layout(
         })();
         `}
       </script>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>TimeTrack</title>
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+      <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+      />
+      <link href="/public/styles/output.css" rel="stylesheet" />
 
       {/* Top Navigation Bar */}
       <nav
@@ -148,29 +148,5 @@ export function Layout(
         <div class="max-w-5xl mx-auto px-6 py-8 w-full">{content}</div>
       </main>
     </html>
-  );
-}
-
-export function renderNavBar(req: AuthContext, activeNav: string = ""): JSX.Element {
-  const currentUser = req.currentUser || { email: "Unknown", role: "account", roles: ["account"] };
-  const availableRoles: string[] = currentUser.roles || ["account"];
-
-  return (
-    <div class="flex items-center gap-1">
-      <NavButtons availableRoles={availableRoles} activeNav={activeNav} />
-    </div>
-  );
-}
-
-export function LogoutButton(): JSX.Element {
-  return (
-    <form method="POST" action={tsBuildUrl(authContract.logout, {})} class="inline">
-      <button
-        type="submit"
-        class="text-gray-600 dark:text-gray-400 text-sm font-medium px-3 py-2 rounded-md hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-700"
-      >
-        Logout
-      </button>
-    </form>
   );
 }

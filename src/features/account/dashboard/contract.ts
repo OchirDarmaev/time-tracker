@@ -76,7 +76,7 @@ export const accountDashboardContract = c.router({
   },
   timeSlider: {
     method: "GET",
-    path: "/account/dashboard/componets/time-slider",
+    path: "/account/dashboard/components/time-slider",
     query: z.object({
       date: z.string().date().optional(),
     }),

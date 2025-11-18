@@ -16,6 +16,8 @@ import { accountDashboardContract } from "@/features/account/dashboard/contract.
 import { ClientInferRequest } from "@ts-rest/core";
 import { getMonthlySummaryData } from "../getMonthlySummaryData";
 import { MonthlySummary } from "./MonthlySummary";
+import { TimeSlider } from "../components/TimeSlider";
+import { getTimeSliderData } from "../getTimeSliderData";
 
 type Request = ClientInferRequest<typeof accountDashboardContract.dashboard>;
 
@@ -101,6 +103,7 @@ export function Dashboard(req: Request, authContext: AuthContext): JSX.Element {
   });
 
   const { reported, expected } = getMonthlySummaryData(selectedDate, currentUser);
+  const timeSliderData = getTimeSliderData(currentUser, selectedDate);
 
   return (
     <div
@@ -179,18 +182,13 @@ export function Dashboard(req: Request, authContext: AuthContext): JSX.Element {
           />
         </div>
         <div class="w-1/2">
-          <div
-            id="time-slider-wrapper"
-            hx-get={tsBuildUrl(accountDashboardContract.timeSlider, {
-              headers: {},
-              query: {
-                date: selectedDate,
-              },
-            })}
-            hx-trigger="load, entries-changed from:body"
-            hx-swap="innerHTML"
-            hx-target="this"
-          ></div>
+          <TimeSlider
+            totalHours={timeSliderData.sliderTotalHours}
+            segments={timeSliderData.segmentsForSlider}
+            projects={timeSliderData.projects}
+            date={selectedDate}
+            syncUrl={tsBuildUrl(accountDashboardContract.syncDashboardEntries, {})}
+          />
         </div>
       </div>
     </div>

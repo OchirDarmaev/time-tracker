@@ -16,11 +16,11 @@ export interface Project {
 }
 
 export interface TimeSliderProps {
-  totalHours?: number;
-  segments?: Segment[];
-  projects?: Project[];
-  date?: string;
-  syncUrl?: string;
+  totalHours: number;
+  segments: Segment[];
+  projects: Project[];
+  date: string;
+  syncUrl: string;
 }
 
 function getProjectColor(project: Project): { bg: string; solid: string } {
@@ -59,12 +59,8 @@ function hoursToMinutes(hours: number): number {
   return Math.round(hours * 60);
 }
 
-export function renderTimeSlider(props: TimeSliderProps): JSX.Element {
-  const totalHours = props.totalHours || 8;
-  const segments = props.segments || [];
-  const projects = props.projects || [];
-  const date = props.date || new Date().toISOString().split("T")[0];
-  const syncUrl = props.syncUrl || "";
+export function TimeSlider(props: TimeSliderProps): JSX.Element {
+  const { totalHours, segments, projects, date, syncUrl } = props;
 
   const totalMinutes = hoursToMinutes(totalHours);
 
@@ -114,7 +110,7 @@ export function renderTimeSlider(props: TimeSliderProps): JSX.Element {
       class="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-3 shadow-sm my-4 w-full max-w-full box-border"
       id="time-slider-container"
       hx-target="this"
-      hx-swap="outerHTML"
+      hx-swap="innerHTML"
     >
       <div class="mb-4 pb-3 border-b border-gray-300 dark:border-gray-700">
         <div class="mb-2">

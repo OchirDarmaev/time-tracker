@@ -386,9 +386,6 @@
   .min-h-\[64px\] {
     min-height: 64px;
   }
-  .min-h-\[140px\] {
-    min-height: 140px;
-  }
   .min-h-screen {
     min-height: 100vh;
   }

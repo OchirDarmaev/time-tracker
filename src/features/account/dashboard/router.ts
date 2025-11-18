@@ -4,13 +4,14 @@ import { AuthContext } from "@/shared/middleware/auth_stub.js";
 import { isAuthContext } from "@/shared/middleware/isAuthContext.js";
 import { timeEntryModel } from "@/shared/models/time_entry.js";
 import { projectModel } from "@/shared/models/project.js";
-import { formatDate, minutesToHours } from "@/shared/utils/date_utils.js";
+import { formatDate } from "@/shared/utils/date_utils.js";
 import { validateDate, validateMinutes } from "@/shared/utils/validation.js";
 import { renderEntriesTable } from "./views/entries_table.js";
 import { Dashboard } from "./views/dashboard.js";
 import { Layout } from "@/shared/utils/layout.js";
-import { renderTimeSlider } from "@/features/account/dashboard/components/render-time-slider.js";
+import { TimeSlider } from "@/features/account/dashboard/components/TimeSlider.js";
 import { tsBuildUrl } from "../../../shared/utils/paths.js";
+import { getTimeSliderData } from "./getTimeSliderData.js";
 
 export const REQUIRED_DAILY_HOURS = 8;
 
@@ -261,19 +262,9 @@ export const accountTimeRouter = s.router(accountDashboardContract, {
       }
     }
     // Re-fetch entries and projects to render updated slider
-    const entries = timeEntryModel.getByUserIdAndDate(currentUser.id, date);
-    const projects = projectModel.getByUserId(currentUser.id);
-    const totalMinutes = timeEntryModel.getTotalMinutesByUserAndDate(currentUser.id, date);
-    const totalHours = minutesToHours(totalMinutes);
-    const sliderTotalHours = Math.max(totalHours, REQUIRED_DAILY_HOURS);
+    const { sliderTotalHours, segmentsForSlider, projects } = getTimeSliderData(currentUser, date);
 
-    const segmentsForSlider = entries.map((entry) => ({
-      project_id: entry.project_id,
-      minutes: entry.minutes,
-      comment: entry.comment || null,
-    }));
-
-    const html = renderTimeSlider({
+    const html = TimeSlider({
       totalHours: sliderTotalHours,
       segments: segmentsForSlider,
       projects,
@@ -312,21 +303,11 @@ export const accountTimeRouter = s.router(accountDashboardContract, {
       };
     }
 
-    const projects = projectModel.getByUserId(currentUser.id);
-    const entries = timeEntryModel.getByUserIdAndDate(currentUser.id, date);
-    const totalMinutes = timeEntryModel.getTotalMinutesByUserAndDate(currentUser.id, date);
-    const totalHours = minutesToHours(totalMinutes);
-    const sliderTotalHours = Math.max(totalHours, REQUIRED_DAILY_HOURS);
+    const { sliderTotalHours, segmentsForSlider, projects } = getTimeSliderData(currentUser, date);
 
-    const segments = entries.map((entry) => ({
-      project_id: entry.project_id,
-      minutes: entry.minutes,
-      comment: entry.comment || null,
-    }));
-
-    const html = renderTimeSlider({
+    const html = TimeSlider({
       totalHours: sliderTotalHours,
-      segments: segments,
+      segments: segmentsForSlider,
       projects: projects.map((p) => ({
         id: p.id,
         name: p.name,

@@ -7,12 +7,12 @@ import { projectModel } from "@/shared/models/project.js";
 import { calendarModel } from "@/shared/models/calendar.js";
 import { formatDate, getMonthFromDate, minutesToHours } from "@/shared/utils/date_utils.js";
 import { validateDate, validateMinutes } from "@/shared/utils/validation.js";
-import { renderSummary } from "./views/summary.js";
 import { renderEntriesTable } from "./views/entries_table.js";
 import { renderDashboard } from "./views/render-dashboard.js";
 import { renderBaseLayout } from "@/shared/utils/layout.js";
 import { renderTimeSlider } from "@/features/account/dashboard/components/render-time-slider.js";
 import { tsBuildUrl } from "../../../shared/utils/paths.js";
+import { renderSummary } from "./views/summary.js";
 
 const REQUIRED_DAILY_HOURS = 8;
 
@@ -43,7 +43,7 @@ export const accountTimeRouter = s.router(accountDashboardContract, {
     if (req.headers["hx-request"] === "true") {
       return {
         status: 200,
-        body: renderDashboard(req, req.req),
+        body: String(renderDashboard(req, req.req)),
       };
     }
 
@@ -83,7 +83,7 @@ export const accountTimeRouter = s.router(accountDashboardContract, {
     const html = renderEntriesTable(entries, projects);
     return {
       status: 200,
-      body: html,
+      body: String(html),
     };
   },
 
@@ -144,7 +144,7 @@ export const accountTimeRouter = s.router(accountDashboardContract, {
     const html = renderEntriesTable(entries, projects);
     return {
       status: 200,
-      body: html,
+      body: String(html),
     };
   },
 
@@ -189,7 +189,7 @@ export const accountTimeRouter = s.router(accountDashboardContract, {
     const html = renderEntriesTable(entries, projects);
     return {
       status: 200,
-      body: html,
+      body: String(html),
     };
   },
 
@@ -285,7 +285,7 @@ export const accountTimeRouter = s.router(accountDashboardContract, {
 
     return {
       status: 200,
-      body: html,
+      body: String(html),
     };
   },
 
@@ -354,7 +354,7 @@ export const accountTimeRouter = s.router(accountDashboardContract, {
     const html = renderSummary(reported, expected);
     return {
       status: 200,
-      body: html,
+      body: String(html),
     };
   },
   timeSlider: async ({ query, req }) => {
@@ -411,7 +411,7 @@ export const accountTimeRouter = s.router(accountDashboardContract, {
 
     return {
       status: 200,
-      body: html,
+      body: String(html),
     };
   },
 });

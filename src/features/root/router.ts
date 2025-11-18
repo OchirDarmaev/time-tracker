@@ -9,7 +9,7 @@ export const rootRouter = s.router(rootContract, {
     const html = renderRoot();
     return {
       status: 200,
-      body: html,
+      body: String(html),
     };
   },
 });

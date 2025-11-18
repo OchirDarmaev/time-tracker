@@ -1,25 +1,23 @@
-import { html } from "@/shared/utils/html";
 import { tsBuildUrl } from "@/shared/utils/paths";
 import { authContract } from "@/features/auth/contract";
 
-export function renderRoot(): string {
+export function renderRoot(): JSX.Element {
   const authUrl = tsBuildUrl(authContract.auth, {});
-  return html`
-    <!DOCTYPE html>
+  return (
     <html lang="en" class="dark">
       <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>TimeTrack - Internal Time Reporting Tool</title>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
         <link
           href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
           rel="stylesheet"
         />
         <link href="/public/styles/output.css" rel="stylesheet" />
         <style>
-          * {
+          {`* {
             font-family:
               "Inter",
               -apple-system,
@@ -27,14 +25,12 @@ export function renderRoot(): string {
               "SF Pro Display",
               "Segoe UI",
               sans-serif;
-          }
+          }`}
         </style>
       </head>
       <body class="bg-gray-950 text-gray-100 min-h-screen flex items-center justify-center">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
-          <h1
-            class="text-6xl font-bold mb-6 bg-linear-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent"
-          >
+          <h1 class="text-6xl font-bold mb-6 bg-linear-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
             TimeTrack
           </h1>
           <p class="text-xl text-gray-400 mb-16 max-w-xl mx-auto">
@@ -63,7 +59,7 @@ export function renderRoot(): string {
           </section>
 
           <a
-            href="${authUrl}"
+            href={authUrl}
             class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-8 py-3 rounded-lg transition-colors duration-200 text-lg"
           >
             Get Started →
@@ -71,5 +67,5 @@ export function renderRoot(): string {
         </div>
       </body>
     </html>
-  `;
+  );
 }

@@ -13,7 +13,7 @@ export const authRouter = s.router(authContract, {
     const html = renderAuth(authReq);
     return {
       status: 200,
-      body: html,
+      body: String(html),
     };
   },
   setUser: async ({ body, req, res }) => {
@@ -81,7 +81,7 @@ export const authRouter = s.router(authContract, {
     const html = renderNavBar(authReq, activeNav);
     return {
       status: 200,
-      body: html,
+      body: String(html),
     };
   },
   logout: async ({ req, res }) => {

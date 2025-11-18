@@ -1,4 +1,3 @@
-import { html } from "@/shared/utils/html.js";
 import { AuthContext } from "@/shared/middleware/auth_stub.js";
 import { projectModel } from "@/shared/models/project.js";
 import { timeEntryModel } from "@/shared/models/time_entry.js";
@@ -19,7 +18,7 @@ import { ClientInferRequest } from "@ts-rest/core";
 
 type Request = ClientInferRequest<typeof accountDashboardContract.dashboard>;
 
-export function renderDashboard(req: Request, authContext: AuthContext) {
+export function renderDashboard(req: Request, authContext: AuthContext): JSX.Element {
   const { currentUser } = authContext;
   const selectedDate = req.query.date || formatDate(new Date());
 
@@ -100,51 +99,53 @@ export function renderDashboard(req: Request, authContext: AuthContext) {
     },
   });
 
-  const content = html`
+  return (
     <div
       id="time-tracking-content"
       class="space-y-4"
-      hx-get="${dashboardUrl}"
+      hx-get={dashboardUrl}
       hx-target="this"
       hx-swap="innerHTML transition:true"
       hx-trigger="entries-changed from:body"
     >
-      <!-- Enhanced Status Bar -->
-      <div
-        class="bg-linear-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-3 shadow-sm"
-      >
+      {/* Enhanced Status Bar */}
+      <div class="bg-linear-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-3 shadow-sm">
         <div class="flex items-start gap-4 flex-wrap">
           <div class="flex-1 min-w-[140px]">
             <div class="text-[10px] font-medium mb-0.5 text-gray-600 dark:text-gray-400">
               Daily Status
             </div>
             <div class="flex items-baseline gap-2 flex-wrap">
-              <span class="text-2xl font-bold ${statusColor}">${totalHours.toFixed(1)}h</span>
-              ${requiresDailyHours
-                ? html`<span class="text-sm text-gray-500 dark:text-gray-400"
-                    >/ ${REQUIRED_DAILY_HOURS}h</span
-                  >`
-                : ""}
-              ${requiresDailyHours
-                ? isOverLimit
-                  ? html`<span class="text-xs text-orange-600 dark:text-orange-400 font-medium"
-                      >⚠ over limit</span
-                    >`
-                  : isComplete
-                    ? html`<span class="text-xs text-green-600 dark:text-green-400"
-                        >✓ Complete</span
-                      >`
-                    : html`<span class="text-xs text-gray-600 dark:text-gray-400"
-                        >(${remainingHours.toFixed(1)}h needed)</span
-                      >`
-                : html`<span class="text-xs text-gray-500 dark:text-gray-400"
-                    >No time required</span
-                  >`}
+              <span class={`text-2xl font-bold ${statusColor}`} safe>
+                ({totalHours.toFixed(1)}h)
+              </span>
+              {requiresDailyHours ? (
+                <span class="text-sm text-gray-500 dark:text-gray-400">
+                  / {REQUIRED_DAILY_HOURS}h
+                </span>
+              ) : (
+                ""
+              )}
+              {requiresDailyHours ? (
+                isOverLimit ? (
+                  <span class="text-xs text-orange-600 dark:text-orange-400 font-medium">
+                    ⚠ over limit
+                  </span>
+                ) : isComplete ? (
+                  <span class="text-xs text-green-600 dark:text-green-400">✓ Complete</span>
+                ) : (
+                  <span class="text-xs text-gray-600 dark:text-gray-400" safe>
+                    ({remainingHours.toFixed(1)}h needed)
+                  </span>
+                )
+              ) : (
+                <span class="text-xs text-gray-500 dark:text-gray-400">No time required</span>
+              )}
             </div>
           </div>
           <div class="h-12 w-px bg-gray-300 dark:bg-gray-600 self-stretch"></div>
           <div class="flex-1 min-w-[160px]">
-            ${renderTimeSummary({
+            {renderTimeSummary({
               hxGet: tsBuildUrl(accountDashboardContract.accountDashboardSummary, {
                 headers: {},
                 query: {
@@ -158,7 +159,7 @@ export function renderDashboard(req: Request, authContext: AuthContext) {
       </div>
       <div class="flex flex-row gap-4 w-full">
         <div class="w-1/2">
-          ${MonthlyCalendar({
+          {MonthlyCalendar({
             selectedDate: selectedDate,
             hxTarget: "#time-tracking-content",
             dayHoursMap: dayHoursMap,
@@ -174,12 +175,12 @@ export function renderDashboard(req: Request, authContext: AuthContext) {
         <div class="w-1/2">
           <div
             id="time-slider-wrapper"
-            hx-get="${tsBuildUrl(accountDashboardContract.timeSlider, {
+            hx-get={tsBuildUrl(accountDashboardContract.timeSlider, {
               headers: {},
               query: {
                 date: selectedDate,
               },
-            })}"
+            })}
             hx-trigger="load, entries-changed from:body"
             hx-swap="innerHTML"
             hx-target="this"
@@ -187,7 +188,5 @@ export function renderDashboard(req: Request, authContext: AuthContext) {
         </div>
       </div>
     </div>
-  `;
-
-  return content;
+  );
 }

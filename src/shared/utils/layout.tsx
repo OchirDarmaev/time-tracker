@@ -3,7 +3,6 @@ import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { AuthContext } from "@/shared/middleware/auth_stub.js";
 import { userModel } from "@/shared/models/user.js";
-import { html } from "@/shared/utils/html.js";
 import { tsBuildUrl } from "@/shared/utils/paths.js";
 import { accountDashboardContract } from "@/features/account/dashboard/contract.js";
 import { authContract } from "@/features/auth/contract.js";
@@ -17,7 +16,7 @@ const roleLabels: Record<string, string> = {
   admin: "Admin",
 };
 // accountTimeContract.accountTime.path;
-function getNavButtons(availableRoles: string[], activeNav: string): string {
+function getNavButtons(availableRoles: string[], activeNav: string): JSX.Element {
   const navItems = [
     {
       href: tsBuildUrl(accountDashboardContract.dashboard, {
@@ -30,35 +29,47 @@ function getNavButtons(availableRoles: string[], activeNav: string): string {
     },
   ];
 
-  return navItems
-    .map((item) => {
-      const hasAccess = item.requiredRoles.some((role) => availableRoles.includes(role));
-      const isActive = activeNav === item.activeNav;
-      // const activeClass = isActive ? "active" : "";
+  return (
+    <>
+      {navItems.map((item) => {
+        const hasAccess = item.requiredRoles.some((role) => availableRoles.includes(role));
+        const isActive = activeNav === item.activeNav;
 
-      if (hasAccess) {
-        const baseClasses =
-          "text-gray-600 dark:text-gray-400 no-underline text-sm font-medium px-3 py-2 rounded-md hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-700";
-        const activeClasses = isActive
-          ? "text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20"
-          : "";
-        return `<a href="${item.href}" class="${baseClasses} ${activeClasses}">${item.label}</a>`;
-      } else {
-        const requiredRolesText = item.requiredRoles
-          .map((r) => `'${roleLabels[r] || r}'`)
-          .join(" or ");
-        const tooltipText = `role ${requiredRolesText} required`;
-        return html`<span
-          class="text-gray-500 dark:text-gray-500 cursor-not-allowed px-3 py-2 text-sm"
-          title="${tooltipText}"
-          >${item.label}</span
-        >`;
-      }
-    })
-    .join("");
+        if (hasAccess) {
+          const baseClasses =
+            "text-gray-600 dark:text-gray-400 no-underline text-sm font-medium px-3 py-2 rounded-md hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-700";
+          const activeClasses = isActive
+            ? "text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20"
+            : "";
+          return (
+            <a href={item.href} class={`${baseClasses} ${activeClasses}`}>
+              {item.label}
+            </a>
+          );
+        } else {
+          const requiredRolesText = item.requiredRoles
+            .map((r) => `'${roleLabels[r] || r}'`)
+            .join(" or ");
+          const tooltipText = `role ${requiredRolesText} required`;
+          return (
+            <span
+              class="text-gray-500 dark:text-gray-500 cursor-not-allowed px-3 py-2 text-sm"
+              title={tooltipText}
+            >
+              {item.label}
+            </span>
+          );
+        }
+      })}
+    </>
+  );
 }
 
-export function renderBaseLayout(content: string, req: AuthContext, activeNav: string = "") {
+export function renderBaseLayout(
+  content: string | JSX.Element,
+  req: AuthContext,
+  activeNav: string = ""
+): string {
   const layoutPath = join(__dirname, "../views/layouts/base.html");
   let layout = readFileSync(layoutPath, "utf-8");
 
@@ -83,8 +94,8 @@ export function renderBaseLayout(content: string, req: AuthContext, activeNav: s
   // const projectSelector = getProjectSelector(availableRoles, userId);
   const emptyProjectSelector = "";
   const logoutUrl = tsBuildUrl(authContract.logout, {});
-  const logoutButton = html`
-    <form method="POST" action="${logoutUrl}" class="inline">
+  const logoutButton = (
+    <form method="POST" action={logoutUrl} class="inline">
       <button
         type="submit"
         class="text-gray-600 dark:text-gray-400 text-sm font-medium px-3 py-2 rounded-md hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-700"
@@ -92,26 +103,31 @@ export function renderBaseLayout(content: string, req: AuthContext, activeNav: s
         Logout
       </button>
     </form>
-  `;
+  );
+
+  // @kitajs/html converts JSX to strings automatically, but we need to ensure they're strings
+  const navButtonsStr = String(navButtons);
+  const logoutButtonStr = String(logoutButton);
+  const contentStr = String(content);
 
   // Replace all placeholders
   layout = layout.replace(/\{\{user_options\}\}/g, userOptions || "");
   layout = layout.replace(/\{\{current_user_email\}\}/g, currentUser.email || "Unknown");
   layout = layout.replace(/\{\{all_roles\}\}/g, allRolesDisplay);
-  layout = layout.replace("{{nav_buttons}}", navButtons);
+  layout = layout.replace("{{nav_buttons}}", navButtonsStr);
   layout = layout.replace("{{role_selector}}", "");
   layout = layout.replace("{{project_selector}}", emptyProjectSelector);
-  layout = layout.replace("{{logout_button}}", logoutButton);
-  layout = layout.replace("{{content}}", content);
+  layout = layout.replace("{{logout_button}}", logoutButtonStr);
+  layout = layout.replace("{{content}}", contentStr);
 
   return layout;
 }
 
-export function renderNavBar(req: AuthContext, activeNav: string = ""): string {
+export function renderNavBar(req: AuthContext, activeNav: string = ""): JSX.Element {
   const currentUser = req.currentUser || { email: "Unknown", role: "account", roles: ["account"] };
   const availableRoles: string[] = currentUser.roles || ["account"];
 
   const navButtons = getNavButtons(availableRoles, activeNav);
 
-  return html` <div class="flex items-center gap-1">${navButtons}</div> `;
+  return <div class="flex items-center gap-1">{navButtons}</div>;
 }

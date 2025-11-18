@@ -12,7 +12,7 @@ import {
 
 const REQUIRED_DAILY_HOURS = 8;
 import { renderTimeSummary } from "@/features/account/dashboard/components/render-time-summary.js";
-import { renderMonthlyCalendar } from "@/features/account/dashboard/components/monthly_calendar_component.js";
+import { MonthlyCalendar } from "@/features/account/dashboard/components/monthly-calendar.js";
 import { tsBuildUrl } from "@/shared/utils/paths.js";
 import { accountDashboardContract } from "@/features/account/dashboard/contract.js";
 import { ClientInferRequest } from "@ts-rest/core";
@@ -158,7 +158,7 @@ export function renderDashboard(req: Request, authContext: AuthContext) {
       </div>
       <div class="flex flex-row gap-4 w-full">
         <div class="w-1/2">
-          ${renderMonthlyCalendar({
+          ${MonthlyCalendar({
             selectedDate: selectedDate,
             hxTarget: "#time-tracking-content",
             dayHoursMap: dayHoursMap,

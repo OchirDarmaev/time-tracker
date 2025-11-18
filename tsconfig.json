@@ -15,7 +15,10 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "types": ["node"]
+    "types": ["node", "@kitajs/html/htmx.d.ts"],
+    "jsx": "react-jsx",
+    "jsxImportSource": "@kitajs/html",
+    "plugins": [{ "name": "@kitajs/ts-html-plugin" }]
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]

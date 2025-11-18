@@ -1,4 +1,3 @@
-import { html } from "@/shared/utils/html";
 import { getAllDaysInMonth, formatDate } from "@/shared/utils/date_utils";
 import { accountDashboardContract } from "@/features/account/dashboard/contract";
 import { tsBuildUrl } from "@/shared/utils/paths";
@@ -35,12 +34,12 @@ function getProjectColor(projectId: number, projects: Project[]): string {
   return project?.color || DEFAULT_PROJECT_COLOR;
 }
 
-function renderCircleDiagram(
+function CircleDiagram(
   breakdown: DayProjectBreakdown[],
   projects: Project[],
   totalHours: number,
   size: number = 48
-): string {
+): JSX.Element {
   if (!breakdown || breakdown.length === 0) {
     return "";
   }
@@ -60,7 +59,7 @@ function renderCircleDiagram(
   const innerRadius = size / 2 - 6; // Ring thickness of 4
   let currentAngle = -Math.PI / 2; // Start at top
 
-  const paths: string[] = [];
+  const paths: JSX.Element[] = [];
 
   // Small reduction per segment to create gaps (in radians)
   const segmentReduction = 0.12; // ~1.7 degrees per segment
@@ -91,25 +90,25 @@ function renderCircleDiagram(
       const largeArcFlag = angle > Math.PI ? 1 : 0;
       // Create ring segment path: outer arc -> line to inner end -> inner arc back -> close
       const pathData = `M ${x1Outer} ${y1Outer} A ${outerRadius} ${outerRadius} 0 ${largeArcFlag} 1 ${x2Outer} ${y2Outer} L ${x2Inner} ${y2Inner} A ${innerRadius} ${innerRadius} 0 ${largeArcFlag} 0 ${x1Inner} ${y1Inner} Z`;
-      paths.push(`<path d="${pathData}" fill="${color}" stroke="none" />`);
+      paths.push(<path d={pathData} fill={color} stroke="none" />);
     }
 
     // Move to end of segment (gap is created by the reduction in angle)
     currentAngle = endAngle + segmentReduction;
   });
 
-  return html`
+  return (
     <svg
-      viewBox="0 0 ${size} ${size}"
+      viewBox={`0 0 ${size} ${size}`}
       class="absolute inset-0 m-auto pointer-events-none w-full h-full"
-      style="z-index: 0;"
+      style={{ zIndex: 0 }}
     >
-      ${paths.join("")}
+      {paths}
     </svg>
-  `;
+  );
 }
 
-export function renderMonthlyCalendar(props: MonthlyCalendarProps): string {
+export function MonthlyCalendar(props: MonthlyCalendarProps): JSX.Element {
   const {
     selectedDate,
 
@@ -183,7 +182,7 @@ export function renderMonthlyCalendar(props: MonthlyCalendarProps): string {
 
   const dayButtons = gridDays.map((day) => {
     if (day.isEmpty) {
-      return html`<div class="aspect-square"></div>`;
+      return <div class="aspect-square"></div>;
     }
 
     const hours = dayHoursMap[day.date] || 0;
@@ -199,15 +198,17 @@ export function renderMonthlyCalendar(props: MonthlyCalendarProps): string {
     // Circle diagram showing project proportions (ring around number)
     // Ring fills proportionally to 8-hour goal
     const breakdown = dayProjectBreakdown[day.date] || [];
-    const circleDiagram = hasHours ? renderCircleDiagram(breakdown, projects, hours, 48) : "";
+    const circleDiagram = hasHours ? CircleDiagram(breakdown, projects, hours, 48) : "";
 
     // Small orange circle indicator when hours exceed required
-    const overLimitIndicator = isOverLimit
-      ? html`<span
-          class="absolute top-1 right-1 w-2 h-2 rounded-full bg-orange-500 z-20"
-          title="Over ${REQUIRED_DAILY_HOURS} hours"
-        ></span>`
-      : "";
+    const overLimitIndicator = isOverLimit ? (
+      <span
+        class="absolute top-1 right-1 w-2 h-2 rounded-full bg-orange-500 z-20"
+        title="Over ${REQUIRED_DAILY_HOURS} hours"
+      ></span>
+    ) : (
+      ""
+    );
 
     // Background for selected state only
     const bgClass = isSelected
@@ -239,64 +240,64 @@ export function renderMonthlyCalendar(props: MonthlyCalendarProps): string {
       title += " - Workday";
     }
 
-    return html`
+    return (
       <button
         type="button"
-        class="relative flex items-center justify-center aspect-square rounded-lg border border-transparent ${bgClass} ${textClass} hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-150 focus:outline-none focus:ring-1 focus:ring-gray-400 dark:focus:ring-gray-600"
-        hx-get="${tsBuildUrl(accountDashboardContract.dashboard, {
+        class={`relative flex items-center justify-center aspect-square rounded-lg border border-transparent ${bgClass} ${textClass} hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-150 focus:outline-none focus:ring-1 focus:ring-gray-400 dark:focus:ring-gray-600`}
+        hx-get={tsBuildUrl(accountDashboardContract.dashboard, {
           headers: {},
           query: {
             date: day.date,
           },
-        })}"
-        ${hxTarget ? `hx-target="${hxTarget}"` : ""}
+        })}
+        hx-target={hxTarget}
         hx-swap="outerHTML transition:true"
         hx-trigger="click"
         hx-scroll="false"
-        title="${title}"
+        title={title}
       >
-        ${circleDiagram}
-        <span class="text-sm font-light relative z-10">${day.dayNumber}</span>
-        ${overLimitIndicator}
+        {circleDiagram}
+        <span class="text-sm font-light relative z-10">{day.dayNumber}</span>
+        {overLimitIndicator}
       </button>
-    `;
+    );
   });
 
   const weekDayHeaders = ["M", "T", "W", "T", "F", "S", "S"];
 
-  return html`
+  return (
     <div class="mb-6">
       <div class="flex justify-between items-center">
         <div class="flex items-center justify-between mb-4">
           <button
             type="button"
             class="px-3 py-1 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors duration-150 focus:outline-none focus:ring-1 focus:ring-gray-400 dark:focus:ring-gray-600"
-            hx-get="${tsBuildUrl(accountDashboardContract.dashboard, {
+            hx-get={tsBuildUrl(accountDashboardContract.dashboard, {
               headers: {},
               query: {
                 date: prevMonthDateStr,
               },
-            })}"
-            ${hxTarget ? `hx-target="${hxTarget}"` : ""}
+            })}
+            hx-target={hxTarget}
             hx-swap="outerHTML transition:true"
             hx-trigger="click"
             hx-scroll="false"
           >
             &lt;
           </button>
-          <h3 class="text-lg font-light text-gray-900 dark:text-gray-100 tracking-wide">
-            ${monthName} ${year}
+          <h3 safe class="text-lg font-light text-gray-900 dark:text-gray-100 tracking-wide">
+            {`${monthName} ${year}`}
           </h3>
           <button
             type="button"
             class="px-3 py-1 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors duration-150 focus:outline-none focus:ring-1 focus:ring-gray-400 dark:focus:ring-gray-600"
-            hx-get="${tsBuildUrl(accountDashboardContract.dashboard, {
+            hx-get={tsBuildUrl(accountDashboardContract.dashboard, {
               headers: {},
               query: {
                 date: nextMonthDateStr,
               },
-            })}"
-            ${hxTarget ? `hx-target="${hxTarget}"` : ""}
+            })}
+            hx-target={hxTarget}
             hx-swap="outerHTML transition:true"
             hx-trigger="click"
             hx-scroll="false"
@@ -308,13 +309,13 @@ export function renderMonthlyCalendar(props: MonthlyCalendarProps): string {
           <button
             type="button"
             class="px-4 py-1 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors duration-150 focus:outline-none focus:ring-1 focus:ring-gray-400 dark:focus:ring-gray-600"
-            hx-get="${tsBuildUrl(accountDashboardContract.dashboard, {
+            hx-get={tsBuildUrl(accountDashboardContract.dashboard, {
               headers: {},
               query: {
                 date: today,
               },
-            })}"
-            ${hxTarget ? `hx-target="${hxTarget}"` : ""}
+            })}
+            hx-target={hxTarget}
             hx-swap="outerHTML transition:true"
             hx-trigger="click"
             hx-scroll="false"
@@ -324,17 +325,13 @@ export function renderMonthlyCalendar(props: MonthlyCalendarProps): string {
         </div>
       </div>
       <div class="grid grid-cols-7 gap-2">
-        ${weekDayHeaders
-          .map(
-            (day) => html`
-              <div class="text-center text-xs font-light text-gray-500 dark:text-gray-500 pb-2">
-                ${day}
-              </div>
-            `
-          )
-          .join("")}
-        ${dayButtons.join("")}
+        {weekDayHeaders.map((day) => (
+          <div safe class="text-center text-xs font-light text-gray-500 dark:text-gray-500 pb-2">
+            {day}
+          </div>
+        ))}
+        {dayButtons}
       </div>
     </div>
-  `;
+  );
 }

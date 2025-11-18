@@ -9,7 +9,7 @@ import { formatDate, getMonthFromDate, minutesToHours } from "@/shared/utils/dat
 import { validateDate, validateMinutes } from "@/shared/utils/validation.js";
 import { renderEntriesTable } from "./views/entries_table.js";
 import { Dashboard } from "./views/dashboard.js";
-import { renderBaseLayout } from "@/shared/utils/layout.js";
+import { Layout } from "@/shared/utils/layout.js";
 import { renderTimeSlider } from "@/features/account/dashboard/components/render-time-slider.js";
 import { tsBuildUrl } from "../../../shared/utils/paths.js";
 import { renderSummary } from "./views/summary.js";
@@ -49,7 +49,7 @@ export const accountTimeRouter = s.router(accountDashboardContract, {
 
     return {
       status: 200,
-      body: String(renderBaseLayout(Dashboard(req, req.req), req.req, "account")),
+      body: String(Layout(Dashboard(req, req.req), req.req, "account")),
     };
   },
   accountDashboardEntries: async ({ query, req }) => {

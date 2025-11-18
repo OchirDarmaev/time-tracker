@@ -1,4 +1,5 @@
 import { minutesToHours } from "@/shared/utils/date_utils.js";
+import { MonthlySummaryData } from "../getMonthlySummaryData";
 
 function getWarningBadge(hours: number, required: number): JSX.Element | "" {
   if (required === 0) return "";
@@ -20,10 +21,7 @@ function getHoursColor(hours: number, required: number): string {
   return "text-gray-900 dark:text-gray-100";
 }
 
-export function renderSummary(
-  reported: { workdaysMinutes: number; public_holidaysMinutes: number; totalMinutes: number },
-  expected: { workdaysMinutes: number; public_holidaysMinutes: number }
-): JSX.Element {
+export function MonthlySummary({ reported, expected }: MonthlySummaryData): JSX.Element {
   // Convert minutes to hours
   const workdayHours = minutesToHours(reported.workdaysMinutes);
   const requiredWorkdayHours = minutesToHours(expected.workdaysMinutes);

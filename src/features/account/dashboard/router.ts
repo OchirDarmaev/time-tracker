@@ -4,21 +4,19 @@ import { AuthContext } from "@/shared/middleware/auth_stub.js";
 import { isAuthContext } from "@/shared/middleware/isAuthContext.js";
 import { timeEntryModel } from "@/shared/models/time_entry.js";
 import { projectModel } from "@/shared/models/project.js";
-import { calendarModel } from "@/shared/models/calendar.js";
-import { formatDate, getMonthFromDate, minutesToHours } from "@/shared/utils/date_utils.js";
+import { formatDate, minutesToHours } from "@/shared/utils/date_utils.js";
 import { validateDate, validateMinutes } from "@/shared/utils/validation.js";
 import { renderEntriesTable } from "./views/entries_table.js";
 import { Dashboard } from "./views/dashboard.js";
 import { Layout } from "@/shared/utils/layout.js";
 import { renderTimeSlider } from "@/features/account/dashboard/components/render-time-slider.js";
 import { tsBuildUrl } from "../../../shared/utils/paths.js";
-import { renderSummary } from "./views/summary.js";
 
-const REQUIRED_DAILY_HOURS = 8;
+export const REQUIRED_DAILY_HOURS = 8;
 
 const s = initServer();
 
-const HOLIDAY_PROJECT_NAME = "Holiday";
+export const HOLIDAY_PROJECT_NAME = "Holiday";
 export const accountTimeRouter = s.router(accountDashboardContract, {
   dashboard: async (req) => {
     if (!isAuthContext(req.req)) {
@@ -283,75 +281,6 @@ export const accountTimeRouter = s.router(accountDashboardContract, {
       syncUrl: tsBuildUrl(accountDashboardContract.syncDashboardEntries, {}),
     });
 
-    return {
-      status: 200,
-      body: String(html),
-    };
-  },
-
-  accountDashboardSummary: async ({ query, req }) => {
-    const authReq = req as unknown as AuthContext;
-
-    if (!authReq.currentUser) {
-      return {
-        status: 401,
-        body: { body: "Unauthorized" },
-      };
-    }
-    if (!authReq.currentUser.roles.includes("account")) {
-      return {
-        status: 403,
-        body: { body: "Forbidden" },
-      };
-    }
-
-    const currentUser = authReq.currentUser;
-    const date = (query?.date as string) || formatDate(new Date());
-
-    if (!validateDate(date)) {
-      return {
-        status: 400,
-        body: { body: "Invalid date" },
-      };
-    }
-
-    const month = getMonthFromDate(date);
-    const monthlyEntries = timeEntryModel.getByUserIdAndMonth(currentUser.id, month);
-    const projects = projectModel.getByUserId(currentUser.id);
-
-    const reported = monthlyEntries.reduce(
-      (acc, entry) => {
-        const project = projects.find((p) => p.id === entry.project_id);
-        if (project?.name === HOLIDAY_PROJECT_NAME) {
-          acc.public_holidaysMinutes += entry.minutes;
-        } else {
-          acc.workdaysMinutes += entry.minutes;
-        }
-        acc.totalMinutes += entry.minutes;
-
-        return acc;
-      },
-      { workdaysMinutes: 0, public_holidaysMinutes: 0, totalMinutes: 0 }
-    );
-    // Get calendar days for the month
-    const calendarDays = calendarModel.getByMonth(month);
-
-    const expected = calendarDays.reduce(
-      (acc, day) => {
-        if (day.day_type === "workday") {
-          acc.workdaysMinutes += REQUIRED_DAILY_HOURS * 60;
-        } else if (day.day_type === "public_holiday") {
-          acc.public_holidaysMinutes += REQUIRED_DAILY_HOURS * 60;
-        }
-        return acc;
-      },
-      {
-        workdaysMinutes: 0,
-        public_holidaysMinutes: 0,
-      }
-    );
-
-    const html = renderSummary(reported, expected);
     return {
       status: 200,
       body: String(html),

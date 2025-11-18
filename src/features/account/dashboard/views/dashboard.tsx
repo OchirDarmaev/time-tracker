@@ -10,11 +10,12 @@ import {
 } from "@/shared/utils/date_utils.js";
 
 const REQUIRED_DAILY_HOURS = 8;
-import { renderTimeSummary } from "@/features/account/dashboard/components/render-time-summary.js";
 import { MonthlyCalendar } from "@/features/account/dashboard/components/monthly-calendar.js";
 import { tsBuildUrl } from "@/shared/utils/paths.js";
 import { accountDashboardContract } from "@/features/account/dashboard/contract.js";
 import { ClientInferRequest } from "@ts-rest/core";
+import { getMonthlySummaryData } from "../getMonthlySummaryData";
+import { MonthlySummary } from "./MonthlySummary";
 
 type Request = ClientInferRequest<typeof accountDashboardContract.dashboard>;
 
@@ -99,6 +100,8 @@ export function Dashboard(req: Request, authContext: AuthContext): JSX.Element {
     },
   });
 
+  const { reported, expected } = getMonthlySummaryData(selectedDate, currentUser);
+
   return (
     <div
       id="time-tracking-content"
@@ -145,15 +148,16 @@ export function Dashboard(req: Request, authContext: AuthContext): JSX.Element {
           </div>
           <div class="h-12 w-px bg-gray-300 dark:bg-gray-600 self-stretch"></div>
           <div class="flex-1 min-w-[160px]">
-            {renderTimeSummary({
-              hxGet: tsBuildUrl(accountDashboardContract.accountDashboardSummary, {
+            {/* <TimeSummary
+              hxGet={tsBuildUrl(accountDashboardContract.accountDashboardSummary, {
                 headers: {},
                 query: {
                   date: selectedDate,
                 },
-              }),
-              hxTrigger: "load, entries-changed from:body",
-            })}
+              })}
+              hxTrigger="none"
+            /> */}
+            <MonthlySummary reported={reported} expected={expected} />
           </div>
         </div>
       </div>

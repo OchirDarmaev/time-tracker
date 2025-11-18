@@ -2,6 +2,7 @@ import { tsBuildUrl } from "../../../../shared/utils/paths";
 import { accountDashboardContract } from "../contract";
 
 export interface Segment {
+  entry_id?: number;
   project_id: number;
   minutes: number;
   comment?: string | null;
@@ -20,7 +21,7 @@ export interface TimeSliderProps {
   segments: Segment[];
   projects: Project[];
   date: string;
-  syncUrl: string;
+  hxTarget?: string;
 }
 
 function getProjectColor(project: Project): { bg: string; solid: string } {
@@ -60,7 +61,7 @@ function hoursToMinutes(hours: number): number {
 }
 
 export function TimeSlider(props: TimeSliderProps): JSX.Element {
-  const { totalHours, segments, projects, date, syncUrl } = props;
+  const { totalHours, segments, projects, date, hxTarget } = props;
 
   const totalMinutes = hoursToMinutes(totalHours);
 
@@ -106,12 +107,7 @@ export function TimeSlider(props: TimeSliderProps): JSX.Element {
   });
 
   return (
-    <div
-      class="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-3 shadow-sm my-4 w-full max-w-full box-border"
-      id="time-slider-container"
-      hx-target="this"
-      hx-swap="innerHTML"
-    >
+    <div class="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-3 shadow-sm my-4 w-full max-w-full box-border">
       <div class="mb-4 pb-3 border-b border-gray-300 dark:border-gray-700">
         <div class="mb-2">
           <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 tracking-wide block">
@@ -141,56 +137,39 @@ export function TimeSlider(props: TimeSliderProps): JSX.Element {
               return (
                 <form
                   hx-post={tsBuildUrl(accountDashboardContract.createDashboardEntry, {})}
-                  hx-target="#time-slider-container"
-                  hx-swap="outerHTML"
-                  hx-trigger="click"
+                  hx-target={hxTarget}
+                  hx-swap="outerHTML transition:true"
+                  hx-trigger="submit"
+                  hx-scroll="false"
                   class="inline-block"
                 >
                   <input type="hidden" name="date" value={date} />
                   <input type="hidden" name="project_id" value={String(project.id)} />
                   <input type="hidden" name="hours" value={minutesToHours(3600).toFixed(1)} />
                   <input type="hidden" name="comment" value="" />
+                  <button
+                    type="submit"
+                    class="px-2 py-1 text-xs font-medium rounded-md border"
+                    style={`border-color: ${color.solid}; color: ${color.solid};`}
+                    safe
+                  >
+                    {project.name}
+                  </button>
                 </form>
               );
             }
             return (
               <form
-                hx-post={syncUrl}
-                hx-target="#time-slider-container"
-                hx-swap="outerHTML"
-                hx-trigger="click"
+                hx-post={tsBuildUrl(accountDashboardContract.addDashboardSegment, {})}
+                hx-target={hxTarget}
+                hx-swap="outerHTML transition:true"
+                hx-trigger="submit"
+                hx-scroll="false"
                 class="inline-block"
               >
                 <input type="hidden" name="date" value={date} />
-                {segments.map((segment, idx) => (
-                  <>
-                    <input
-                      type="hidden"
-                      name={`segments[${idx}][project_id]`}
-                      value={String(segment.project_id)}
-                    />
-                    <input
-                      type="hidden"
-                      name={`segments[${idx}][minutes]`}
-                      value={String(segment.minutes)}
-                    />
-                    {segment.comment ? (
-                      <input
-                        type="hidden"
-                        name={`segments[${idx}][comment]`}
-                        value={segment.comment}
-                      />
-                    ) : (
-                      ""
-                    )}
-                  </>
-                ))}
-                <input
-                  type="hidden"
-                  name={`segments[${segments.length}][project_id]`}
-                  value={String(project.id)}
-                />
-                <input type="hidden" name={`segments[${segments.length}][minutes]`} value="60" />
+                <input type="hidden" name="project_id" value={String(project.id)} />
+                <input type="hidden" name="minutes" value="60" />
                 <button
                   type="submit"
                   class="px-2 py-1 text-xs font-medium rounded-md border"
@@ -235,7 +214,7 @@ export function TimeSlider(props: TimeSliderProps): JSX.Element {
       <div class="mt-4 pt-3 border-t border-gray-300 dark:border-gray-700">
         {segments.length === 0
           ? ""
-          : segments.map((segment, index) => {
+          : segments.map((segment, _index) => {
               const project = projects.find((p) => p.id === segment.project_id);
               const color = project
                 ? getProjectColor(project)
@@ -263,38 +242,15 @@ export function TimeSlider(props: TimeSliderProps): JSX.Element {
                     </div>
                   </div>
                   <form
-                    hx-post={syncUrl}
-                    hx-target="#time-slider-container"
-                    hx-swap="outerHTML"
-                    hx-trigger="click"
+                    hx-delete={tsBuildUrl(accountDashboardContract.deleteDashboardSegment, {
+                      params: { entryId: segment.entry_id! },
+                    })}
+                    hx-target={hxTarget}
+                    hx-swap="outerHTML transition:true"
+                    hx-trigger="submit"
+                    hx-scroll="false"
                     class="ml-3"
                   >
-                    <input type="hidden" name="date" value={date} />
-                    {segments
-                      .filter((_, i) => i !== index)
-                      .map((segment, idx) => (
-                        <>
-                          <input
-                            type="hidden"
-                            name={`segments[${idx}][project_id]`}
-                            value={String(segment.project_id)}
-                          />
-                          <input
-                            type="hidden"
-                            name={`segments[${idx}][minutes]`}
-                            value={String(segment.minutes)}
-                          />
-                          {segment.comment ? (
-                            <input
-                              type="hidden"
-                              name={`segments[${idx}][comment]`}
-                              value={segment.comment}
-                            />
-                          ) : (
-                            ""
-                          )}
-                        </>
-                      ))}
                     <button
                       type="submit"
                       class="text-xs text-red-600 dark:text-red-400 hover:underline"

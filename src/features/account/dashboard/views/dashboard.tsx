@@ -11,7 +11,6 @@ import {
 
 const REQUIRED_DAILY_HOURS = 8;
 import { MonthlyCalendar } from "@/features/account/dashboard/components/monthly-calendar.js";
-import { tsBuildUrl } from "@/shared/utils/paths.js";
 import { accountDashboardContract } from "@/features/account/dashboard/contract.js";
 import { ClientInferRequest } from "@ts-rest/core";
 import { getMonthlySummaryData } from "../getMonthlySummaryData";
@@ -94,14 +93,6 @@ export function Dashboard(req: Request, authContext: AuthContext): JSX.Element {
           ? "text-red-600 dark:text-red-400"
           : "text-gray-600 dark:text-gray-400";
 
-  // Add HTMX trigger to refresh calendar when entries change
-  const dashboardUrl = tsBuildUrl(accountDashboardContract.dashboard, {
-    headers: {},
-    query: {
-      date: req.query.date,
-    },
-  });
-
   const { reported, expected } = getMonthlySummaryData(selectedDate, currentUser);
   const timeSliderData = getTimeSliderData(currentUser, selectedDate);
 
@@ -109,10 +100,7 @@ export function Dashboard(req: Request, authContext: AuthContext): JSX.Element {
     <div
       id="time-tracking-content"
       class="space-y-4"
-      hx-get={dashboardUrl}
-      hx-target="this"
-      hx-swap="innerHTML transition:true"
-      hx-trigger="entries-changed from:body"
+      style={{ viewTransitionName: "time-tracking-content" }}
     >
       {/* Enhanced Status Bar */}
       <div class="bg-linear-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-3 shadow-sm">
@@ -187,7 +175,7 @@ export function Dashboard(req: Request, authContext: AuthContext): JSX.Element {
             segments={timeSliderData.segmentsForSlider}
             projects={timeSliderData.projects}
             date={selectedDate}
-            syncUrl={tsBuildUrl(accountDashboardContract.syncDashboardEntries, {})}
+            hxTarget="#time-tracking-content"
           />
         </div>
       </div>

@@ -106,6 +106,32 @@ export const timeEntryModel = {
     db.prepare("DELETE FROM time_entries WHERE id = ?").run(id);
   },
 
+  update(
+    id: number,
+    updates: {
+      minutes?: number;
+      comment?: string | null;
+    }
+  ): TimeEntry | undefined {
+    const entry = this.getById(id);
+    if (!entry) {
+      return undefined;
+    }
+
+    const minutes = updates.minutes !== undefined ? updates.minutes : entry.minutes;
+    const comment = updates.comment !== undefined ? updates.comment : entry.comment;
+
+    db.prepare(
+      `
+      UPDATE time_entries
+      SET minutes = ?, comment = ?
+      WHERE id = ?
+    `
+    ).run(minutes, comment, id);
+
+    return this.getById(id);
+  },
+
   getTotalMinutesByUserAndDate(userId: number, date: string): number {
     const result = db
       .prepare(

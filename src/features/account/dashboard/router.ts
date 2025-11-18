@@ -1,4 +1,5 @@
 import { initServer } from "@ts-rest/express";
+import { ClientInferRequest } from "@ts-rest/core";
 import { accountDashboardContract } from "./contract.js";
 import { AuthContext } from "@/shared/middleware/auth_stub.js";
 import { isAuthContext } from "@/shared/middleware/isAuthContext.js";
@@ -9,9 +10,6 @@ import { validateDate, validateMinutes } from "@/shared/utils/validation.js";
 import { renderEntriesTable } from "./views/entries_table.js";
 import { Dashboard } from "./views/dashboard.js";
 import { Layout } from "@/shared/utils/layout.js";
-import { TimeSlider } from "@/features/account/dashboard/components/TimeSlider.js";
-import { tsBuildUrl } from "../../../shared/utils/paths.js";
-import { getTimeSliderData } from "./getTimeSliderData.js";
 
 export const REQUIRED_DAILY_HOURS = 8;
 
@@ -138,12 +136,15 @@ export const accountTimeRouter = s.router(accountDashboardContract, {
 
     timeEntryModel.create(currentUser.id, project.id, date, minutes, comment || null);
 
-    const projects = projectModel.getByUserId(currentUser.id);
-    const entries = timeEntryModel.getByUserIdAndDate(currentUser.id, date);
-    const html = renderEntriesTable(entries, projects);
+    // Return the full dashboard to update everything
+    const dashboardReq: ClientInferRequest<typeof accountDashboardContract.dashboard> = {
+      query: { date: String(date) },
+      headers: { "hx-request": "true" },
+    };
+
     return {
       status: 200,
-      body: String(html),
+      body: String(Dashboard(dashboardReq, authReq)),
     };
   },
 
@@ -183,97 +184,186 @@ export const accountTimeRouter = s.router(accountDashboardContract, {
     timeEntryModel.delete(params.entryId);
 
     const date = entry.date;
-    const projects = projectModel.getByUserId(currentUser.id);
-    const entries = timeEntryModel.getByUserIdAndDate(currentUser.id, date);
-    const html = renderEntriesTable(entries, projects);
+
+    // Return the full dashboard to update everything
+    const dashboardReq: ClientInferRequest<typeof accountDashboardContract.dashboard> = {
+      query: { date: String(date) },
+      headers: { "hx-request": "true" },
+    };
+
     return {
       status: 200,
-      body: String(html),
+      body: String(Dashboard(dashboardReq, authReq)),
     };
   },
-  syncDashboardEntries: async ({ body, req }) => {
+  addDashboardSegment: async ({ body, req }) => {
     const authReq = req as unknown as AuthContext;
 
     if (!authReq.currentUser) {
       return {
         status: 401,
-        body: { success: false },
+        body: { body: "Unauthorized" },
       };
     }
     if (!authReq.currentUser.roles.includes("account")) {
       return {
         status: 403,
-        body: { success: false },
+        body: { body: "Forbidden" },
       };
     }
 
     const currentUser = authReq.currentUser;
-    const {
-      date,
-      segments,
-      // planned_hours
-    } = body;
+    const { date, project_id, minutes, comment } = body;
 
     if (!validateDate(date)) {
       return {
         status: 400,
-        body: { success: false },
+        body: { body: "Invalid date" },
       };
     }
 
-    // Verify user has access to all projects
+    if (!validateMinutes(minutes)) {
+      return {
+        status: 400,
+        body: { body: "Invalid minutes" },
+      };
+    }
+
+    // Verify user has access to project
     const userProjects = projectModel.getByUserId(currentUser.id);
-    const projectIds = new Set(userProjects.map((p) => p.id));
-
-    if (segments) {
-      for (const segment of segments) {
-        if (!projectIds.has(segment.project_id)) {
-          return {
-            status: 403,
-            body: { success: false },
-          };
-        }
-        if (!validateMinutes(segment.minutes)) {
-          return {
-            status: 400,
-            body: { success: false },
-          };
-        }
-      }
+    const project = userProjects.find((p) => p.id === project_id);
+    if (!project) {
+      return {
+        status: 403,
+        body: { body: "Access denied to this project" },
+      };
     }
 
-    // Delete all existing entries for this date and user
-    const existingEntries = timeEntryModel.getByUserIdAndDate(currentUser.id, date);
-    for (const entry of existingEntries) {
-      timeEntryModel.delete(entry.id);
-    }
+    // Create the entry
+    timeEntryModel.create(currentUser.id, project_id, date, minutes, comment || null);
 
-    if (segments) {
-      // Create new entries from segments
-      for (const segment of segments) {
-        timeEntryModel.create(
-          currentUser.id,
-          segment.project_id,
-          date,
-          segment.minutes,
-          segment.comment || null
-        );
-      }
-    }
-    // Re-fetch entries and projects to render updated slider
-    const { sliderTotalHours, segmentsForSlider, projects } = getTimeSliderData(currentUser, date);
-
-    const html = TimeSlider({
-      totalHours: sliderTotalHours,
-      segments: segmentsForSlider,
-      projects,
-      date,
-      syncUrl: tsBuildUrl(accountDashboardContract.syncDashboardEntries, {}),
-    });
+    // Return the full dashboard to update everything
+    const dashboardReq: ClientInferRequest<typeof accountDashboardContract.dashboard> = {
+      query: { date: String(date) },
+      headers: { "hx-request": "true" },
+    };
 
     return {
       status: 200,
-      body: String(html),
+      body: String(Dashboard(dashboardReq, authReq)),
+    };
+  },
+  updateDashboardSegment: async ({ params, body, req }) => {
+    const authReq = req as unknown as AuthContext;
+
+    if (!authReq.currentUser) {
+      return {
+        status: 401,
+        body: { body: "Unauthorized" },
+      };
+    }
+    if (!authReq.currentUser.roles.includes("account")) {
+      return {
+        status: 403,
+        body: { body: "Forbidden" },
+      };
+    }
+
+    const currentUser = authReq.currentUser;
+    const entry = timeEntryModel.getById(params.entryId);
+
+    if (!entry) {
+      return {
+        status: 404,
+        body: { body: "Entry not found" },
+      };
+    }
+
+    if (entry.user_id !== currentUser.id) {
+      return {
+        status: 403,
+        body: { body: "Access denied" },
+      };
+    }
+
+    // Validate minutes if provided
+    if (body.minutes !== undefined && !validateMinutes(body.minutes)) {
+      return {
+        status: 400,
+        body: { body: "Invalid minutes" },
+      };
+    }
+
+    // Update the entry
+    const updated = timeEntryModel.update(params.entryId, {
+      minutes: body.minutes,
+      comment: body.comment,
+    });
+
+    if (!updated) {
+      return {
+        status: 404,
+        body: { body: "Entry not found" },
+      };
+    }
+
+    // Return the full dashboard to update everything
+    const dashboardReq: ClientInferRequest<typeof accountDashboardContract.dashboard> = {
+      query: { date: String(entry.date) },
+      headers: { "hx-request": "true" },
+    };
+
+    return {
+      status: 200,
+      body: String(Dashboard(dashboardReq, authReq)),
+    };
+  },
+
+  deleteDashboardSegment: async ({ params, req }) => {
+    const authReq = req as unknown as AuthContext;
+
+    if (!authReq.currentUser) {
+      return {
+        status: 401,
+        body: { body: "Unauthorized" },
+      };
+    }
+    if (!authReq.currentUser.roles.includes("account")) {
+      return {
+        status: 403,
+        body: { body: "Forbidden" },
+      };
+    }
+
+    const currentUser = authReq.currentUser;
+    const entry = timeEntryModel.getById(params.entryId);
+
+    if (!entry) {
+      return {
+        status: 404,
+        body: { body: "Entry not found" },
+      };
+    }
+
+    if (entry.user_id !== currentUser.id) {
+      return {
+        status: 403,
+        body: { body: "Access denied" },
+      };
+    }
+
+    const date = entry.date;
+    timeEntryModel.delete(params.entryId);
+
+    // Return the full dashboard to update everything
+    const dashboardReq: ClientInferRequest<typeof accountDashboardContract.dashboard> = {
+      query: { date: String(date) },
+      headers: { "hx-request": "true" },
+    };
+
+    return {
+      status: 200,
+      body: String(Dashboard(dashboardReq, authReq)),
     };
   },
 });

@@ -76,10 +76,10 @@ export function renderEntriesTable(entries: TimeEntry[], projects: Project[]): J
                   hx-delete={tsBuildUrl(accountDashboardContract.deleteDashboardEntry, {
                     params: { entryId: entry.id },
                   })}
-                  hx-target="#entries-container"
-                  hx-swap="innerHTML transition:true"
+                  hx-target="#time-tracking-content"
+                  hx-swap="outerHTML transition:true"
                   hx-confirm="Delete this entry?"
-                  {...{ "hx-on::after-request": "htmx.trigger('body', 'entries-changed')" }}
+                  hx-scroll="false"
                   class="bg-transparent text-red-500 dark:text-red-400 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-xs font-medium cursor-pointer hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-500 dark:hover:border-red-400"
                 >
                   Delete

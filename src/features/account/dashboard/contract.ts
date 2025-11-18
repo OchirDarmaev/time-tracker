@@ -52,26 +52,44 @@ export const accountDashboardContract = c.router({
       404: z.any(),
     },
   },
-  syncDashboardEntries: {
+  addDashboardSegment: {
     method: "POST",
-    path: "/account/dashboard/sync",
+    path: "/account/dashboard/segments",
     body: z.object({
       date: z.string().date(),
-      segments: z
-        .array(
-          z.object({
-            project_id: z.coerce.number(),
-            minutes: z.coerce.number().min(0),
-            comment: z.string().optional(),
-          })
-        )
-        .optional(),
-      // planned_hours: z.coerce.number().min(8).max(24),
+      project_id: z.coerce.number(),
+      minutes: z.coerce.number().min(0),
+      comment: z.string().optional(),
     }),
     responses: {
       200: htmlResponse,
       400: z.any(),
       403: z.any(),
+    },
+  },
+  updateDashboardSegment: {
+    method: "PATCH",
+    path: "/account/dashboard/segments/:entryId",
+    pathParams: z.object({ entryId: z.coerce.number() }),
+    body: z.object({
+      minutes: z.coerce.number().min(0).optional(),
+      comment: z.string().optional(),
+    }),
+    responses: {
+      200: htmlResponse,
+      400: z.any(),
+      403: z.any(),
+      404: z.any(),
+    },
+  },
+  deleteDashboardSegment: {
+    method: "DELETE",
+    path: "/account/dashboard/segments/:entryId",
+    pathParams: z.object({ entryId: z.coerce.number() }),
+    responses: {
+      200: htmlResponse,
+      403: z.any(),
+      404: z.any(),
     },
   },
 });

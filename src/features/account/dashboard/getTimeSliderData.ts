@@ -21,6 +21,7 @@ export function getTimeSliderData(
   const sliderTotalHours = Math.max(totalHours, REQUIRED_DAILY_HOURS);
 
   const segmentsForSlider = entries.map((entry) => ({
+    entry_id: entry.id,
     project_id: entry.project_id,
     minutes: entry.minutes,
     comment: entry.comment || null,

@@ -8,17 +8,17 @@ Feature: Warning for insufficient time
     Given I am a user
     And I have tracked time for today
     When my daily total is less than 8 hours
-    Then I should see a red warning indicator
+    Then I should see a red warning indicator on the daily status
 
-  Scenario: Show yellow warning when monthly total is insufficient
+  Scenario: Show yellow warning when monthly total is over the expected hours
     Given I am a user
     And I have tracked time for the current month
-    When my monthly total is less than workingDays × 8 hours
+    When my monthly total is more than expected hours
     Then I should see a yellow warning indicator
-    And working days should be calculated as weekdays minus weekends
+    And working days should be calculated as weekdays based on system calendar provided by manager
 
-  Scenario: Calculate working days correctly
+  Scenario: Calculate expected hours correctly
     Given I am a user
     When the system provides required monthly hours
-    Then working days should count only weekdays (Mon-Fri)
-    And holidays should be optional in the calculation
+    Then working days should count only weekdays based on system calendar provided by manager
+    And public holidays should represent all public holidays based on system calendar provided by manager

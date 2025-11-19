@@ -269,7 +269,7 @@ export function TimeSlider(props: TimeSliderProps): JSX.Element {
                         value={hours.toFixed(1)}
                         min="0"
                         step="0.5"
-                        class="text-lg font-semibold text-gray-700 dark:text-gray-300 bg-transparent border-none outline-none w-16 text-right focus:bg-gray-100 dark:focus:bg-gray-800 px-1 py-0.5 rounded"
+                        class="text-lg font-semibold text-gray-700 dark:text-gray-300 bg-transparent border-none outline-none w-20 text-right focus:bg-gray-100 dark:focus:bg-gray-800 px-1 py-0.5 rounded [&::-webkit-inner-spin-button]:opacity-100 [&::-webkit-outer-spin-button]:opacity-100 [&::-webkit-inner-spin-button]:block [&::-webkit-outer-spin-button]:block"
                         onchange={`this.form.querySelector('input[name=minutes]').value = Math.round(parseFloat(this.value) * 60)`}
                       />
                       <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">h</span>

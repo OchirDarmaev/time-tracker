@@ -406,6 +406,9 @@
   .w-16 {
     width: calc(var(--spacing) * 16);
   }
+  .w-20 {
+    width: calc(var(--spacing) * 20);
+  }
   .w-\[60px\] {
     width: 60px;
   }
@@ -1362,6 +1365,26 @@
       &:focus {
         --tw-ring-color: var(--color-gray-600);
       }
+    }
+  }
+  .\[\&\:\:-webkit-inner-spin-button\]\:block {
+    &::-webkit-inner-spin-button {
+      display: block;
+    }
+  }
+  .\[\&\:\:-webkit-inner-spin-button\]\:opacity-100 {
+    &::-webkit-inner-spin-button {
+      opacity: 100%;
+    }
+  }
+  .\[\&\:\:-webkit-outer-spin-button\]\:block {
+    &::-webkit-outer-spin-button {
+      display: block;
+    }
+  }
+  .\[\&\:\:-webkit-outer-spin-button\]\:opacity-100 {
+    &::-webkit-outer-spin-button {
+      opacity: 100%;
     }
   }
 }

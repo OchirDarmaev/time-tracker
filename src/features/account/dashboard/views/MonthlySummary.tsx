@@ -1,9 +1,10 @@
 import { minutesToHours } from "@/shared/utils/date_utils.js";
 import { MonthlySummaryData } from "../getMonthlySummaryData";
+import { REQUIRED_DAILY_HOURS } from "../router";
 
 function getWarningBadge(hours: number, required: number): JSX.Element | "" {
   if (required === 0) return "";
-  if (hours !== required) {
+  if (hours > required) {
     return (
       <span class="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-medium bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400">
         ⚠ Mismatch
@@ -15,7 +16,7 @@ function getWarningBadge(hours: number, required: number): JSX.Element | "" {
 
 function getHoursColor(hours: number, required: number): string {
   if (required === 0) return "text-gray-600 dark:text-gray-400";
-  if (hours !== required) {
+  if (hours > required) {
     return "text-yellow-600 dark:text-yellow-400";
   }
   return "text-gray-900 dark:text-gray-100";
@@ -50,83 +51,93 @@ export function MonthlySummary({ reported, expected }: MonthlySummaryData): JSX.
   const overtimeColor =
     overtimeHours > 0 ? "text-orange-600 dark:text-orange-400" : "text-gray-600 dark:text-gray-400";
 
+  const totalDays = (workdayHours + publicHolidayHours) / REQUIRED_DAILY_HOURS;
+
   return (
-    <div class="space-y-3">
+    <div class="flex justify-between flex-row gap-4 w-full">
       {/* Monthly Total - Most Important */}
       <div>
-        <div class="text-[10px] font-medium mb-1 text-gray-600 dark:text-gray-400 uppercase tracking-wide">
-          Monthly Total
+        <div class="text-[10px] font-medium mb-1 text-gray-600 dark:text-gray-400  tracking-wide">
+          Monthly Total: {totalDays} days
         </div>
         <div class="flex items-baseline gap-2 flex-wrap">
-          <span class={`text-lg font-bold ${totalHoursColor}`} safe>
+          <span class={`text-lg font-bold ${totalHoursColor}`} safe title="Total reported hours">
             {`${totalMonthlyHours.toFixed(1)}h`}
           </span>
-          <span class="text-xs text-gray-500 dark:text-gray-400" safe>
-            / {`${totalRequiredHours.toFixed(1)}h`}
+          <span class="text-xs text-gray-500 dark:text-gray-400" safe title="Total required hours">
+            {`/ ${totalRequiredHours.toFixed(1)}h`}
           </span>
           {hasTotalMismatch ? getWarningBadge(totalMonthlyHours, totalRequiredHours) : ""}
         </div>
       </div>
 
       {/* Breakdown by Type */}
-      <div class="space-y-1.5 pt-1 border-t border-gray-200 dark:border-gray-700">
-        <div class="flex items-baseline justify-between gap-2 flex-wrap">
-          <span class="text-[10px] font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">
-            Workday
+      <div class="flex flex-col items-baseline justify-between gap-2 flex-wrap">
+        <span class="text-[10px] font-medium text-gray-600 dark:text-gray-400  tracking-wide">
+          Workdays: {workdayHours / REQUIRED_DAILY_HOURS} days
+        </span>
+        <div class="flex items-baseline gap-2 flex-wrap">
+          <span
+            class={`text-xs font-semibold ${getHoursColor(workdayHours, requiredWorkdayHours)}`}
+            safe
+            title="Workday reported hours"
+          >
+            {`${workdayHours.toFixed(1)}h`}
           </span>
-          <div class="flex items-baseline gap-1.5 flex-wrap">
-            <span
-              class={`text-xs font-semibold ${getHoursColor(workdayHours, requiredWorkdayHours)}`}
-              safe
-            >
-              {`${workdayHours.toFixed(1)}h`}
-            </span>
-            <span safe class="text-[10px] text-gray-500 dark:text-gray-400">
-              / {`${requiredWorkdayHours.toFixed(1)}h`}
-            </span>
-            {getWarningBadge(workdayHours, requiredWorkdayHours)}
-          </div>
+          <span
+            class="text-[10px] text-gray-500 dark:text-gray-400"
+            safe
+            title="Workday required hours"
+          >
+            {`/ ${requiredWorkdayHours.toFixed(1)}h`}
+          </span>
+          {getWarningBadge(workdayHours, requiredWorkdayHours)}
         </div>
-        <div class="flex items-baseline justify-between gap-2 flex-wrap">
-          <span class="text-[10px] font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">
-            Public Holiday
+      </div>
+      <div class="flex flex-col items-baseline justify-between gap-2 flex-wrap">
+        <span class="text-[10px] font-medium text-gray-600 dark:text-gray-400  tracking-wide">
+          Public Holidays: {publicHolidayHours / REQUIRED_DAILY_HOURS} days
+        </span>
+        <div class="flex items-baseline gap-2 flex-wrap">
+          <span
+            class={`text-xs font-semibold ${getHoursColor(
+              publicHolidayHours,
+              requiredPublicHolidayHours
+            )}`}
+            safe
+            title="Public holiday reported hours"
+          >
+            {`${publicHolidayHours.toFixed(1)}h`}
           </span>
-          <div class="flex items-baseline gap-1.5 flex-wrap">
+          <span
+            class="text-[10px] text-gray-500 dark:text-gray-400"
+            safe
+            title="Public holiday required hours"
+          >
+            {`/ ${requiredPublicHolidayHours.toFixed(1)}h`}
+          </span>
+          {getWarningBadge(publicHolidayHours, requiredPublicHolidayHours)}
+          {publicHolidayHasWarning && publicHolidayOvertimeHours > 0 ? (
             <span
-              class={`text-xs font-semibold ${getHoursColor(
-                publicHolidayHours,
-                requiredPublicHolidayHours
-              )}`}
+              class="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-medium bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400"
               safe
             >
-              {`${publicHolidayHours.toFixed(1)}h`}
+              {`⚠ + ${publicHolidayOvertimeHours.toFixed(1)}h`}
             </span>
-            <span safe class="text-[10px] text-gray-500 dark:text-gray-400">
-              {`/ ${requiredPublicHolidayHours.toFixed(1)}h`}
-            </span>
-            {getWarningBadge(publicHolidayHours, requiredPublicHolidayHours)}
-            {publicHolidayHasWarning && publicHolidayOvertimeHours > 0 ? (
-              <span
-                safe
-                class="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-medium bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400"
-              >
-                {`⚠ + ${publicHolidayOvertimeHours.toFixed(1)}h`}
-              </span>
-            ) : (
-              ""
-            )}
-          </div>
+          ) : (
+            ""
+          )}
         </div>
       </div>
 
       {/* Overtime - Derived Metric */}
-      <div class="pt-1 border-t border-gray-200 dark:border-gray-700">
-        <div class="text-[10px] font-medium mb-1 text-gray-600 dark:text-gray-400 uppercase tracking-wide">
+      <div>
+        <div class="text-[10px] font-medium mb-1 text-gray-600 dark:text-gray-400  tracking-wide">
           Overtime
         </div>
         <div class="flex items-baseline gap-2 flex-wrap">
           <span class={`text-sm font-bold ${overtimeColor}`} safe>
-            {`${overtimeHours.toFixed(1)}h `}
+            {`${overtimeHours.toFixed(1)}h`}
           </span>
           {overtimeHours > 0 ? (
             <span class="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-medium bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400">

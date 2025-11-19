@@ -1,5 +1,7 @@
 import { tsBuildUrl } from "../../../../shared/utils/paths";
 import { accountDashboardContract } from "../contract";
+import { DailyStatus } from "./daily_status";
+import { DayType } from "./monthly-calendar";
 
 export interface Segment {
   entry_id?: number;
@@ -17,7 +19,8 @@ export interface Project {
 }
 
 export interface TimeSliderProps {
-  totalHours: number;
+  reportedHours: number;
+  dayType: DayType | undefined;
   segments: Segment[];
   projects: Project[];
   date: string;
@@ -61,9 +64,9 @@ function hoursToMinutes(hours: number): number {
 }
 
 export function TimeSlider(props: TimeSliderProps): JSX.Element {
-  const { totalHours, segments, projects, date, hxTarget } = props;
+  const { reportedHours, dayType, segments, projects, date, hxTarget } = props;
 
-  const totalMinutes = hoursToMinutes(totalHours);
+  const totalMinutes = hoursToMinutes(reportedHours);
 
   // Sort projects: regular projects first, then system projects
   const sortedProjects = [...projects].sort((a, b) => {
@@ -188,16 +191,7 @@ export function TimeSlider(props: TimeSliderProps): JSX.Element {
         </div>
       </div>
 
-      <div class="flex justify-end items-center mb-3">
-        <div class="flex items-center gap-3">
-          <label class="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400 font-medium">
-            <span class="block">Total Hours:</span>
-            <div class="text-gray-900 dark:text-gray-100 rounded-md px-2 py-1 text-xs w-[60px] block">
-              {totalHours}
-            </div>
-          </label>
-        </div>
-      </div>
+      <DailyStatus dayType={dayType} reportedHours={reportedHours} />
 
       <div class="relative my-4">
         <div class="relative h-16 bg-linear-to-r from-gray-200 via-teal-50/5 to-gray-200 dark:from-gray-700 dark:via-teal-900/5 dark:to-gray-700 rounded-md border border-gray-300 dark:border-gray-600 overflow-visible min-h-[64px]">
@@ -211,7 +205,7 @@ export function TimeSlider(props: TimeSliderProps): JSX.Element {
         </div>
         <div class="flex justify-between mt-1 text-[10px] text-gray-500 dark:text-gray-400">
           <span class="font-medium">0h</span>
-          <span class="font-medium">{totalHours}h</span>
+          <span class="font-medium">{reportedHours}h</span>
         </div>
       </div>
 

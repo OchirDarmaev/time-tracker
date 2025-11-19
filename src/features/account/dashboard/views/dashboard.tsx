@@ -111,7 +111,7 @@ export function Dashboard(req: Request, authContext: AuthContext): JSX.Element {
             </div>
             <div class="flex items-baseline gap-2 flex-wrap">
               <span class={`text-2xl font-bold ${statusColor}`} safe>
-                ({totalHours.toFixed(1)}h)
+                {totalHours.toFixed(1)}h
               </span>
               {requiresDailyHours ? (
                 <span class="text-sm text-gray-500 dark:text-gray-400">

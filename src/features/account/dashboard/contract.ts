@@ -31,9 +31,9 @@ export const accountDashboardContract = c.router({
     method: "POST",
     path: "/account/dashboard/entries",
     body: z.object({
-      project_id: z.string(),
-      date: z.string(),
-      hours: z.string(),
+      project_id: z.coerce.number(),
+      date: z.string().date(),
+      minutes: z.coerce.number().min(0).default(0),
       comment: z.string().optional(),
     }),
     responses: {

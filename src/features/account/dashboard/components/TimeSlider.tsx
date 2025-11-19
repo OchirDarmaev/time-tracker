@@ -136,20 +136,24 @@ export function TimeSlider(props: TimeSliderProps): JSX.Element {
             if (isActive) {
               return (
                 <form
-                  hx-post={tsBuildUrl(accountDashboardContract.createDashboardEntry, {})}
+                  hx-delete={tsBuildUrl(accountDashboardContract.deleteDashboardSegment, {
+                    params: {
+                      entryId: segments.find((s) => s.project_id === project.id)!.entry_id!,
+                    },
+                  })}
                   hx-target={hxTarget}
                   hx-swap="outerHTML transition:true"
                   hx-trigger="submit"
                   hx-scroll="false"
-                  class="inline-block"
+                  class="inline-block drop-shadow-lg drop-shadow-indigo-500/50"
                 >
                   <input type="hidden" name="date" value={date} />
                   <input type="hidden" name="project_id" value={String(project.id)} />
-                  <input type="hidden" name="hours" value={minutesToHours(3600).toFixed(1)} />
+                  {/* <input type="hidden" name="hours" value={minutesToHours(3600).toFixed(1)} /> */}
                   <input type="hidden" name="comment" value="" />
                   <button
                     type="submit"
-                    class="px-2 py-1 text-xs font-medium rounded-md border"
+                    class="px-2 py-1 text-xs font-medium rounded-md border outline-2 "
                     style={`border-color: ${color.solid}; color: ${color.solid};`}
                     safe
                   >
@@ -169,7 +173,7 @@ export function TimeSlider(props: TimeSliderProps): JSX.Element {
               >
                 <input type="hidden" name="date" value={date} />
                 <input type="hidden" name="project_id" value={String(project.id)} />
-                <input type="hidden" name="minutes" value="60" />
+                <input type="hidden" name="minutes" value={String(0)} />
                 <button
                   type="submit"
                   class="px-2 py-1 text-xs font-medium rounded-md border"

@@ -101,24 +101,17 @@ export const accountTimeRouter = s.router(accountDashboardContract, {
     }
 
     const currentUser = authReq.currentUser;
-    const { project_id, date, hours, comment } = body;
-
-    if (!validateDate(date)) {
-      return {
-        status: 400,
-        body: { body: "Invalid date" },
-      };
+    const { project_id, date, minutes, comment } = body;
+    let localMinutes = 0;
+    if (!minutes) {
+      // get all available minutes  for current user in that day limit 8 hours
+      const availableMinutes = timeEntryModel.getTotalMinutesByUserAndDate(currentUser.id, date);
+      localMinutes = Math.max(60, 8 * 60 - availableMinutes);
+    } else {
+      localMinutes = minutes;
     }
 
-    const minutes = Math.round(parseFloat(hours) * 60);
-    if (!validateMinutes(minutes)) {
-      return {
-        status: 400,
-        body: { body: "Invalid hours" },
-      };
-    }
-
-    const project = projectModel.getById(parseInt(project_id));
+    const project = projectModel.getById(project_id);
     if (!project) {
       return {
         status: 400,
@@ -134,7 +127,7 @@ export const accountTimeRouter = s.router(accountDashboardContract, {
       };
     }
 
-    timeEntryModel.create(currentUser.id, project.id, date, minutes, comment || null);
+    timeEntryModel.create(currentUser.id, project.id, date, localMinutes, comment || null);
 
     // Return the full dashboard to update everything
     const dashboardReq: ClientInferRequest<typeof accountDashboardContract.dashboard> = {
@@ -215,18 +208,13 @@ export const accountTimeRouter = s.router(accountDashboardContract, {
     const currentUser = authReq.currentUser;
     const { date, project_id, minutes, comment } = body;
 
-    if (!validateDate(date)) {
-      return {
-        status: 400,
-        body: { body: "Invalid date" },
-      };
-    }
-
-    if (!validateMinutes(minutes)) {
-      return {
-        status: 400,
-        body: { body: "Invalid minutes" },
-      };
+    let localMinutes: number;
+    if (!minutes) {
+      // get all available minutes  for current user in that day limit 8 hours
+      const availableMinutes = timeEntryModel.getTotalMinutesByUserAndDate(currentUser.id, date);
+      localMinutes = Math.max(60, 8 * 60 - availableMinutes);
+    } else {
+      localMinutes = minutes;
     }
 
     // Verify user has access to project
@@ -240,7 +228,7 @@ export const accountTimeRouter = s.router(accountDashboardContract, {
     }
 
     // Create the entry
-    timeEntryModel.create(currentUser.id, project_id, date, minutes, comment || null);
+    timeEntryModel.create(currentUser.id, project_id, date, localMinutes, comment || null);
 
     // Return the full dashboard to update everything
     const dashboardReq: ClientInferRequest<typeof accountDashboardContract.dashboard> = {

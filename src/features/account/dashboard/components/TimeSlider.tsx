@@ -226,24 +226,55 @@ export function TimeSlider(props: TimeSliderProps): JSX.Element {
               const hours = minutesToHours(segment.minutes);
 
               return (
-                <div class="flex justify-between items-center p-2 bg-gray-50 dark:bg-gray-900 rounded-md mb-2 border border-gray-200 dark:border-gray-700">
-                  <div class="flex items-center gap-3 flex-1">
+                <div class="flex justify-between items-start p-2 bg-gray-50 dark:bg-gray-900 rounded-md mb-2 border border-gray-200 dark:border-gray-700">
+                  <div class="flex items-start gap-3 flex-1">
                     <div class="w-4 h-4 rounded" style={`background: ${color.solid};`}></div>
                     <div class="flex-1">
                       <div class="text-xs font-medium text-gray-900 dark:text-gray-100">
                         {project ? project.name : "Unknown"}
                       </div>
-                      {segment.comment ? (
-                        <div safe class="text-[10px] text-gray-600 dark:text-gray-400 italic mt-1">
-                          {segment.comment}
-                        </div>
-                      ) : (
-                        ""
-                      )}
+                      <form
+                        hx-patch={tsBuildUrl(accountDashboardContract.updateDashboardSegment, {
+                          params: { entryId: segment.entry_id! },
+                        })}
+                        hx-target={hxTarget}
+                        hx-swap="outerHTML transition:true"
+                        hx-trigger="change delay:500ms"
+                        hx-scroll="false"
+                        class="mt-1"
+                      >
+                        <textarea
+                          name="comment"
+                          rows="5"
+                          placeholder="Add comment..."
+                          class="text-base text-gray-900 dark:text-gray-100 font-normal leading-relaxed bg-transparent border-none outline-none w-full focus:bg-gray-100 dark:focus:bg-gray-800 px-3 py-2 rounded placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                          safe
+                        >
+                          {segment.comment || ""}
+                        </textarea>
+                      </form>
                     </div>
-                    <div safe class="text-xs font-semibold text-gray-700 dark:text-gray-300">
-                      {hours.toFixed(1)}h
-                    </div>
+                    <form
+                      hx-patch={tsBuildUrl(accountDashboardContract.updateDashboardSegment, {
+                        params: { entryId: segment.entry_id! },
+                      })}
+                      hx-target={hxTarget}
+                      hx-swap="outerHTML transition:true"
+                      hx-trigger="change from:input[type=number]"
+                      hx-scroll="false"
+                      class="flex items-center gap-1"
+                    >
+                      <input
+                        type="number"
+                        value={hours.toFixed(1)}
+                        min="0"
+                        step="0.5"
+                        class="text-lg font-semibold text-gray-700 dark:text-gray-300 bg-transparent border-none outline-none w-16 text-right focus:bg-gray-100 dark:focus:bg-gray-800 px-1 py-0.5 rounded"
+                        onchange={`this.form.querySelector('input[name=minutes]').value = Math.round(parseFloat(this.value) * 60)`}
+                      />
+                      <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">h</span>
+                      <input type="hidden" name="minutes" value={String(segment.minutes)} />
+                    </form>
                   </div>
                   <form
                     hx-delete={tsBuildUrl(accountDashboardContract.deleteDashboardSegment, {

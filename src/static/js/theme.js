@@ -32,3 +32,4 @@ function updateThemeIcon(theme) {
 }
 
 document.addEventListener("DOMContentLoaded", () => updateThemeIcon(localStorage.getItem("theme")));
+

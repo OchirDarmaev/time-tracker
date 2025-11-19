@@ -33,9 +33,9 @@ app.use(
   })
 );
 
-// Serve static CSS files
-app.use("/public/styles", express.static("public/styles"));
-app.use("/public/js", express.static("public/js"));
+// Serve static CSS and JS files from dist
+app.use("/static/styles", express.static("dist/static/styles"));
+app.use("/static/js", express.static("dist/static/js"));
 
 createExpressEndpoints(authContract, authRouter, app, {
   responseValidation: false,

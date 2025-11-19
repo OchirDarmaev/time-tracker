@@ -15,7 +15,7 @@ export function renderRoot(): JSX.Element {
           href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
           rel="stylesheet"
         />
-        <link href="/public/styles/output.css" rel="stylesheet" />
+        <link href="/static/styles/output.css" rel="stylesheet" />
       </head>
       <body class="bg-gray-950 text-gray-100 min-h-screen flex items-center justify-center">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">

@@ -27,9 +27,9 @@ export function Layout(
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
         rel="stylesheet"
       />
-      <link href="/public/styles/output.css" rel="stylesheet" />
+      <link href="/static/styles/output.css" rel="stylesheet" />
       <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js"></script>
-      <script src="/public/js/theme.js" />
+      <script src="/static/js/theme.min.js"></script>
       {/* Top Navigation Bar */}
       <nav
         class="px-6 flex items-center justify-between bg-gray-100 dark:bg-gray-800 border-b border-gray-300 dark:border-gray-700 backdrop-blur-sm sticky top-0 z-100 h-16"

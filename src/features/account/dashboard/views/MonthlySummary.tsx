@@ -50,13 +50,16 @@ export function MonthlySummary({ reported, expected }: MonthlySummaryData): JSX.
   const totalDays = (workdayHours + publicHolidayHours) / REQUIRED_DAILY_HOURS;
 
   return (
-    <div class="flex justify-between flex-row gap-4 w-full">
+    <div class="grid grid-cols-4 gap-4 w-full">
       {/* Monthly Total - Most Important */}
-      <div>
-        <div class="text-[10px] font-medium mb-1 text-gray-600 dark:text-gray-400  tracking-wide">
-          Monthly Total: {totalDays} days
+      <div class="min-w-0">
+        <div
+          class="text-[10px] font-medium mb-1 text-gray-600 dark:text-gray-400 tracking-wide"
+          safe
+        >
+          Monthly Total: {totalDays.toFixed(1)} days
         </div>
-        <div class="flex items-baseline gap-2 flex-wrap">
+        <div class="flex items-baseline gap-2 flex-wrap min-h-[24px]">
           <span class={`text-lg font-bold ${totalHoursColor}`} safe title="Total reported hours">
             {`${totalMonthlyHours.toFixed(1)}h`}
           </span>
@@ -67,12 +70,15 @@ export function MonthlySummary({ reported, expected }: MonthlySummaryData): JSX.
         </div>
       </div>
 
-      {/* Breakdown by Type */}
-      <div class="flex flex-col items-baseline justify-between gap-2 flex-wrap">
-        <span class="text-[10px] font-medium text-gray-600 dark:text-gray-400  tracking-wide">
-          Workdays: {workdayHours / REQUIRED_DAILY_HOURS} days
-        </span>
-        <div class="flex items-baseline gap-2 flex-wrap">
+      {/* Workdays */}
+      <div class="min-w-0">
+        <div
+          class="text-[10px] font-medium mb-1 text-gray-600 dark:text-gray-400 tracking-wide"
+          safe
+        >
+          Workdays: {(workdayHours / REQUIRED_DAILY_HOURS).toFixed(1)} days
+        </div>
+        <div class="flex items-baseline gap-2 flex-wrap min-h-[24px]">
           <span
             class={`text-xs font-semibold ${getHoursColor(workdayHours, requiredWorkdayHours)}`}
             safe
@@ -90,11 +96,16 @@ export function MonthlySummary({ reported, expected }: MonthlySummaryData): JSX.
           {getWarningBadge(workdayHours, requiredWorkdayHours)}
         </div>
       </div>
-      <div class="flex flex-col items-baseline justify-between gap-2 flex-wrap">
-        <span class="text-[10px] font-medium text-gray-600 dark:text-gray-400  tracking-wide">
-          Public Holidays: {publicHolidayHours / REQUIRED_DAILY_HOURS} days
-        </span>
-        <div class="flex items-baseline gap-2 flex-wrap">
+
+      {/* Public Holidays */}
+      <div class="min-w-0">
+        <div
+          class="text-[10px] font-medium mb-1 text-gray-600 dark:text-gray-400 tracking-wide"
+          safe
+        >
+          Public Holidays: {(publicHolidayHours / REQUIRED_DAILY_HOURS).toFixed(1)} days
+        </div>
+        <div class="flex items-baseline gap-2 flex-wrap min-h-[24px]">
           <span
             class={`text-xs font-semibold ${getHoursColor(
               publicHolidayHours,
@@ -127,11 +138,11 @@ export function MonthlySummary({ reported, expected }: MonthlySummaryData): JSX.
       </div>
 
       {/* Overtime - Derived Metric */}
-      <div>
-        <div class="text-[10px] font-medium mb-1 text-gray-600 dark:text-gray-400  tracking-wide">
+      <div class="min-w-0">
+        <div class="text-[10px] font-medium mb-1 text-gray-600 dark:text-gray-400 tracking-wide">
           Overtime
         </div>
-        <div class="flex items-baseline gap-2 flex-wrap">
+        <div class="flex items-baseline gap-2 flex-wrap min-h-[24px]">
           <span class={`text-sm font-bold ${overtimeColor}`} safe>
             {`${overtimeHours.toFixed(1)}h`}
           </span>

@@ -260,7 +260,7 @@ export function TimeSlider(props: TimeSliderProps): JSX.Element {
                       })}
                       hx-target={hxTarget}
                       hx-swap="outerHTML transition:true"
-                      hx-trigger="change from:input[type=number]"
+                      hx-trigger="change"
                       hx-scroll="false"
                       class="flex items-center gap-1"
                     >

@@ -5,7 +5,7 @@ export interface TimeEntry {
   user_id: number;
   project_id: number;
   date: string;
-  minutes: number;
+  hours: number;
   comment: string | null;
 }
 
@@ -84,17 +84,17 @@ export const timeEntryModel = {
     userId: number,
     projectId: number,
     date: string,
-    minutes: number,
+    hours: number,
     comment: string | null
   ): TimeEntry {
     const result = db
       .prepare(
         `
-      INSERT INTO time_entries (user_id, project_id, date, minutes, comment)
+      INSERT INTO time_entries (user_id, project_id, date, hours, comment)
       VALUES (?, ?, ?, ?, ?)
     `
       )
-      .run(userId, projectId, date, minutes, comment);
+      .run(userId, projectId, date, hours, comment);
     return this.getById(result.lastInsertRowid as number)!;
   },
 
@@ -109,7 +109,7 @@ export const timeEntryModel = {
   update(
     id: number,
     updates: {
-      minutes?: number;
+      hours?: number;
       comment?: string | null;
     }
   ): TimeEntry | undefined {
@@ -118,25 +118,25 @@ export const timeEntryModel = {
       return undefined;
     }
 
-    const minutes = updates.minutes !== undefined ? updates.minutes : entry.minutes;
+    const hours = updates.hours !== undefined ? updates.hours : entry.hours;
     const comment = updates.comment !== undefined ? updates.comment : entry.comment;
 
     db.prepare(
       `
       UPDATE time_entries
-      SET minutes = ?, comment = ?
+      SET hours = ?, comment = ?
       WHERE id = ?
     `
-    ).run(minutes, comment, id);
+    ).run(hours, comment, id);
 
     return this.getById(id);
   },
 
-  getTotalMinutesByUserAndDate(userId: number, date: string): number {
+  getTotalHoursByUserAndDate(userId: number, date: string): number {
     const result = db
       .prepare(
         `
-      SELECT COALESCE(SUM(minutes), 0) as total
+      SELECT COALESCE(SUM(hours), 0) as total
       FROM time_entries
       WHERE user_id = ? AND date = ?
     `

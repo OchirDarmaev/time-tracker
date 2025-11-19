@@ -12,7 +12,7 @@ export interface Project {
 
 export interface DayProjectBreakdown {
   project_id: number;
-  minutes: number;
+  hours: number;
 }
 
 export type DayType = "workday" | "public_holiday" | "weekend";
@@ -44,8 +44,8 @@ function CircleDiagram(
     return "";
   }
 
-  const totalMinutes = breakdown.reduce((sum, item) => sum + item.minutes, 0);
-  if (totalMinutes === 0) {
+  const totalBreakdownHours = breakdown.reduce((sum, item) => sum + item.hours, 0);
+  if (totalBreakdownHours === 0) {
     return "";
   }
 
@@ -66,7 +66,7 @@ function CircleDiagram(
 
   breakdown.forEach((item) => {
     // Calculate this project's proportion of total logged time
-    const projectPercentage = item.minutes / totalMinutes;
+    const projectPercentage = item.hours / totalBreakdownHours;
     // This project's angle within the filled portion
     const angle = projectPercentage * totalFillAngle - segmentReduction;
     const endAngle = currentAngle + angle;

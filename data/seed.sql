@@ -107,3 +107,104 @@ VALUES ('2025-11-01', 'weekend'),
        ('2025-11-29', 'weekend'),
        ('2025-11-30', 'weekend');
 
+-- Time entries for account-1@mail.com (first half of November 2025)
+-- November 3 (Monday) - Workday
+INSERT OR IGNORE INTO time_entries (user_id, project_id, date, hours, comment)
+SELECT u.id, p.id, '2025-11-03', 5.0, 'Working on jupiter project features #development'
+FROM users u, projects p
+WHERE u.email = 'account-1@mail.com' AND p.name = 'jupiter';
+
+INSERT OR IGNORE INTO time_entries (user_id, project_id, date, hours, comment)
+SELECT u.id, p.id, '2025-11-03', 3.0, 'Mars project code review #review'
+FROM users u, projects p
+WHERE u.email = 'account-1@mail.com' AND p.name = 'mars';
+
+-- November 4 (Tuesday) - Workday
+INSERT OR IGNORE INTO time_entries (user_id, project_id, date, hours, comment)
+SELECT u.id, p.id, '2025-11-04', 4.5, 'Jupiter project implementation'
+FROM users u, projects p
+WHERE u.email = 'account-1@mail.com' AND p.name = 'jupiter';
+
+INSERT OR IGNORE INTO time_entries (user_id, project_id, date, hours, comment)
+SELECT u.id, p.id, '2025-11-04', 3.5, 'Mars project bug fixes #bugfix'
+FROM users u, projects p
+WHERE u.email = 'account-1@mail.com' AND p.name = 'mars';
+
+-- November 5 (Wednesday) - Workday
+INSERT OR IGNORE INTO time_entries (user_id, project_id, date, hours, comment)
+SELECT u.id, p.id, '2025-11-05', 8.0, 'Full day on jupiter project #development'
+FROM users u, projects p
+WHERE u.email = 'account-1@mail.com' AND p.name = 'jupiter';
+
+-- November 6 (Thursday) - Workday
+INSERT OR IGNORE INTO time_entries (user_id, project_id, date, hours, comment)
+SELECT u.id, p.id, '2025-11-06', 3.0, 'Jupiter project meetings'
+FROM users u, projects p
+WHERE u.email = 'account-1@mail.com' AND p.name = 'jupiter';
+
+INSERT OR IGNORE INTO time_entries (user_id, project_id, date, hours, comment)
+SELECT u.id, p.id, '2025-11-06', 5.0, 'Mars project development #development'
+FROM users u, projects p
+WHERE u.email = 'account-1@mail.com' AND p.name = 'mars';
+
+-- November 7 (Friday) - Workday
+INSERT OR IGNORE INTO time_entries (user_id, project_id, date, hours, comment)
+SELECT u.id, p.id, '2025-11-07', 2.5, 'Jupiter project documentation'
+FROM users u, projects p
+WHERE u.email = 'account-1@mail.com' AND p.name = 'jupiter';
+
+INSERT OR IGNORE INTO time_entries (user_id, project_id, date, hours, comment)
+SELECT u.id, p.id, '2025-11-07', 5.5, 'Mars project testing and deployment #testing'
+FROM users u, projects p
+WHERE u.email = 'account-1@mail.com' AND p.name = 'mars';
+
+-- November 10 (Monday) - Workday
+INSERT OR IGNORE INTO time_entries (user_id, project_id, date, hours, comment)
+SELECT u.id, p.id, '2025-11-10', 6.0, 'Jupiter project new features #development'
+FROM users u, projects p
+WHERE u.email = 'account-1@mail.com' AND p.name = 'jupiter';
+
+INSERT OR IGNORE INTO time_entries (user_id, project_id, date, hours, comment)
+SELECT u.id, p.id, '2025-11-10', 2.0, 'Mars project maintenance'
+FROM users u, projects p
+WHERE u.email = 'account-1@mail.com' AND p.name = 'mars';
+
+-- November 11 (Tuesday) - Workday
+INSERT OR IGNORE INTO time_entries (user_id, project_id, date, hours, comment)
+SELECT u.id, p.id, '2025-11-11', 4.0, 'Jupiter project refactoring #refactoring'
+FROM users u, projects p
+WHERE u.email = 'account-1@mail.com' AND p.name = 'jupiter';
+
+INSERT OR IGNORE INTO time_entries (user_id, project_id, date, hours, comment)
+SELECT u.id, p.id, '2025-11-11', 4.0, 'Mars project feature development #development'
+FROM users u, projects p
+WHERE u.email = 'account-1@mail.com' AND p.name = 'mars';
+
+-- November 12 (Wednesday) - Workday
+INSERT OR IGNORE INTO time_entries (user_id, project_id, date, hours, comment)
+SELECT u.id, p.id, '2025-11-12', 7.5, 'Jupiter project implementation and testing'
+FROM users u, projects p
+WHERE u.email = 'account-1@mail.com' AND p.name = 'jupiter';
+
+INSERT OR IGNORE INTO time_entries (user_id, project_id, date, hours, comment)
+SELECT u.id, p.id, '2025-11-12', 0.5, 'Quick mars project fix'
+FROM users u, projects p
+WHERE u.email = 'account-1@mail.com' AND p.name = 'mars';
+
+-- November 13 (Thursday) - Workday
+INSERT OR IGNORE INTO time_entries (user_id, project_id, date, hours, comment)
+SELECT u.id, p.id, '2025-11-13', 3.5, 'Jupiter project code review #review'
+FROM users u, projects p
+WHERE u.email = 'account-1@mail.com' AND p.name = 'jupiter';
+
+INSERT OR IGNORE INTO time_entries (user_id, project_id, date, hours, comment)
+SELECT u.id, p.id, '2025-11-13', 4.5, 'Mars project new module development #development'
+FROM users u, projects p
+WHERE u.email = 'account-1@mail.com' AND p.name = 'mars';
+
+-- November 14 (Friday) - Public Holiday
+INSERT OR IGNORE INTO time_entries (user_id, project_id, date, hours, comment)
+SELECT u.id, p.id, '2025-11-14', 8.0, 'Public holiday work'
+FROM users u, projects p
+WHERE u.email = 'account-1@mail.com' AND p.name = 'Holiday';
+

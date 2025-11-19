@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS time_entries (
     user_id INTEGER NOT NULL,
     project_id INTEGER NOT NULL,
     date TEXT NOT NULL,
-    minutes INTEGER NOT NULL,
+    hours REAL NOT NULL,
     comment TEXT,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE

@@ -33,7 +33,7 @@ export const accountDashboardContract = c.router({
     body: z.object({
       project_id: z.coerce.number(),
       date: z.string().date(),
-      minutes: z.coerce.number().min(0).default(0),
+      hours: z.coerce.number().min(0).default(0),
       comment: z.string().optional(),
     }),
     responses: {
@@ -58,7 +58,7 @@ export const accountDashboardContract = c.router({
     body: z.object({
       date: z.string().date(),
       project_id: z.coerce.number(),
-      minutes: z.coerce.number().min(0),
+      hours: z.coerce.number().min(0),
       comment: z.string().optional(),
     }),
     responses: {
@@ -72,7 +72,7 @@ export const accountDashboardContract = c.router({
     path: "/account/dashboard/segments/:entryId",
     pathParams: z.object({ entryId: z.coerce.number() }),
     body: z.object({
-      minutes: z.coerce.number().min(0).optional(),
+      hours: z.coerce.number().min(0).optional(),
       comment: z.string().optional(),
     }),
     responses: {

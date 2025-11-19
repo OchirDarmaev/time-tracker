@@ -7,13 +7,13 @@ import { HOLIDAY_PROJECT_NAME, REQUIRED_DAILY_HOURS } from "./router";
 
 export type MonthlySummaryData = {
   reported: {
-    workdaysMinutes: number;
-    public_holidaysMinutes: number;
-    totalMinutes: number;
+    workdaysHours: number;
+    public_holidaysHours: number;
+    totalHours: number;
   };
   expected: {
-    workdaysMinutes: number;
-    public_holidaysMinutes: number;
+    workdaysHours: number;
+    public_holidaysHours: number;
   };
 };
 
@@ -29,15 +29,15 @@ export function getMonthlySummaryData(
     (acc, entry) => {
       const project = projects.find((p) => p.id === entry.project_id);
       if (project?.name === HOLIDAY_PROJECT_NAME) {
-        acc.public_holidaysMinutes += entry.minutes;
+        acc.public_holidaysHours += entry.hours;
       } else {
-        acc.workdaysMinutes += entry.minutes;
+        acc.workdaysHours += entry.hours;
       }
-      acc.totalMinutes += entry.minutes;
+      acc.totalHours += entry.hours;
 
       return acc;
     },
-    { workdaysMinutes: 0, public_holidaysMinutes: 0, totalMinutes: 0 }
+    { workdaysHours: 0, public_holidaysHours: 0, totalHours: 0 }
   );
   // Get calendar days for the month
   const calendarDays = calendarModel.getByMonth(month);
@@ -45,15 +45,15 @@ export function getMonthlySummaryData(
   const expected = calendarDays.reduce(
     (acc, day) => {
       if (day.day_type === "workday") {
-        acc.workdaysMinutes += REQUIRED_DAILY_HOURS * 60;
+        acc.workdaysHours += REQUIRED_DAILY_HOURS;
       } else if (day.day_type === "public_holiday") {
-        acc.public_holidaysMinutes += REQUIRED_DAILY_HOURS * 60;
+        acc.public_holidaysHours += REQUIRED_DAILY_HOURS;
       }
       return acc;
     },
     {
-      workdaysMinutes: 0,
-      public_holidaysMinutes: 0,
+      workdaysHours: 0,
+      public_holidaysHours: 0,
     }
   );
   return { reported, expected };

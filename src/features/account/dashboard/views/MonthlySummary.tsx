@@ -1,4 +1,3 @@
-import { minutesToHours } from "@/shared/utils/date_utils.js";
 import { MonthlySummaryData } from "../getMonthlySummaryData";
 import { REQUIRED_DAILY_HOURS } from "../router";
 
@@ -23,28 +22,25 @@ function getHoursColor(hours: number, required: number): string {
 }
 
 export function MonthlySummary({ reported, expected }: MonthlySummaryData): JSX.Element {
-  // Convert minutes to hours
-  const workdayHours = minutesToHours(reported.workdaysMinutes);
-  const requiredWorkdayHours = minutesToHours(expected.workdaysMinutes);
-  const publicHolidayHours = minutesToHours(reported.public_holidaysMinutes);
-  const requiredPublicHolidayHours = minutesToHours(expected.public_holidaysMinutes);
+  const workdayHours = reported.workdaysHours;
+  const requiredWorkdayHours = expected.workdaysHours;
+  const publicHolidayHours = reported.public_holidaysHours;
+  const requiredPublicHolidayHours = expected.public_holidaysHours;
 
   // Calculate overtime and warnings
-  const totalExpectedMinutes = expected.workdaysMinutes + expected.public_holidaysMinutes;
-  const overtimeMinutes = Math.max(0, reported.totalMinutes - totalExpectedMinutes);
-  const overtimeHours = minutesToHours(overtimeMinutes);
+  const totalExpectedHours = expected.workdaysHours + expected.public_holidaysHours;
+  const overtimeHours = Math.max(0, reported.totalHours - totalExpectedHours);
 
   // Public holiday specific calculations
-  const publicHolidayOvertimeMinutes = Math.max(
+  const publicHolidayOvertimeHours = Math.max(
     0,
-    reported.public_holidaysMinutes - expected.public_holidaysMinutes
+    reported.public_holidaysHours - expected.public_holidaysHours
   );
-  const publicHolidayOvertimeHours = minutesToHours(publicHolidayOvertimeMinutes);
-  const publicHolidayHasWarning = reported.public_holidaysMinutes > expected.public_holidaysMinutes;
+  const publicHolidayHasWarning = reported.public_holidaysHours > expected.public_holidaysHours;
 
   // Calculate total monthly hours
-  const totalMonthlyHours = minutesToHours(reported.totalMinutes);
-  const totalRequiredHours = minutesToHours(totalExpectedMinutes);
+  const totalMonthlyHours = reported.totalHours;
+  const totalRequiredHours = totalExpectedHours;
   const totalHoursColor = getHoursColor(totalMonthlyHours, totalRequiredHours);
   const hasTotalMismatch = totalMonthlyHours !== totalRequiredHours;
 

@@ -1,6 +1,5 @@
 import { Project } from "@/shared/models/project.js";
 import { TimeEntry } from "@/shared/models/time_entry.js";
-import { minutesToHours } from "@/shared/utils/date_utils.js";
 import { accountDashboardContract } from "@/features/account/dashboard/contract.js";
 import { tsBuildUrl } from "@/shared/utils/paths.js";
 
@@ -50,7 +49,7 @@ export function renderEntriesTable(entries: TimeEntry[], projects: Project[]): J
                 <span safe>{projectMap.get(entry.project_id) || "Unknown"}</span>
               </td>
               <td class="px-5 py-4 font-semibold text-indigo-600 dark:text-indigo-400 text-sm">
-                <span safe>{minutesToHours(entry.minutes).toFixed(1)}h</span>
+                <span safe>{entry.hours.toFixed(1)}h</span>
               </td>
               <td class="px-5 py-4 text-sm">
                 {commentWithoutTags ? (

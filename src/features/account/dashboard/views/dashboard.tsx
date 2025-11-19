@@ -2,12 +2,7 @@ import { AuthContext } from "@/shared/middleware/auth_stub.js";
 import { projectModel } from "@/shared/models/project.js";
 import { timeEntryModel } from "@/shared/models/time_entry.js";
 import { calendarModel } from "@/shared/models/calendar.js";
-import {
-  formatDate,
-  minutesToHours,
-  getAllDaysInMonth,
-  getMonthFromDate,
-} from "@/shared/utils/date_utils.js";
+import { formatDate, getAllDaysInMonth, getMonthFromDate } from "@/shared/utils/date_utils.js";
 
 import { MonthlyCalendar } from "@/features/account/dashboard/components/monthly-calendar.js";
 import { accountDashboardContract } from "@/features/account/dashboard/contract.js";
@@ -30,7 +25,7 @@ export function Dashboard(req: Request, authContext: AuthContext): JSX.Element {
   const monthEntries = timeEntryModel.getByUserIdAndMonth(currentUser.id, month);
   const allDaysInMonth = getAllDaysInMonth(selectedDate);
   const dayHoursMap: Record<string, number> = {};
-  const dayProjectBreakdown: Record<string, Array<{ project_id: number; minutes: number }>> = {};
+  const dayProjectBreakdown: Record<string, Array<{ project_id: number; hours: number }>> = {};
 
   // Get calendar days for the current month
   const calendarDays = calendarModel.getByMonth(month);
@@ -50,7 +45,7 @@ export function Dashboard(req: Request, authContext: AuthContext): JSX.Element {
 
   // Calculate hours and project breakdown for each day from entries
   monthEntries.forEach((entry) => {
-    const hours = minutesToHours(entry.minutes);
+    const hours = entry.hours;
     dayHoursMap[entry.date] = (dayHoursMap[entry.date] || 0) + hours;
 
     // Add to project breakdown
@@ -61,11 +56,11 @@ export function Dashboard(req: Request, authContext: AuthContext): JSX.Element {
       (p) => p.project_id === entry.project_id
     );
     if (existingProject) {
-      existingProject.minutes += entry.minutes;
+      existingProject.hours += entry.hours;
     } else {
       dayProjectBreakdown[entry.date].push({
         project_id: entry.project_id,
-        minutes: entry.minutes,
+        hours: entry.hours,
       });
     }
   });

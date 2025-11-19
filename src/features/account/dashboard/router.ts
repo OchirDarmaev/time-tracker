@@ -6,7 +6,7 @@ import { isAuthContext } from "@/shared/middleware/isAuthContext.js";
 import { timeEntryModel } from "@/shared/models/time_entry.js";
 import { projectModel } from "@/shared/models/project.js";
 import { formatDate } from "@/shared/utils/date_utils.js";
-import { validateDate, validateMinutes } from "@/shared/utils/validation.js";
+import { validateDate, validateHours } from "@/shared/utils/validation.js";
 import { renderEntriesTable } from "./views/entries_table.js";
 import { Dashboard } from "./views/dashboard.js";
 import { Layout } from "@/shared/utils/layout.js";
@@ -101,14 +101,14 @@ export const accountTimeRouter = s.router(accountDashboardContract, {
     }
 
     const currentUser = authReq.currentUser;
-    const { project_id, date, minutes, comment } = body;
-    let localMinutes = 0;
-    if (!minutes) {
-      // get all available minutes  for current user in that day limit 8 hours
-      const availableMinutes = timeEntryModel.getTotalMinutesByUserAndDate(currentUser.id, date);
-      localMinutes = Math.max(60, 8 * 60 - availableMinutes);
+    const { project_id, date, hours, comment } = body;
+    let localHours = 0;
+    if (!hours) {
+      // get all available hours for current user in that day limit 8 hours
+      const availableHours = timeEntryModel.getTotalHoursByUserAndDate(currentUser.id, date);
+      localHours = Math.max(1, REQUIRED_DAILY_HOURS - availableHours);
     } else {
-      localMinutes = minutes;
+      localHours = hours;
     }
 
     const project = projectModel.getById(project_id);
@@ -127,7 +127,7 @@ export const accountTimeRouter = s.router(accountDashboardContract, {
       };
     }
 
-    timeEntryModel.create(currentUser.id, project.id, date, localMinutes, comment || null);
+    timeEntryModel.create(currentUser.id, project.id, date, localHours, comment || null);
 
     // Return the full dashboard to update everything
     const dashboardReq: ClientInferRequest<typeof accountDashboardContract.dashboard> = {
@@ -206,15 +206,15 @@ export const accountTimeRouter = s.router(accountDashboardContract, {
     }
 
     const currentUser = authReq.currentUser;
-    const { date, project_id, minutes, comment } = body;
+    const { date, project_id, hours, comment } = body;
 
-    let localMinutes: number;
-    if (!minutes) {
-      // get all available minutes  for current user in that day limit 8 hours
-      const availableMinutes = timeEntryModel.getTotalMinutesByUserAndDate(currentUser.id, date);
-      localMinutes = Math.max(60, 8 * 60 - availableMinutes);
+    let localHours: number;
+    if (!hours) {
+      // get all available hours for current user in that day limit 8 hours
+      const availableHours = timeEntryModel.getTotalHoursByUserAndDate(currentUser.id, date);
+      localHours = Math.max(1, REQUIRED_DAILY_HOURS - availableHours);
     } else {
-      localMinutes = minutes;
+      localHours = hours;
     }
 
     // Verify user has access to project
@@ -228,7 +228,7 @@ export const accountTimeRouter = s.router(accountDashboardContract, {
     }
 
     // Create the entry
-    timeEntryModel.create(currentUser.id, project_id, date, localMinutes, comment || null);
+    timeEntryModel.create(currentUser.id, project_id, date, localHours, comment || null);
 
     // Return the full dashboard to update everything
     const dashboardReq: ClientInferRequest<typeof accountDashboardContract.dashboard> = {
@@ -274,17 +274,17 @@ export const accountTimeRouter = s.router(accountDashboardContract, {
       };
     }
 
-    // Validate minutes if provided
-    if (body.minutes !== undefined && !validateMinutes(body.minutes)) {
+    // Validate hours if provided
+    if (body.hours !== undefined && !validateHours(body.hours)) {
       return {
         status: 400,
-        body: { body: "Invalid minutes" },
+        body: { body: "Invalid hours" },
       };
     }
 
     // Update the entry
     const updated = timeEntryModel.update(params.entryId, {
-      minutes: body.minutes,
+      hours: body.hours,
       comment: body.comment,
     });
 

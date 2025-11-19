@@ -6,7 +6,7 @@ import { DayType } from "./monthly-calendar";
 export interface Segment {
   entry_id?: number;
   project_id: number;
-  minutes: number;
+  hours: number;
   comment?: string | null;
 }
 
@@ -55,18 +55,8 @@ function getProjectColor(project: Project): { bg: string; solid: string } {
   };
 }
 
-function minutesToHours(minutes: number): number {
-  return minutes / 60;
-}
-
-function hoursToMinutes(hours: number): number {
-  return Math.round(hours * 60);
-}
-
 export function TimeSlider(props: TimeSliderProps): JSX.Element {
   const { reportedHours, dayType, segments, projects, date, hxTarget } = props;
-
-  const totalMinutes = hoursToMinutes(reportedHours);
 
   // Sort projects: regular projects first, then system projects
   const sortedProjects = [...projects].sort((a, b) => {
@@ -83,9 +73,9 @@ export function TimeSlider(props: TimeSliderProps): JSX.Element {
   const segmentElements: JSX.Element[] = [];
 
   segments.forEach((segment) => {
-    const segmentMinutes = segment.minutes || 0;
-    const segmentWidth = totalMinutes > 0 ? (segmentMinutes / totalMinutes) * 100 : 0;
-    const leftPercent = totalMinutes > 0 ? (currentPosition / totalMinutes) * 100 : 0;
+    const segmentHours = segment.hours || 0;
+    const segmentWidth = reportedHours > 0 ? (segmentHours / reportedHours) * 100 : 0;
+    const leftPercent = reportedHours > 0 ? (currentPosition / reportedHours) * 100 : 0;
 
     const project = projects.find((p) => p.id === segment.project_id);
     const color = project ? getProjectColor(project) : { bg: "#14b8a6", solid: "#14b8a6" };
@@ -100,13 +90,13 @@ export function TimeSlider(props: TimeSliderProps): JSX.Element {
             {project ? project.name : "Unknown"}
           </div>
           <div class="text-[10px] text-white/90 drop-shadow-sm" safe>
-            {`${minutesToHours(segmentMinutes).toFixed(1)}h`}
+            {`${segmentHours.toFixed(1)}h`}
           </div>
         </div>
       </div>
     );
 
-    currentPosition += segmentMinutes;
+    currentPosition += segmentHours;
   });
 
   return (
@@ -152,7 +142,6 @@ export function TimeSlider(props: TimeSliderProps): JSX.Element {
                 >
                   <input type="hidden" name="date" value={date} />
                   <input type="hidden" name="project_id" value={String(project.id)} />
-                  {/* <input type="hidden" name="hours" value={minutesToHours(3600).toFixed(1)} /> */}
                   <input type="hidden" name="comment" value="" />
                   <button
                     type="submit"
@@ -176,7 +165,7 @@ export function TimeSlider(props: TimeSliderProps): JSX.Element {
               >
                 <input type="hidden" name="date" value={date} />
                 <input type="hidden" name="project_id" value={String(project.id)} />
-                <input type="hidden" name="minutes" value={String(0)} />
+                <input type="hidden" name="hours" value={String(0)} />
                 <button
                   type="submit"
                   class="px-2 py-1 text-xs font-medium rounded-md border"
@@ -217,7 +206,7 @@ export function TimeSlider(props: TimeSliderProps): JSX.Element {
               const color = project
                 ? getProjectColor(project)
                 : { bg: "#14b8a6", solid: "#14b8a6" };
-              const hours = minutesToHours(segment.minutes);
+              const hours = segment.hours;
 
               return (
                 <div class="flex justify-between items-start p-2 bg-gray-50 dark:bg-gray-900 rounded-md mb-2 border border-gray-200 dark:border-gray-700">
@@ -260,14 +249,13 @@ export function TimeSlider(props: TimeSliderProps): JSX.Element {
                     >
                       <input
                         type="number"
+                        name="hours"
                         value={hours.toFixed(1)}
                         min="0"
                         step="0.5"
                         class="text-lg font-semibold text-gray-700 dark:text-gray-300 bg-transparent border-none outline-none w-20 text-right focus:bg-gray-100 dark:focus:bg-gray-800 px-1 py-0.5 rounded [&::-webkit-inner-spin-button]:opacity-100 [&::-webkit-outer-spin-button]:opacity-100 [&::-webkit-inner-spin-button]:block [&::-webkit-outer-spin-button]:block"
-                        onchange={`this.form.querySelector('input[name=minutes]').value = Math.round(parseFloat(this.value) * 60)`}
                       />
                       <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">h</span>
-                      <input type="hidden" name="minutes" value={String(segment.minutes)} />
                     </form>
                   </div>
                   <form

@@ -12,8 +12,8 @@ export function validateDate(dateString: string): boolean {
   return date instanceof Date && !isNaN(date.getTime());
 }
 
-export function validateMinutes(minutes: number): boolean {
-  return minutes > 0 && minutes <= 24 * 60; // Max 24 hours
+export function validateHours(hours: number): boolean {
+  return hours > 0 && hours <= 24; // Max 24 hours
 }
 
 export function validateProjectName(name: string): boolean {

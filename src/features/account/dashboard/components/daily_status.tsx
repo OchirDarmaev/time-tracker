@@ -13,9 +13,7 @@ export function DailyStatus(props: DailyStatusProps): JSX.Element {
   const requiresDailyHours = dayType === "workday" || dayType === "public_holiday";
 
   const remainingHours = requiresDailyHours ? Math.max(0, REQUIRED_DAILY_HOURS - reportedHours) : 0;
-  const isComplete = requiresDailyHours
-    ? reportedHours >= REQUIRED_DAILY_HOURS
-    : true;
+  const isComplete = requiresDailyHours ? reportedHours >= REQUIRED_DAILY_HOURS : true;
   const isOverLimit = requiresDailyHours ? reportedHours > REQUIRED_DAILY_HOURS : false;
   const statusColor = isOverLimit
     ? "var(--orange)"

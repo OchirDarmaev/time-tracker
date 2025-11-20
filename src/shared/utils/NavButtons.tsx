@@ -100,19 +100,19 @@ export function NavButtons({
             </a>
           );
         } else {
-          const requiredRolesText = item.requiredRoles
-            .map((r) => `'${roleLabels[r] || r}'`)
-            .join(" or ");
-          const tooltipText = `role ${requiredRolesText} required`;
+          const requiredRolesText = item.requiredRoles.map((r) => roleLabels[r] || r).join(" or ");
+          const tooltipText = `Requires ${requiredRolesText} role${item.requiredRoles.length > 1 ? "s" : ""}`;
           return (
-            <span
-              class="cursor-not-allowed px-5 py-2.5 text-sm opacity-50"
-              style="color: var(--text-tertiary);"
+            <a
+              href="#"
+              onclick="return false;"
+              class="no-underline text-sm font-medium px-5 py-2.5 rounded-xl opacity-50"
+              style="color: var(--text-tertiary); pointer-events: auto; cursor: help;"
               title={tooltipText}
               safe
             >
               {item.label}
-            </span>
+            </a>
           );
         }
       })}

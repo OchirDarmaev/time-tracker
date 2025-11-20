@@ -2,7 +2,6 @@ import { Project, projectModel } from "../../../shared/models/project";
 import { timeEntryModel } from "../../../shared/models/time_entry";
 import { UserRole } from "../../../shared/models/user";
 import { Segment } from "./components/TimeSlider";
-import { REQUIRED_DAILY_HOURS } from "./router";
 
 export type TimeSliderData = {
   sliderTotalHours: number;
@@ -16,7 +15,7 @@ export function getTimeSliderData(
   const entries = timeEntryModel.getByUserIdAndDate(currentUser.id, date);
   const projects = projectModel.getByUserId(currentUser.id);
   const totalHours = timeEntryModel.getTotalHoursByUserAndDate(currentUser.id, date);
-  const sliderTotalHours = Math.max(totalHours, REQUIRED_DAILY_HOURS);
+  const sliderTotalHours = totalHours;
 
   const segmentsForSlider = entries.map((entry) => ({
     entry_id: entry.id,

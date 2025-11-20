@@ -164,10 +164,7 @@ export function MonthlyCalendar({ month }: MonthlyCalendarProps): JSX.Element {
             class="px-3 py-2 rounded-lg flex items-center gap-2"
             style="background-color: var(--bg-tertiary);"
           >
-            <div
-              class="w-2 h-2 rounded-full"
-              style="background-color: var(--text-tertiary);"
-            ></div>
+            <div class="w-2 h-2 rounded-full" style="background-color: var(--text-tertiary);"></div>
             <span class="text-xs" style="color: var(--text-secondary);">
               Weekends:{" "}
             </span>
@@ -298,4 +295,3 @@ export function MonthlyCalendar({ month }: MonthlyCalendarProps): JSX.Element {
     </div>
   );
 }
-

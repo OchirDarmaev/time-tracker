@@ -1,5 +1,5 @@
 import { calendarModel } from "@/shared/models/calendar.js";
-import { getAllDaysInMonth, parseDate } from "@/shared/utils/date_utils.js";
+import { getAllDaysInMonth } from "@/shared/utils/date_utils.js";
 import { adminCalendarContract } from "../contract.js";
 import { tsBuildUrl } from "@/shared/utils/paths.js";
 
@@ -92,10 +92,7 @@ export function YearlySummary({ year, currentMonth }: YearlySummaryProps): JSX.E
               <th class="text-right py-2 px-3 font-medium" style="color: var(--text-tertiary);">
                 w
               </th>
-              <th
-                class="text-right py-2 px-3 font-medium"
-                style="color: var(--text-secondary);"
-              >
+              <th class="text-right py-2 px-3 font-medium" style="color: var(--text-secondary);">
                 t
               </th>
             </tr>
@@ -160,16 +157,10 @@ export function YearlySummary({ year, currentMonth }: YearlySummaryProps): JSX.E
               <td class="py-2 px-3 text-right font-semibold" style="color: var(--error);">
                 {yearlySummary.reduce((sum, m) => sum + m.holidays, 0)}
               </td>
-              <td
-                class="py-2 px-3 text-right font-semibold"
-                style="color: var(--text-tertiary);"
-              >
+              <td class="py-2 px-3 text-right font-semibold" style="color: var(--text-tertiary);">
                 {yearlySummary.reduce((sum, m) => sum + m.weekends, 0)}
               </td>
-              <td
-                class="py-2 px-3 text-right font-semibold"
-                style="color: var(--text-primary);"
-              >
+              <td class="py-2 px-3 text-right font-semibold" style="color: var(--text-primary);">
                 {yearlySummary.reduce(
                   (sum, m) => sum + m.workdays + m.holidays + m.weekends + m.notSet,
                   0
@@ -182,4 +173,3 @@ export function YearlySummary({ year, currentMonth }: YearlySummaryProps): JSX.E
     </div>
   );
 }
-

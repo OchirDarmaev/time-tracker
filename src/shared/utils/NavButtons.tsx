@@ -1,6 +1,7 @@
 import { accountDashboardContract } from "../../features/account/dashboard/contract";
 import { adminProjectsContract } from "../../features/admin/projects/contract";
 import { adminCalendarContract } from "../../features/admin/calendar/contract";
+import { reportsContract } from "../../features/reports/contract";
 import { roleLabels } from "./layout";
 import { tsBuildUrl } from "./paths";
 
@@ -21,6 +22,15 @@ export function NavButtons({
       label: "Dashboard",
       requiredRoles: ["account"],
       activeNav: "account",
+    },
+    {
+      href: tsBuildUrl(reportsContract.view, {
+        headers: {},
+        query: {},
+      }) as string,
+      label: "Reports",
+      requiredRoles: ["account"],
+      activeNav: "reports",
     },
     {
       href: tsBuildUrl(adminProjectsContract.list, {

@@ -20,7 +20,7 @@
     "jsxImportSource": "@kitajs/html",
     "plugins": [{ "name": "@kitajs/ts-html-plugin" }]
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "sst-env.d.ts"],
   "exclude": ["node_modules", "dist"]
 }
 

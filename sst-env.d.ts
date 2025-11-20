@@ -12,6 +12,7 @@ declare module "sst" {
 import * as cloudflare from "@cloudflare/workers-types";
 declare module "sst" {
   export interface Resource {
+    "DB": cloudflare.D1Database
     "time-tracker": cloudflare.Service
   }
 }

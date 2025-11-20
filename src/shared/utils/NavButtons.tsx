@@ -1,4 +1,5 @@
 import { accountDashboardContract } from "../../features/account/dashboard/contract";
+import { adminProjectsContract } from "../../features/admin/projects/contract";
 import { roleLabels } from "./layout";
 import { tsBuildUrl } from "./paths";
 
@@ -19,6 +20,15 @@ export function NavButtons({
       label: "Dashboard",
       requiredRoles: ["account"],
       activeNav: "account",
+    },
+    {
+      href: tsBuildUrl(adminProjectsContract.list, {
+        headers: {},
+        query: {},
+      }) as string,
+      label: "Manage Projects",
+      requiredRoles: ["admin"],
+      activeNav: "admin",
     },
   ];
   // todo <div hx-boost="true">

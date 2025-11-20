@@ -9,6 +9,8 @@ import { rootContract } from "@/features/root/contract.js";
 import { rootRouter } from "@/features/root/router.js";
 import { accountDashboardContract } from "@/features/account/dashboard/contract.js";
 import { accountTimeRouter } from "@/features/account/dashboard/router.js";
+import { adminProjectsContract } from "@/features/admin/projects/contract.js";
+import { adminProjectsRouter } from "@/features/admin/projects/router.js";
 import { authStubMiddleware } from "@/shared/middleware/auth_stub.js";
 
 const app = express();
@@ -52,6 +54,12 @@ createExpressEndpoints(accountDashboardContract, accountTimeRouter, app, {
   responseValidation: false,
   jsonQuery: true,
   globalMiddleware: [authStubMiddleware<typeof accountDashboardContract>],
+});
+
+createExpressEndpoints(adminProjectsContract, adminProjectsRouter, app, {
+  responseValidation: false,
+  jsonQuery: true,
+  globalMiddleware: [authStubMiddleware<typeof adminProjectsContract>],
 });
 
 app.listen(PORT, () => {

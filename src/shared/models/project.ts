@@ -53,6 +53,22 @@ export const projectModel = {
     return this.getById(id);
   },
 
+  updateName(id: number, name: string): Project | undefined {
+    const project = this.getById(id);
+    if (!project) return undefined;
+    // Prevent editing system projects
+    if (project.isSystem) {
+      throw new Error("Cannot edit system projects");
+    }
+    db.prepare("UPDATE projects SET name = ? WHERE id = ?").run(name, id);
+    return this.getById(id);
+  },
+
+  updateColor(id: number, color: string): Project | undefined {
+    db.prepare("UPDATE projects SET color = ? WHERE id = ?").run(color, id);
+    return this.getById(id);
+  },
+
   toggleSuppress(id: number): Project | undefined {
     const project = this.getById(id);
     if (!project) return undefined;
@@ -61,6 +77,17 @@ export const projectModel = {
       throw new Error("Cannot suppress system projects");
     }
     db.prepare("UPDATE projects SET suppressed = NOT suppressed WHERE id = ?").run(id);
+    return this.getById(id);
+  },
+
+  updateSuppressed(id: number, suppressed: boolean): Project | undefined {
+    const project = this.getById(id);
+    if (!project) return undefined;
+    // Prevent suppression of system projects
+    if (project.isSystem && suppressed) {
+      throw new Error("Cannot suppress system projects");
+    }
+    db.prepare("UPDATE projects SET suppressed = ? WHERE id = ?").run(suppressed ? 1 : 0, id);
     return this.getById(id);
   },
 

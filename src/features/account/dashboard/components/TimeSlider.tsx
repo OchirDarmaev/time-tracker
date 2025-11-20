@@ -78,18 +78,27 @@ export function TimeSlider(props: TimeSliderProps): JSX.Element {
     const leftPercent = reportedHours > 0 ? (currentPosition / reportedHours) * 100 : 0;
 
     const project = projects.find((p) => p.id === segment.project_id);
-    const color = project ? getProjectColor(project) : { bg: "linear-gradient(135deg, var(--project-default) 0%, var(--project-default-dark) 100%)", solid: "var(--project-default)" };
+    const color = project
+      ? getProjectColor(project)
+      : {
+          bg: "linear-gradient(135deg, var(--project-default) 0%, var(--project-default-dark) 100%)",
+          solid: "var(--project-default)",
+        };
 
     segmentElements.push(
       <div
-        class="absolute top-0 h-full rounded-md flex items-center justify-center overflow-hidden"
-        style={`left: ${leftPercent}%; width: ${segmentWidth}%; background: ${color.bg};`}
+        class="absolute top-0 h-full rounded-xl flex items-center justify-center overflow-hidden transition-all duration-200"
+        style={`left: ${leftPercent}%; width: ${segmentWidth}%; background: ${color.bg}; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);`}
       >
         <div class="text-center pointer-events-none">
-          <div class="text-xs font-semibold text-white drop-shadow-sm">
+          <div class="text-xs font-bold text-white drop-shadow-md" style="letter-spacing: -0.01em;">
             {project ? project.name : "Unknown"}
           </div>
-          <div class="text-[10px] text-white/90 drop-shadow-sm" safe>
+          <div
+            class="text-[10px] font-semibold text-white/95 drop-shadow-md mt-0.5"
+            safe
+            style="letter-spacing: -0.01em;"
+          >
             {`${segmentHours.toFixed(1)}h`}
           </div>
         </div>
@@ -100,14 +109,20 @@ export function TimeSlider(props: TimeSliderProps): JSX.Element {
   });
 
   return (
-    <div class="rounded-lg p-3 shadow-sm my-4 w-full max-w-full box-border" style="background-color: var(--bg-tertiary); border: 1px solid var(--border);">
-      <div class="mb-4 pb-3" style="border-bottom: 1px solid var(--border);">
-        <div class="mb-2">
-          <span class="text-xs font-semibold tracking-wide block" style="color: var(--text-secondary);">
+    <div
+      class="rounded-2xl p-6 my-4 w-full max-w-full box-border"
+      style="background-color: var(--bg-elevated); border: 1px solid var(--border-subtle); box-shadow: var(--shadow-sm);"
+    >
+      <div class="mb-6 pb-4" style="border-bottom: 1px solid var(--border-subtle);">
+        <div class="mb-3">
+          <span
+            class="text-xs font-semibold tracking-wide uppercase block"
+            style="color: var(--text-tertiary); letter-spacing: 0.05em;"
+          >
             Projects
           </span>
         </div>
-        <div class="flex flex-wrap gap-1.5">
+        <div class="flex flex-wrap gap-2">
           {sortedProjects.map((project) => {
             const isUsed = segments.some((s) => s.project_id === project.id);
             const color = getProjectColor(project);
@@ -117,8 +132,8 @@ export function TimeSlider(props: TimeSliderProps): JSX.Element {
             if (isDisabled) {
               return (
                 <div
-                  class="px-2 py-1 text-xs font-medium rounded-md border cursor-not-allowed opacity-40"
-                  style={`border-color: ${color.solid}; color: ${color.solid};`}
+                  class="px-3 py-1.5 text-xs font-medium rounded-xl border cursor-not-allowed opacity-40 transition-all duration-200"
+                  style={`border-color: ${color.solid}; color: ${color.solid}; background-color: var(--bg-tertiary);`}
                   safe
                 >
                   {project.name}
@@ -138,15 +153,17 @@ export function TimeSlider(props: TimeSliderProps): JSX.Element {
                   hx-swap="outerHTML transition:true"
                   hx-trigger="submit"
                   hx-scroll="false"
-                  class="inline-block drop-shadow-lg drop-shadow-indigo-500/50"
+                  class="inline-block"
                 >
                   <input type="hidden" name="date" value={date} />
                   <input type="hidden" name="project_id" value={String(project.id)} />
                   <input type="hidden" name="comment" value="" />
                   <button
                     type="submit"
-                    class="px-2 py-1 text-xs font-medium rounded-md border outline-2 "
-                    style={`border-color: ${color.solid}; color: ${color.solid};`}
+                    class="px-3 py-1.5 text-xs font-semibold rounded-xl border transition-all duration-200"
+                    style={`border-color: ${color.solid}; color: ${color.solid}; background-color: ${color.solid}15; box-shadow: var(--shadow-sm); letter-spacing: -0.01em;`}
+                    onmouseover={`this.style.boxShadow='var(--shadow-md)'; this.style.transform='translateY(-1px)';`}
+                    onmouseout={`this.style.boxShadow='var(--shadow-sm)'; this.style.transform='translateY(0)';`}
                     safe
                   >
                     {project.name}
@@ -168,8 +185,10 @@ export function TimeSlider(props: TimeSliderProps): JSX.Element {
                 <input type="hidden" name="hours" value={String(0)} />
                 <button
                   type="submit"
-                  class="px-2 py-1 text-xs font-medium rounded-md border"
-                  style={`border-color: ${color.solid}; color: ${color.solid};`}
+                  class="px-3 py-1.5 text-xs font-medium rounded-xl border transition-all duration-200"
+                  style={`border-color: ${color.solid}; color: ${color.solid}; background-color: var(--bg-elevated); letter-spacing: -0.01em;`}
+                  onmouseover={`this.style.backgroundColor='var(--bg-tertiary)'; this.style.boxShadow='var(--shadow-sm)'; this.style.transform='translateY(-1px)';`}
+                  onmouseout={`this.style.backgroundColor='var(--bg-elevated)'; this.style.boxShadow='none'; this.style.transform='translateY(0)';`}
                   safe
                 >
                   {project.name}
@@ -182,38 +201,61 @@ export function TimeSlider(props: TimeSliderProps): JSX.Element {
 
       <DailyStatus dayType={dayType} reportedHours={reportedHours} />
 
-      <div class="relative my-4">
-        <div class="relative h-16 rounded-md overflow-visible min-h-[64px]" style="background-color: var(--bg-tertiary); border: 1px solid var(--border);">
+      <div class="relative my-6">
+        <div
+          class="relative h-20 rounded-xl overflow-visible min-h-[80px]"
+          style="background-color: var(--bg-tertiary); border: 1px solid var(--border-subtle); box-shadow: var(--shadow-sm);"
+        >
           {segments.length === 0 ? (
-            <div class="flex items-center justify-center h-full w-full text-xs" style="color: var(--text-tertiary);">
+            <div
+              class="flex items-center justify-center h-full w-full text-sm font-medium"
+              style="color: var(--text-tertiary); letter-spacing: -0.01em;"
+            >
               Click a project chip to add a time segment
             </div>
           ) : (
             segmentElements
           )}
         </div>
-        <div class="flex justify-between mt-1 text-[10px]" style="color: var(--text-tertiary);">
-          <span class="font-medium">0h</span>
-          <span class="font-medium">{reportedHours}h</span>
+        <div
+          class="flex justify-between mt-2 text-xs font-medium"
+          style="color: var(--text-tertiary); letter-spacing: -0.01em;"
+        >
+          <span>0h</span>
+          <span>{reportedHours}h</span>
         </div>
       </div>
 
-      <div class="mt-4 pt-3" style="border-top: 1px solid var(--border);">
+      <div class="mt-6 pt-4" style="border-top: 1px solid var(--border-subtle);">
         {segments.length === 0
           ? ""
           : segments.map((segment, _index) => {
               const project = projects.find((p) => p.id === segment.project_id);
               const color = project
                 ? getProjectColor(project)
-                : { bg: "linear-gradient(135deg, var(--project-default) 0%, var(--project-default-dark) 100%)", solid: "var(--project-default)" };
+                : {
+                    bg: "linear-gradient(135deg, var(--project-default) 0%, var(--project-default-dark) 100%)",
+                    solid: "var(--project-default)",
+                  };
               const hours = segment.hours;
 
               return (
-                <div class="flex justify-between items-start p-2 rounded-md mb-2" style="background-color: var(--bg-tertiary); border: 1px solid var(--border);">
-                  <div class="flex items-start gap-3 flex-1">
-                    <div class="w-4 h-4 rounded" style={`background: ${color.solid};`}></div>
+                <div
+                  class="flex justify-between items-start p-4 rounded-xl mb-3 transition-all duration-200"
+                  style="background-color: var(--bg-tertiary); border: 1px solid var(--border-subtle); box-shadow: var(--shadow-sm);"
+                  onmouseover="this.style.boxShadow='var(--shadow-md)'; this.style.borderColor='var(--border)';"
+                  onmouseout="this.style.boxShadow='var(--shadow-sm)'; this.style.borderColor='var(--border-subtle)';"
+                >
+                  <div class="flex items-start gap-4 flex-1">
+                    <div
+                      class="w-5 h-5 rounded-lg mt-0.5"
+                      style={`background: ${color.solid}; box-shadow: 0 2px 8px ${color.solid}40;`}
+                    ></div>
                     <div class="flex-1">
-                      <div class="text-xs font-medium" style="color: var(--text-primary);">
+                      <div
+                        class="text-sm font-semibold mb-2"
+                        style="color: var(--text-primary); letter-spacing: -0.01em;"
+                      >
                         {project ? project.name : "Unknown"}
                       </div>
                       <form
@@ -228,10 +270,12 @@ export function TimeSlider(props: TimeSliderProps): JSX.Element {
                       >
                         <textarea
                           name="comment"
-                          rows="5"
+                          rows="3"
                           placeholder="Add comment..."
-                          class="text-base font-normal leading-relaxed bg-transparent border-none outline-none w-full px-3 py-2 rounded"
-                          style="color: var(--text-primary);"
+                          class="text-sm font-normal leading-relaxed bg-transparent border-none outline-none w-full px-3 py-2 rounded-lg transition-all duration-200"
+                          style="color: var(--text-primary); resize: none;"
+                          hx-on:focus="this.style.backgroundColor='var(--bg-elevated)'; this.style.border='1px solid var(--border)';"
+                          hx-on:blur="this.style.backgroundColor='transparent'; this.style.border='none';"
                           safe
                         >
                           {segment.comment || ""}
@@ -246,7 +290,7 @@ export function TimeSlider(props: TimeSliderProps): JSX.Element {
                       hx-swap="outerHTML transition:true"
                       hx-trigger="change"
                       hx-scroll="false"
-                      class="flex items-center gap-1"
+                      class="flex items-center gap-1.5"
                     >
                       <input
                         type="number"
@@ -254,10 +298,17 @@ export function TimeSlider(props: TimeSliderProps): JSX.Element {
                         value={hours.toFixed(1)}
                         min="0"
                         step="0.5"
-                        class="text-lg font-semibold bg-transparent border-none outline-none w-20 text-right px-1 py-0.5 rounded [&::-webkit-inner-spin-button]:opacity-100 [&::-webkit-outer-spin-button]:opacity-100 [&::-webkit-inner-spin-button]:block [&::-webkit-outer-spin-button]:block"
-                        style="color: var(--text-primary);"
+                        class="text-xl font-bold bg-transparent border-none outline-none w-24 text-right px-2 py-1 rounded-lg transition-all duration-200 [&::-webkit-inner-spin-button]:opacity-100 [&::-webkit-outer-spin-button]:opacity-100 [&::-webkit-inner-spin-button]:block [&::-webkit-outer-spin-button]:block"
+                        style="color: var(--text-primary); letter-spacing: -0.02em;"
+                        onfocus="this.style.backgroundColor='var(--bg-elevated)'; this.style.border='1px solid var(--border)';"
+                        onblur="this.style.backgroundColor='transparent'; this.style.border='none';"
                       />
-                      <span class="text-xs font-semibold" style="color: var(--text-primary);">h</span>
+                      <span
+                        class="text-sm font-semibold"
+                        style="color: var(--text-secondary); letter-spacing: -0.01em;"
+                      >
+                        h
+                      </span>
                     </form>
                   </div>
                   <form
@@ -268,12 +319,14 @@ export function TimeSlider(props: TimeSliderProps): JSX.Element {
                     hx-swap="outerHTML transition:true"
                     hx-trigger="submit"
                     hx-scroll="false"
-                    class="ml-3"
+                    class="ml-4"
                   >
                     <button
                       type="submit"
-                      class="text-xs hover:underline"
+                      class="text-xs font-medium px-3 py-1.5 rounded-lg transition-all duration-200"
                       style="color: var(--error);"
+                      onmouseover="this.style.backgroundColor='var(--error-light)';"
+                      onmouseout="this.style.backgroundColor='transparent';"
                     >
                       Remove
                     </button>

@@ -73,14 +73,17 @@ export function Dashboard(req: Request, authContext: AuthContext): JSX.Element {
   return (
     <div
       id="time-tracking-content"
-      class="space-y-4"
+      class="space-y-8"
       style={{ viewTransitionName: "time-tracking-content" }}
     >
       {/* Enhanced Status Bar */}
-      <div class="rounded-lg p-3 shadow-sm" style="background-color: var(--bg-tertiary); border: 1px solid var(--border);">
+      <div
+        class="rounded-2xl p-6"
+        style="background-color: var(--bg-elevated); border: 1px solid var(--border-subtle); box-shadow: var(--shadow-sm);"
+      >
         <MonthlySummary reported={reported} expected={expected} />
       </div>
-      <div class="flex flex-row gap-4 w-full">
+      <div class="flex flex-row gap-8 w-full">
         <div class="w-1/2">
           <MonthlyCalendar
             props={{

@@ -6,10 +6,18 @@ export function CreateProject(req: AuthContext, errorMessage?: string): JSX.Elem
   return (
     <div id="create-project" hx-target="this" hx-swap="outerHTML">
       {errorMessage ? (
-        <div class="mb-6 p-4 rounded-r-md" style="background-color: rgba(248, 113, 113, 0.12); border-left: 4px solid var(--error);">
+        <div
+          class="mb-6 p-4 rounded-r-md"
+          style="background-color: rgba(248, 113, 113, 0.12); border-left: 4px solid var(--error);"
+        >
           <div class="flex">
             <div class="flex-shrink-0">
-              <svg class="h-5 w-5" style="color: var(--error);" viewBox="0 0 20 20" fill="currentColor">
+              <svg
+                class="h-5 w-5"
+                style="color: var(--error);"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
                 <path
                   fill-rule="evenodd"
                   d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
@@ -26,11 +34,16 @@ export function CreateProject(req: AuthContext, errorMessage?: string): JSX.Elem
         </div>
       ) : null}
       <div class="mb-8">
-        <h1 class="text-3xl font-bold mb-2" style="color: var(--text-primary);">Create New Project</h1>
+        <h1 class="text-3xl font-bold mb-2" style="color: var(--text-primary);">
+          Create New Project
+        </h1>
         <p style="color: var(--text-secondary);">Add a new project for time tracking</p>
       </div>
 
-      <div class="rounded-xl shadow-sm p-6" style="background-color: var(--bg-secondary); border: 1px solid var(--border);">
+      <div
+        class="rounded-xl shadow-sm p-6"
+        style="background-color: var(--bg-secondary); border: 1px solid var(--border);"
+      >
         <form
           hx-post={tsBuildUrl(adminProjectsContract.create, {})}
           hx-target="body"
@@ -76,8 +89,15 @@ export function CreateProject(req: AuthContext, errorMessage?: string): JSX.Elem
                 class="w-20 h-12 border-2 rounded-lg cursor-pointer transition-colors"
                 style="border-color: var(--border);"
               />
-              <div class="flex-1 h-12 rounded-lg border-2 flex items-center justify-center" style="border-color: var(--border); background-color: var(--bg-tertiary);">
-                <span class="text-xs font-mono" style="color: var(--text-secondary);" id="color-value">
+              <div
+                class="flex-1 h-12 rounded-lg border-2 flex items-center justify-center"
+                style="border-color: var(--border); background-color: var(--bg-tertiary);"
+              >
+                <span
+                  class="text-xs font-mono"
+                  style="color: var(--text-secondary);"
+                  id="color-value"
+                >
                   #14b8a6
                 </span>
               </div>

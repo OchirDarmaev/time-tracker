@@ -35,7 +35,7 @@ export const adminProjectsRouter = s.router(adminProjectsContract, {
     }
 
     const projects = projectModel.getAll(true);
-    const html = ProjectsList(projects, authReq);
+    const html = ProjectsList(projects);
 
     if (req.headers["hx-request"] === "true") {
       return {
@@ -109,18 +109,13 @@ export const adminProjectsRouter = s.router(adminProjectsContract, {
       const color = body.color && body.color.trim() !== "" ? body.color : "#14b8a6";
       projectModel.create(body.name, color, false);
       const projects = projectModel.getAll(true);
-      const html = ProjectsList(projects, authReq);
+      const html = ProjectsList(projects);
       return {
         status: 200,
         body: String(Layout(html, authReq, "admin")),
       };
-    } catch (error: any) {
-      let errorMessage = "Failed to create project";
-      if (error.message?.includes("UNIQUE constraint")) {
-        errorMessage = "Project with this name already exists";
-      } else if (error.message) {
-        errorMessage = error.message;
-      }
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to create project";
       const html = CreateProject(authReq, errorMessage);
       return {
         status: 400,
@@ -157,19 +152,20 @@ export const adminProjectsRouter = s.router(adminProjectsContract, {
     try {
       projectModel.updateName(params.id, body.name);
       const projects = projectModel.getAll(true);
-      const html = ProjectsList(projects, authReq);
+      const html = ProjectsList(projects);
       return {
         status: 200,
         body: String(html),
       };
-    } catch (error: any) {
-      if (error.message?.includes("system projects")) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to update project";
+      if (error instanceof Error && error.message?.includes("system projects")) {
         return {
           status: 400,
-          body: { body: error.message },
+          body: { body: errorMessage },
         };
       }
-      if (error.message?.includes("UNIQUE constraint")) {
+      if (error instanceof Error && error.message?.includes("UNIQUE constraint")) {
         return {
           status: 400,
           body: { body: "Project with this name already exists" },
@@ -177,7 +173,7 @@ export const adminProjectsRouter = s.router(adminProjectsContract, {
       }
       return {
         status: 400,
-        body: { body: error.message || "Failed to update project" },
+        body: { body: errorMessage },
       };
     }
   },
@@ -210,15 +206,17 @@ export const adminProjectsRouter = s.router(adminProjectsContract, {
     try {
       projectModel.updateColor(params.id, body.color);
       const projects = projectModel.getAll(true);
-      const html = ProjectsList(projects, authReq);
+      const html = ProjectsList(projects);
       return {
         status: 200,
         body: String(html),
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to update project color";
       return {
         status: 400,
-        body: { body: error.message || "Failed to update project color" },
+        body: { body: errorMessage },
       };
     }
   },
@@ -251,21 +249,22 @@ export const adminProjectsRouter = s.router(adminProjectsContract, {
     try {
       projectModel.toggleSuppress(params.id);
       const projects = projectModel.getAll(true);
-      const html = ProjectsList(projects, authReq);
+      const html = ProjectsList(projects);
       return {
         status: 200,
         body: String(html),
       };
-    } catch (error: any) {
-      if (error.message?.includes("system projects")) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to suppress project";
+      if (error instanceof Error && error.message?.includes("system projects")) {
         return {
           status: 400,
-          body: { body: error.message },
+          body: { body: errorMessage },
         };
       }
       return {
         status: 400,
-        body: { body: error.message || "Failed to suppress project" },
+        body: { body: errorMessage },
       };
     }
   },
@@ -364,20 +363,13 @@ export const adminProjectsRouter = s.router(adminProjectsContract, {
       const suppressed = body.suppressed ?? false;
       projectModel.updateSuppressed(params.id, suppressed);
       const projects = projectModel.getAll(true);
-      const html = ProjectsList(projects, authReq);
+      const html = ProjectsList(projects);
       return {
         status: 200,
         body: String(Layout(html, authReq, "admin")),
       };
-    } catch (error: any) {
-      let errorMessage = "Failed to update project";
-      if (error.message?.includes("system projects")) {
-        errorMessage = error.message;
-      } else if (error.message?.includes("UNIQUE constraint")) {
-        errorMessage = "Project with this name already exists";
-      } else if (error.message) {
-        errorMessage = error.message;
-      }
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to update project";
       const html = EditProject(project, authReq, errorMessage);
       return {
         status: 400,

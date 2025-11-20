@@ -1,13 +1,8 @@
-import { AuthContext } from "@/shared/middleware/auth_stub.js";
 import { Project } from "@/shared/models/project.js";
 import { adminProjectsContract } from "../contract.js";
 import { tsBuildUrl } from "@/shared/utils/paths.js";
 
-export function ProjectsList(
-  projects: Project[],
-  req: AuthContext,
-  errorMessage?: string
-): JSX.Element {
+export function ProjectsList(projects: Project[]): JSX.Element {
   return (
     <div id="projects-list" hx-target="this" hx-swap="outerHTML">
       <div class="mb-6 flex items-center justify-between">

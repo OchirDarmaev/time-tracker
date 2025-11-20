@@ -203,8 +203,8 @@ export function MonthlyCalendar({ props }: { props: MonthlyCalendarProps }): JSX
     // Small orange circle indicator when hours exceed required
     const overLimitIndicator = isOverLimit ? (
       <span
-        class="absolute top-1 right-1 w-2 h-2 rounded-full z-20"
-        style="background-color: var(--orange);"
+        class="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full z-20"
+        style="background-color: var(--orange); box-shadow: 0 0 8px rgba(249, 115, 22, 0.6);"
         title="Over ${REQUIRED_DAILY_HOURS} hours"
       ></span>
     ) : (
@@ -244,8 +244,18 @@ export function MonthlyCalendar({ props }: { props: MonthlyCalendarProps }): JSX
     return (
       <button
         type="button"
-        class="relative flex items-center justify-center aspect-square rounded-lg border border-transparent transition-colors duration-150 focus:outline-none"
-        style={`${bgStyle} ${textStyle} border-color: transparent;`}
+        class="relative flex items-center justify-center aspect-square rounded-xl border transition-all duration-200 focus:outline-none"
+        style={`${bgStyle} ${textStyle} border-color: ${isSelected ? "transparent" : "var(--border-subtle)"}; box-shadow: ${isSelected ? "var(--shadow-md)" : "var(--shadow-sm)"};`}
+        onmouseover={
+          isSelected
+            ? ""
+            : "this.style.backgroundColor='var(--bg-tertiary)'; this.style.borderColor='var(--border)'; this.style.boxShadow='var(--shadow-md)'; this.style.transform='translateY(-2px)';"
+        }
+        onmouseout={
+          isSelected
+            ? ""
+            : "this.style.backgroundColor=''; this.style.borderColor='var(--border-subtle)'; this.style.boxShadow='var(--shadow-sm)'; this.style.transform='translateY(0)';"
+        }
         hx-get={tsBuildUrl(accountDashboardContract.dashboard, {
           headers: {},
           query: {
@@ -259,7 +269,9 @@ export function MonthlyCalendar({ props }: { props: MonthlyCalendarProps }): JSX
         title={title}
       >
         {circleDiagram}
-        <span class="text-sm font-light relative z-10">{day.dayNumber}</span>
+        <span class="text-sm font-medium relative z-10" style="letter-spacing: -0.01em;">
+          {day.dayNumber}
+        </span>
         {overLimitIndicator}
       </button>
     );
@@ -269,12 +281,14 @@ export function MonthlyCalendar({ props }: { props: MonthlyCalendarProps }): JSX
 
   return (
     <div class="mb-6">
-      <div class="flex justify-between items-center">
-        <div class="flex items-center justify-between mb-4">
+      <div class="flex justify-between items-center mb-6">
+        <div class="flex items-center gap-4">
           <button
             type="button"
-            class="px-3 py-1 text-sm rounded transition-colors duration-150 focus:outline-none"
-            style="color: var(--text-primary);"
+            class="px-4 py-2 rounded-xl transition-all duration-200 focus:outline-none"
+            style="color: var(--text-secondary); background-color: var(--bg-elevated); border: 1px solid var(--border); box-shadow: var(--shadow-sm); letter-spacing: -0.01em;"
+            onmouseover="this.style.color='var(--text-primary)'; this.style.backgroundColor='var(--bg-tertiary)'; this.style.boxShadow='var(--shadow-md)'; this.style.transform='translateY(-1px)';"
+            onmouseout="this.style.color='var(--text-secondary)'; this.style.backgroundColor='var(--bg-elevated)'; this.style.boxShadow='var(--shadow-sm)'; this.style.transform='translateY(0)';"
             hx-get={tsBuildUrl(accountDashboardContract.dashboard, {
               headers: {},
               query: {
@@ -288,13 +302,19 @@ export function MonthlyCalendar({ props }: { props: MonthlyCalendarProps }): JSX
           >
             &lt;
           </button>
-          <h3 safe class="text-lg font-light tracking-wide" style="color: var(--text-primary);">
+          <h3
+            safe
+            class="text-2xl font-semibold tracking-tight"
+            style="color: var(--text-primary); letter-spacing: -0.03em;"
+          >
             {`${monthName} ${year}`}
           </h3>
           <button
             type="button"
-            class="px-3 py-1 text-sm rounded transition-colors duration-150 focus:outline-none"
-            style="color: var(--text-primary);"
+            class="px-4 py-2 rounded-xl transition-all duration-200 focus:outline-none"
+            style="color: var(--text-secondary); background-color: var(--bg-elevated); border: 1px solid var(--border); box-shadow: var(--shadow-sm); letter-spacing: -0.01em;"
+            onmouseover="this.style.color='var(--text-primary)'; this.style.backgroundColor='var(--bg-tertiary)'; this.style.boxShadow='var(--shadow-md)'; this.style.transform='translateY(-1px)';"
+            onmouseout="this.style.color='var(--text-secondary)'; this.style.backgroundColor='var(--bg-elevated)'; this.style.boxShadow='var(--shadow-sm)'; this.style.transform='translateY(0)';"
             hx-get={tsBuildUrl(accountDashboardContract.dashboard, {
               headers: {},
               query: {
@@ -309,11 +329,13 @@ export function MonthlyCalendar({ props }: { props: MonthlyCalendarProps }): JSX
             &gt;
           </button>
         </div>
-        <div class="flex justify-center mb-4">
+        <div class="flex justify-center">
           <button
             type="button"
-            class="px-4 py-1 text-sm rounded transition-colors duration-150 focus:outline-none"
-            style="color: var(--text-primary);"
+            class="px-5 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 focus:outline-none"
+            style="color: var(--accent); background-color: var(--accent-light); border: 1px solid var(--border); box-shadow: var(--shadow-sm); letter-spacing: -0.01em;"
+            onmouseover="this.style.boxShadow='var(--shadow-md)'; this.style.transform='translateY(-1px)';"
+            onmouseout="this.style.boxShadow='var(--shadow-sm)'; this.style.transform='translateY(0)';"
             hx-get={tsBuildUrl(accountDashboardContract.dashboard, {
               headers: {},
               query: {
@@ -329,9 +351,13 @@ export function MonthlyCalendar({ props }: { props: MonthlyCalendarProps }): JSX
           </button>
         </div>
       </div>
-      <div class="grid grid-cols-7 gap-2">
+      <div class="grid grid-cols-7 gap-3">
         {weekDayHeaders.map((day) => (
-          <div safe class="text-center text-xs font-light pb-2" style="color: var(--text-tertiary);">
+          <div
+            safe
+            class="text-center text-xs font-medium pb-3"
+            style="color: var(--text-tertiary); letter-spacing: 0.05em; text-transform: uppercase;"
+          >
             {day}
           </div>
         ))}

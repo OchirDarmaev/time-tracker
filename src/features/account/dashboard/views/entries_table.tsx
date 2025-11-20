@@ -7,7 +7,9 @@ export function renderEntriesTable(entries: TimeEntry[], projects: Project[]): J
   if (entries.length === 0) {
     return (
       <div class="text-center py-12">
-        <p class="text-sm" style="color: var(--text-secondary);">No entries for this date.</p>
+        <p class="text-sm" style="color: var(--text-secondary);">
+          No entries for this date.
+        </p>
       </div>
     );
   }
@@ -22,19 +24,34 @@ export function renderEntriesTable(entries: TimeEntry[], projects: Project[]): J
   };
 
   return (
-    <table class="w-full border-separate border-spacing-0 rounded-lg overflow-hidden shadow-sm" style="background-color: var(--bg-secondary);">
+    <table
+      class="w-full border-separate border-spacing-0 rounded-lg overflow-hidden shadow-sm"
+      style="background-color: var(--bg-secondary);"
+    >
       <thead style="background-color: var(--bg-tertiary);">
         <tr>
-          <th class="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--text-secondary); border-bottom: 1px solid var(--border);">
+          <th
+            class="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wide"
+            style="color: var(--text-secondary); border-bottom: 1px solid var(--border);"
+          >
             Project
           </th>
-          <th class="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--text-secondary); border-bottom: 1px solid var(--border);">
+          <th
+            class="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wide"
+            style="color: var(--text-secondary); border-bottom: 1px solid var(--border);"
+          >
             Hours
           </th>
-          <th class="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--text-secondary); border-bottom: 1px solid var(--border);">
+          <th
+            class="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wide"
+            style="color: var(--text-secondary); border-bottom: 1px solid var(--border);"
+          >
             Comment
           </th>
-          <th class="px-5 py-4 text-right text-xs font-semibold uppercase tracking-wide" style="color: var(--text-secondary); border-bottom: 1px solid var(--border);">
+          <th
+            class="px-5 py-4 text-right text-xs font-semibold uppercase tracking-wide"
+            style="color: var(--text-secondary); border-bottom: 1px solid var(--border);"
+          >
             Actions
           </th>
         </tr>

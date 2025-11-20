@@ -5,7 +5,10 @@ function getWarningBadge(hours: number, required: number): JSX.Element | "" {
   if (required === 0) return "";
   if (hours > required) {
     return (
-      <span class="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-medium" style="background-color: rgba(251, 191, 36, 0.12); color: var(--warning);">
+      <span
+        class="inline-flex items-center px-2 py-1 rounded-lg text-xs font-medium"
+        style="background-color: var(--warning-light); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.2);"
+      >
         ⚠ Mismatch
       </span>
     );
@@ -44,27 +47,36 @@ export function MonthlySummary({ reported, expected }: MonthlySummaryData): JSX.
   const totalHoursColor = getHoursColor(totalMonthlyHours, totalRequiredHours);
   const hasTotalMismatch = totalMonthlyHours !== totalRequiredHours;
 
-  const overtimeColor =
-    overtimeHours > 0 ? "var(--orange)" : "var(--text-secondary)";
+  const overtimeColor = overtimeHours > 0 ? "var(--orange)" : "var(--text-secondary)";
 
   const totalDays = (workdayHours + publicHolidayHours) / REQUIRED_DAILY_HOURS;
 
   return (
-    <div class="grid grid-cols-4 gap-4 w-full">
+    <div class="grid grid-cols-4 gap-6 w-full">
       {/* Monthly Total - Most Important */}
       <div class="min-w-0">
         <div
-          class="text-[10px] font-medium mb-1 tracking-wide"
-          style="color: var(--text-secondary);"
+          class="text-xs font-medium mb-2 tracking-wide uppercase"
+          style="color: var(--text-tertiary); letter-spacing: 0.05em;"
           safe
         >
           Monthly Total: {totalDays.toFixed(1)} days
         </div>
-        <div class="flex items-baseline gap-2 flex-wrap min-h-[24px]">
-          <span class="text-lg font-bold" style={`color: ${totalHoursColor};`} safe title="Total reported hours">
+        <div class="flex items-baseline gap-2.5 flex-wrap min-h-[32px]">
+          <span
+            class="text-2xl font-bold"
+            style={`color: ${totalHoursColor}; letter-spacing: -0.02em;`}
+            safe
+            title="Total reported hours"
+          >
             {`${totalMonthlyHours.toFixed(1)}h`}
           </span>
-          <span class="text-xs" style="color: var(--text-tertiary);" safe title="Total required hours">
+          <span
+            class="text-sm font-medium"
+            style="color: var(--text-tertiary); letter-spacing: -0.01em;"
+            safe
+            title="Total required hours"
+          >
             {`/ ${totalRequiredHours.toFixed(1)}h`}
           </span>
           {hasTotalMismatch ? getWarningBadge(totalMonthlyHours, totalRequiredHours) : ""}
@@ -74,24 +86,24 @@ export function MonthlySummary({ reported, expected }: MonthlySummaryData): JSX.
       {/* Workdays */}
       <div class="min-w-0">
         <div
-          class="text-[10px] font-medium mb-1 tracking-wide"
-          style="color: var(--text-secondary);"
+          class="text-xs font-medium mb-2 tracking-wide uppercase"
+          style="color: var(--text-tertiary); letter-spacing: 0.05em;"
           safe
         >
           Workdays: {(workdayHours / REQUIRED_DAILY_HOURS).toFixed(1)} days
         </div>
-        <div class="flex items-baseline gap-2 flex-wrap min-h-[24px]">
+        <div class="flex items-baseline gap-2.5 flex-wrap min-h-[32px]">
           <span
-            class="text-xs font-semibold"
-            style={`color: ${getHoursColor(workdayHours, requiredWorkdayHours)};`}
+            class="text-xl font-bold"
+            style={`color: ${getHoursColor(workdayHours, requiredWorkdayHours)}; letter-spacing: -0.02em;`}
             safe
             title="Workday reported hours"
           >
             {`${workdayHours.toFixed(1)}h`}
           </span>
           <span
-            class="text-[10px]"
-            style="color: var(--text-tertiary);"
+            class="text-sm font-medium"
+            style="color: var(--text-tertiary); letter-spacing: -0.01em;"
             safe
             title="Workday required hours"
           >
@@ -104,27 +116,27 @@ export function MonthlySummary({ reported, expected }: MonthlySummaryData): JSX.
       {/* Public Holidays */}
       <div class="min-w-0">
         <div
-          class="text-[10px] font-medium mb-1 tracking-wide"
-          style="color: var(--text-secondary);"
+          class="text-xs font-medium mb-2 tracking-wide uppercase"
+          style="color: var(--text-tertiary); letter-spacing: 0.05em;"
           safe
         >
           Public Holidays: {(publicHolidayHours / REQUIRED_DAILY_HOURS).toFixed(1)} days
         </div>
-        <div class="flex items-baseline gap-2 flex-wrap min-h-[24px]">
+        <div class="flex items-baseline gap-2.5 flex-wrap min-h-[32px]">
           <span
-            class="text-xs font-semibold"
+            class="text-xl font-bold"
             style={`color: ${getHoursColor(
               publicHolidayHours,
               requiredPublicHolidayHours
-            )};`}
+            )}; letter-spacing: -0.02em;`}
             safe
             title="Public holiday reported hours"
           >
             {`${publicHolidayHours.toFixed(1)}h`}
           </span>
           <span
-            class="text-[10px]"
-            style="color: var(--text-tertiary);"
+            class="text-sm font-medium"
+            style="color: var(--text-tertiary); letter-spacing: -0.01em;"
             safe
             title="Public holiday required hours"
           >
@@ -133,8 +145,8 @@ export function MonthlySummary({ reported, expected }: MonthlySummaryData): JSX.
           {getWarningBadge(publicHolidayHours, requiredPublicHolidayHours)}
           {publicHolidayHasWarning && publicHolidayOvertimeHours > 0 ? (
             <span
-              class="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-medium"
-              style="background-color: rgba(248, 113, 113, 0.12); color: var(--error);"
+              class="inline-flex items-center px-2 py-1 rounded-lg text-xs font-medium"
+              style="background-color: var(--error-light); color: var(--error); border: 1px solid rgba(239, 68, 68, 0.2);"
               safe
             >
               {`⚠ + ${publicHolidayOvertimeHours.toFixed(1)}h`}
@@ -147,19 +159,32 @@ export function MonthlySummary({ reported, expected }: MonthlySummaryData): JSX.
 
       {/* Overtime - Derived Metric */}
       <div class="min-w-0">
-        <div class="text-[10px] font-medium mb-1 tracking-wide" style="color: var(--text-secondary);">
+        <div
+          class="text-xs font-medium mb-2 tracking-wide uppercase"
+          style="color: var(--text-tertiary); letter-spacing: 0.05em;"
+        >
           Overtime
         </div>
-        <div class="flex items-baseline gap-2 flex-wrap min-h-[24px]">
-          <span class="text-sm font-bold" style={`color: ${overtimeColor};`} safe>
+        <div class="flex items-baseline gap-2.5 flex-wrap min-h-[32px]">
+          <span
+            class="text-xl font-bold"
+            style={`color: ${overtimeColor}; letter-spacing: -0.02em;`}
+            safe
+          >
             {`${overtimeHours.toFixed(1)}h`}
           </span>
           {overtimeHours > 0 ? (
-            <span class="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-medium" style="background-color: rgba(249, 115, 22, 0.12); color: var(--orange);">
+            <span
+              class="inline-flex items-center px-2 py-1 rounded-lg text-xs font-medium"
+              style="background-color: var(--orange-light); color: var(--orange); border: 1px solid rgba(249, 115, 22, 0.2);"
+            >
               Overtime
             </span>
           ) : (
-            <span class="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-medium" style="background-color: var(--bg-tertiary); color: var(--text-secondary);">
+            <span
+              class="inline-flex items-center px-2 py-1 rounded-lg text-xs font-medium"
+              style="background-color: var(--bg-tertiary); color: var(--text-secondary); border: 1px solid var(--border-subtle);"
+            >
               No overtime
             </span>
           )}

@@ -43,12 +43,21 @@ export function NavButtons({
 
         if (hasAccess) {
           const baseClasses =
-            "text-gray-700 dark:text-gray-300 no-underline text-sm font-medium px-4 py-2 rounded-lg transition-all duration-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-100 dark:hover:bg-gray-800";
-          const activeClasses = isActive
-            ? "text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 font-semibold shadow-sm"
-            : "";
+            "no-underline text-sm font-medium px-5 py-2.5 rounded-xl transition-all duration-200";
+          const inactiveStyle = "color: var(--text-secondary);";
+          const activeStyle = isActive
+            ? "color: var(--accent); background-color: var(--accent-light); font-weight: 600; box-shadow: var(--shadow-sm);"
+            : inactiveStyle;
+          const hoverStyle = isActive
+            ? ""
+            : "hover:color: var(--text-primary); hover:background-color: var(--bg-tertiary);";
           return (
-            <a safe href={item.href} class={`${baseClasses} ${activeClasses}`}>
+            <a
+              safe
+              href={item.href}
+              class={baseClasses}
+              style={`${activeStyle} ${hoverStyle} letter-spacing: -0.01em;`}
+            >
               {item.label}
             </a>
           );
@@ -59,7 +68,8 @@ export function NavButtons({
           const tooltipText = `role ${requiredRolesText} required`;
           return (
             <span
-              class="text-gray-400 dark:text-gray-600 cursor-not-allowed px-4 py-2 text-sm opacity-60"
+              class="cursor-not-allowed px-5 py-2.5 text-sm opacity-50"
+              style="color: var(--text-tertiary);"
               title={tooltipText}
               safe
             >

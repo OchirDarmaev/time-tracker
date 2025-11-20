@@ -56,4 +56,34 @@ export const projectUserModel = {
       | ProjectUser
       | undefined;
   },
+
+  getByUserAndProject(userId: number, projectId: number): ProjectUser | undefined {
+    return db
+      .prepare("SELECT * FROM project_users WHERE user_id = ? AND project_id = ?")
+      .get(userId, projectId) as ProjectUser | undefined;
+  },
+
+  toggleSuppressByUserAndProject(userId: number, projectId: number): ProjectUser | undefined {
+    const existing = this.getByUserAndProject(userId, projectId);
+    if (!existing) {
+      return undefined;
+    }
+    db.prepare(
+      "UPDATE project_users SET suppressed = NOT suppressed WHERE user_id = ? AND project_id = ?"
+    ).run(userId, projectId);
+    return this.getByUserAndProject(userId, projectId);
+  },
+
+  deleteByUserAndProject(userId: number, projectId: number): void {
+    db.prepare("DELETE FROM project_users WHERE user_id = ? AND project_id = ?").run(
+      userId,
+      projectId
+    );
+  },
+
+  getAll(): ProjectUser[] {
+    return db
+      .prepare("SELECT * FROM project_users ORDER BY user_id, project_id")
+      .all() as ProjectUser[];
+  },
 };

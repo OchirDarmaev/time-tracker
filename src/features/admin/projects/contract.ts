@@ -112,4 +112,41 @@ export const adminProjectsContract = c.router({
       404: z.any(),
     },
   },
+  manageUsers: {
+    method: "GET",
+    path: "/admin/projects/users",
+    headers: z.object({
+      "hx-request": z.literal("true").optional(),
+    }),
+    responses: {
+      200: htmlResponse,
+      403: z.any(),
+    },
+  },
+  assignUserToProject: {
+    method: "POST",
+    path: "/admin/projects/users/assign",
+    body: z.object({
+      user_id: z.coerce.number(),
+      project_id: z.coerce.number(),
+    }),
+    responses: {
+      200: htmlResponse,
+      400: z.any(),
+      403: z.any(),
+    },
+  },
+  removeUserFromProject: {
+    method: "PATCH",
+    path: "/admin/projects/users/remove",
+    body: z.object({
+      user_id: z.coerce.number(),
+      project_id: z.coerce.number(),
+    }),
+    responses: {
+      200: htmlResponse,
+      400: z.any(),
+      403: z.any(),
+    },
+  },
 });

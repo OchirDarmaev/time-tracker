@@ -3,9 +3,12 @@ import { adminProjectsContract } from "./contract.js";
 import { AuthContext } from "@/shared/middleware/auth_stub.js";
 import { isAuthContext } from "@/shared/middleware/isAuthContext.js";
 import { projectModel } from "@/shared/models/project.js";
+import { projectUserModel } from "@/shared/models/project_user.js";
+import { userModel } from "@/shared/models/user.js";
 import { ProjectsList } from "./views/projects_list.js";
 import { EditProject } from "./views/edit_project.js";
 import { CreateProject } from "./views/create_project.js";
+import { ManageProjectUsers } from "./views/manage_project_users.js";
 import { Layout } from "@/shared/utils/layout.js";
 
 const s = initServer();
@@ -374,6 +377,146 @@ export const adminProjectsRouter = s.router(adminProjectsContract, {
       return {
         status: 400,
         body: String(Layout(html, authReq, "admin")),
+      };
+    }
+  },
+
+  manageUsers: async (req) => {
+    if (!isAuthContext(req.req)) {
+      return {
+        status: 401,
+        body: { body: "Unauthorized" },
+      };
+    }
+
+    const authReq = req.req as unknown as AuthContext;
+    if (!authReq.currentUser) {
+      return {
+        status: 401,
+        body: { body: "Unauthorized" },
+      };
+    }
+
+    if (!authReq.currentUser.roles.includes("admin")) {
+      return {
+        status: 403,
+        body: { body: "Forbidden" },
+      };
+    }
+
+    const users = userModel.getAll();
+    const projects = projectModel.getAll(true);
+    const projectUsers = projectUserModel.getAll();
+    const html = ManageProjectUsers({ users, projects, projectUsers });
+
+    if (req.headers["hx-request"] === "true") {
+      return {
+        status: 200,
+        body: String(html),
+      };
+    }
+
+    return {
+      status: 200,
+      body: String(Layout(html, authReq, "admin")),
+    };
+  },
+
+  assignUserToProject: async ({ body, req }) => {
+    const authReq = req as unknown as AuthContext;
+
+    if (!authReq.currentUser) {
+      return {
+        status: 401,
+        body: { body: "Unauthorized" },
+      };
+    }
+
+    if (!authReq.currentUser.roles.includes("admin")) {
+      return {
+        status: 403,
+        body: { body: "Forbidden" },
+      };
+    }
+
+    try {
+      // Check if assignment already exists
+      const existing = projectUserModel.getByUserAndProject(body.user_id, body.project_id);
+      if (existing) {
+        // If it exists but is suppressed, restore it (unsuppress)
+        if (existing.suppressed) {
+          projectUserModel.toggleSuppressByUserAndProject(body.user_id, body.project_id);
+        }
+      } else {
+        // Create new assignment
+        projectUserModel.create(body.user_id, body.project_id);
+      }
+
+      const users = userModel.getAll();
+      const projects = projectModel.getAll(true);
+      const projectUsers = projectUserModel.getAll();
+      const html = ManageProjectUsers({ users, projects, projectUsers });
+
+      return {
+        status: 200,
+        body: String(html),
+      };
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to assign user to project";
+      return {
+        status: 400,
+        body: { body: errorMessage },
+      };
+    }
+  },
+
+  removeUserFromProject: async ({ body, req }) => {
+    const authReq = req as unknown as AuthContext;
+
+    if (!authReq.currentUser) {
+      return {
+        status: 401,
+        body: { body: "Unauthorized" },
+      };
+    }
+
+    if (!authReq.currentUser.roles.includes("admin")) {
+      return {
+        status: 403,
+        body: { body: "Forbidden" },
+      };
+    }
+
+    try {
+      const existing = projectUserModel.getByUserAndProject(body.user_id, body.project_id);
+      if (!existing) {
+        return {
+          status: 400,
+          body: { body: "User is not assigned to this project" },
+        };
+      }
+
+      // Suppress the user instead of deleting
+      if (!existing.suppressed) {
+        projectUserModel.toggleSuppressByUserAndProject(body.user_id, body.project_id);
+      }
+
+      const users = userModel.getAll();
+      const projects = projectModel.getAll(true);
+      const projectUsers = projectUserModel.getAll();
+      const html = ManageProjectUsers({ users, projects, projectUsers });
+
+      return {
+        status: 200,
+        body: String(html),
+      };
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to remove user from project";
+      return {
+        status: 400,
+        body: { body: errorMessage },
       };
     }
   },

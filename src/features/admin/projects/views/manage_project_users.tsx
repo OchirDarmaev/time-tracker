@@ -1,0 +1,151 @@
+import { User } from "@/shared/models/user.js";
+import { Project } from "@/shared/models/project.js";
+import { ProjectUser } from "@/shared/models/project_user.js";
+import { adminProjectsContract } from "../contract.js";
+import { tsBuildUrl } from "@/shared/utils/paths.js";
+
+interface ManageProjectUsersProps {
+  users: User[];
+  projects: Project[];
+  projectUsers: ProjectUser[];
+}
+
+export function ManageProjectUsers({
+  users,
+  projects,
+  projectUsers,
+}: ManageProjectUsersProps): JSX.Element {
+  // Filter out system projects - they are always assigned to all users
+  const customProjects = projects.filter((p) => !p.isSystem);
+
+  // Create a map for quick lookup: user_id -> project_id -> ProjectUser
+  const projectUserMap = new Map<number, Map<number, ProjectUser>>();
+  projectUsers.forEach((pu) => {
+    if (!projectUserMap.has(pu.user_id)) {
+      projectUserMap.set(pu.user_id, new Map());
+    }
+    projectUserMap.get(pu.user_id)!.set(pu.project_id, pu);
+  });
+
+  const isUserAssignedToProject = (userId: number, projectId: number): boolean => {
+    return projectUserMap.get(userId)?.has(projectId) ?? false;
+  };
+
+  const isUserSuppressedInProject = (userId: number, projectId: number): boolean => {
+    return projectUserMap.get(userId)?.get(projectId)?.suppressed ?? false;
+  };
+
+  return (
+    <div id="manage-project-users" hx-target="this" hx-swap="outerHTML">
+      <div class="mb-6 flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold mb-2" style="color: var(--text-primary);">
+            Manage Project Users
+          </h1>
+          <p style="color: var(--text-secondary);">
+            Assign users to projects by checking the boxes below. System projects are always
+            assigned to all users and are hidden from this view.
+          </p>
+        </div>
+      </div>
+
+      <div
+        class="rounded-xl shadow-sm overflow-hidden"
+        style="background-color: var(--bg-secondary); border: 1px solid var(--border);"
+      >
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y" style="border-color: var(--border);">
+            <thead style="background-color: var(--bg-tertiary);">
+              <tr>
+                <th
+                  class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider sticky left-0 z-10"
+                  style="background-color: var(--bg-tertiary); color: var(--text-secondary); border-right: 1px solid var(--border);"
+                >
+                  User
+                </th>
+                {customProjects.map((project) => (
+                  <th
+                    class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider"
+                    style="color: var(--text-secondary); min-width: 120px;"
+                  >
+                    <div class="flex items-center justify-center gap-2">
+                      <div
+                        class="w-3 h-3 rounded shrink-0"
+                        style={`background-color: ${project.color}`}
+                      ></div>
+                      <span safe class="truncate max-w-[100px]" title={project.name}>
+                        {project.name}
+                      </span>
+                    </div>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody
+              class="divide-y"
+              style="background-color: var(--bg-secondary); border-color: var(--border);"
+            >
+              {users.map((user) => (
+                <tr
+                  class="transition-colors"
+                  style="border-color: var(--border);"
+                  id={`user-row-${user.id}`}
+                >
+                  <td
+                    class="px-4 py-3 whitespace-nowrap sticky left-0 z-10"
+                    style="background-color: var(--bg-secondary); border-right: 1px solid var(--border);"
+                  >
+                    <div class="flex items-center gap-2">
+                      <span safe class="text-sm font-medium" style="color: var(--text-primary);">
+                        {user.email}
+                      </span>
+                      {!user.active && (
+                        <span
+                          class="px-2 py-0.5 text-xs font-semibold rounded-full"
+                          style="background-color: var(--bg-tertiary); color: var(--text-secondary);"
+                        >
+                          Inactive
+                        </span>
+                      )}
+                    </div>
+                  </td>
+                  {customProjects.map((project) => {
+                    const assigned = isUserAssignedToProject(user.id, project.id);
+                    const suppressed = isUserSuppressedInProject(user.id, project.id);
+                    const cellId = `cell-${user.id}-${project.id}`;
+
+                    return (
+                      <td class="px-4 py-3 text-center" style={suppressed ? "opacity: 0.5;" : ""}>
+                        <div class="flex items-center justify-center">
+                          <input
+                            type="checkbox"
+                            id={cellId}
+                            checked={assigned && !suppressed}
+                            hx-post={
+                              assigned && !suppressed
+                                ? tsBuildUrl(adminProjectsContract.removeUserFromProject, {})
+                                : tsBuildUrl(adminProjectsContract.assignUserToProject, {})
+                            }
+                            hx-vals={JSON.stringify({
+                              user_id: user.id,
+                              project_id: project.id,
+                            })}
+                            hx-target="#manage-project-users"
+                            hx-swap="outerHTML"
+                            hx-trigger="change"
+                            class="w-4 h-4 rounded"
+                            style="cursor: pointer; accent-color: var(--accent);"
+                          />
+                        </div>
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}

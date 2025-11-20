@@ -12,23 +12,42 @@ export function ProjectsList(projects: Project[]): JSX.Element {
           </h1>
           <p style="color: var(--text-secondary);">Create and manage projects for time tracking</p>
         </div>
-        <a
-          href={tsBuildUrl(adminProjectsContract.createPage, {
-            headers: {},
-          })}
-          class="px-4 py-2.5 text-white font-medium rounded-lg shadow-sm hover:shadow-md focus:outline-none focus:ring-2 transition-all no-underline inline-flex items-center gap-2"
-          style="background-color: var(--accent);"
-        >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 4v16m8-8H4"
-            />
-          </svg>
-          Create Project
-        </a>
+        <div class="flex items-center gap-3">
+          <a
+            href={tsBuildUrl(adminProjectsContract.manageUsers, {
+              headers: {},
+            })}
+            class="px-4 py-2.5 font-medium rounded-lg shadow-sm hover:shadow-md focus:outline-none focus:ring-2 transition-all no-underline inline-flex items-center gap-2"
+            style="background-color: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border);"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+              />
+            </svg>
+            Manage Users
+          </a>
+          <a
+            href={tsBuildUrl(adminProjectsContract.createPage, {
+              headers: {},
+            })}
+            class="px-4 py-2.5 text-white font-medium rounded-lg shadow-sm hover:shadow-md focus:outline-none focus:ring-2 transition-all no-underline inline-flex items-center gap-2"
+            style="background-color: var(--accent);"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 4v16m8-8H4"
+              />
+            </svg>
+            Create Project
+          </a>
+        </div>
       </div>
 
       <div

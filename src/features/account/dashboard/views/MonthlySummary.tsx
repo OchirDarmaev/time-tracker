@@ -5,7 +5,7 @@ function getWarningBadge(hours: number, required: number): JSX.Element | "" {
   if (required === 0) return "";
   if (hours > required) {
     return (
-      <span class="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-medium bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400">
+      <span class="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-medium" style="background-color: rgba(251, 191, 36, 0.12); color: var(--warning);">
         ⚠ Mismatch
       </span>
     );
@@ -14,11 +14,11 @@ function getWarningBadge(hours: number, required: number): JSX.Element | "" {
 }
 
 function getHoursColor(hours: number, required: number): string {
-  if (required === 0) return "text-gray-600 dark:text-gray-400";
+  if (required === 0) return "var(--text-secondary)";
   if (hours > required) {
-    return "text-yellow-600 dark:text-yellow-400";
+    return "var(--warning)";
   }
-  return "text-gray-900 dark:text-gray-100";
+  return "var(--text-primary)";
 }
 
 export function MonthlySummary({ reported, expected }: MonthlySummaryData): JSX.Element {
@@ -45,7 +45,7 @@ export function MonthlySummary({ reported, expected }: MonthlySummaryData): JSX.
   const hasTotalMismatch = totalMonthlyHours !== totalRequiredHours;
 
   const overtimeColor =
-    overtimeHours > 0 ? "text-orange-600 dark:text-orange-400" : "text-gray-600 dark:text-gray-400";
+    overtimeHours > 0 ? "var(--orange)" : "var(--text-secondary)";
 
   const totalDays = (workdayHours + publicHolidayHours) / REQUIRED_DAILY_HOURS;
 
@@ -54,16 +54,17 @@ export function MonthlySummary({ reported, expected }: MonthlySummaryData): JSX.
       {/* Monthly Total - Most Important */}
       <div class="min-w-0">
         <div
-          class="text-[10px] font-medium mb-1 text-gray-600 dark:text-gray-400 tracking-wide"
+          class="text-[10px] font-medium mb-1 tracking-wide"
+          style="color: var(--text-secondary);"
           safe
         >
           Monthly Total: {totalDays.toFixed(1)} days
         </div>
         <div class="flex items-baseline gap-2 flex-wrap min-h-[24px]">
-          <span class={`text-lg font-bold ${totalHoursColor}`} safe title="Total reported hours">
+          <span class="text-lg font-bold" style={`color: ${totalHoursColor};`} safe title="Total reported hours">
             {`${totalMonthlyHours.toFixed(1)}h`}
           </span>
-          <span class="text-xs text-gray-500 dark:text-gray-400" safe title="Total required hours">
+          <span class="text-xs" style="color: var(--text-tertiary);" safe title="Total required hours">
             {`/ ${totalRequiredHours.toFixed(1)}h`}
           </span>
           {hasTotalMismatch ? getWarningBadge(totalMonthlyHours, totalRequiredHours) : ""}
@@ -73,21 +74,24 @@ export function MonthlySummary({ reported, expected }: MonthlySummaryData): JSX.
       {/* Workdays */}
       <div class="min-w-0">
         <div
-          class="text-[10px] font-medium mb-1 text-gray-600 dark:text-gray-400 tracking-wide"
+          class="text-[10px] font-medium mb-1 tracking-wide"
+          style="color: var(--text-secondary);"
           safe
         >
           Workdays: {(workdayHours / REQUIRED_DAILY_HOURS).toFixed(1)} days
         </div>
         <div class="flex items-baseline gap-2 flex-wrap min-h-[24px]">
           <span
-            class={`text-xs font-semibold ${getHoursColor(workdayHours, requiredWorkdayHours)}`}
+            class="text-xs font-semibold"
+            style={`color: ${getHoursColor(workdayHours, requiredWorkdayHours)};`}
             safe
             title="Workday reported hours"
           >
             {`${workdayHours.toFixed(1)}h`}
           </span>
           <span
-            class="text-[10px] text-gray-500 dark:text-gray-400"
+            class="text-[10px]"
+            style="color: var(--text-tertiary);"
             safe
             title="Workday required hours"
           >
@@ -100,24 +104,27 @@ export function MonthlySummary({ reported, expected }: MonthlySummaryData): JSX.
       {/* Public Holidays */}
       <div class="min-w-0">
         <div
-          class="text-[10px] font-medium mb-1 text-gray-600 dark:text-gray-400 tracking-wide"
+          class="text-[10px] font-medium mb-1 tracking-wide"
+          style="color: var(--text-secondary);"
           safe
         >
           Public Holidays: {(publicHolidayHours / REQUIRED_DAILY_HOURS).toFixed(1)} days
         </div>
         <div class="flex items-baseline gap-2 flex-wrap min-h-[24px]">
           <span
-            class={`text-xs font-semibold ${getHoursColor(
+            class="text-xs font-semibold"
+            style={`color: ${getHoursColor(
               publicHolidayHours,
               requiredPublicHolidayHours
-            )}`}
+            )};`}
             safe
             title="Public holiday reported hours"
           >
             {`${publicHolidayHours.toFixed(1)}h`}
           </span>
           <span
-            class="text-[10px] text-gray-500 dark:text-gray-400"
+            class="text-[10px]"
+            style="color: var(--text-tertiary);"
             safe
             title="Public holiday required hours"
           >
@@ -126,7 +133,8 @@ export function MonthlySummary({ reported, expected }: MonthlySummaryData): JSX.
           {getWarningBadge(publicHolidayHours, requiredPublicHolidayHours)}
           {publicHolidayHasWarning && publicHolidayOvertimeHours > 0 ? (
             <span
-              class="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-medium bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400"
+              class="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-medium"
+              style="background-color: rgba(248, 113, 113, 0.12); color: var(--error);"
               safe
             >
               {`⚠ + ${publicHolidayOvertimeHours.toFixed(1)}h`}
@@ -139,19 +147,19 @@ export function MonthlySummary({ reported, expected }: MonthlySummaryData): JSX.
 
       {/* Overtime - Derived Metric */}
       <div class="min-w-0">
-        <div class="text-[10px] font-medium mb-1 text-gray-600 dark:text-gray-400 tracking-wide">
+        <div class="text-[10px] font-medium mb-1 tracking-wide" style="color: var(--text-secondary);">
           Overtime
         </div>
         <div class="flex items-baseline gap-2 flex-wrap min-h-[24px]">
-          <span class={`text-sm font-bold ${overtimeColor}`} safe>
+          <span class="text-sm font-bold" style={`color: ${overtimeColor};`} safe>
             {`${overtimeHours.toFixed(1)}h`}
           </span>
           {overtimeHours > 0 ? (
-            <span class="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-medium bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400">
+            <span class="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-medium" style="background-color: rgba(249, 115, 22, 0.12); color: var(--orange);">
               Overtime
             </span>
           ) : (
-            <span class="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-medium bg-gray-100 dark:bg-gray-900/30 text-gray-600 dark:text-gray-400">
+            <span class="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-medium" style="background-color: var(--bg-tertiary); color: var(--text-secondary);">
               No overtime
             </span>
           )}

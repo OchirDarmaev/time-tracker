@@ -47,7 +47,7 @@ class MultiSlider extends HTMLElement {
           border-radius: 0.5rem; 
           overflow: hidden; 
           display: flex; 
-          background-color: rgb(229 231 235); 
+          background-color: var(--bg-tertiary); 
           user-select: none; 
         }
         .seg { 
@@ -59,12 +59,12 @@ class MultiSlider extends HTMLElement {
           background-color: rgba(0, 0, 0, 0.3); 
           cursor: ew-resize; 
         }
-        .color0 { background-color: rgb(147 197 253); }
-        .color1 { background-color: rgb(125 211 252); }
-        .color2 { background-color: rgb(134 239 172); }
-        .color3 { background-color: rgb(196 181 253); }
-        .color4 { background-color: rgb(253 186 116); }
-        .color5 { background-color: rgb(94 234 212); }
+        .color0 { background-color: var(--info); }
+        .color1 { background-color: var(--accent); }
+        .color2 { background-color: var(--success); }
+        .color3 { background-color: var(--project-default); }
+        .color4 { background-color: var(--orange); }
+        .color5 { background-color: var(--warning); }
       </style>
 
       <div class="slider">

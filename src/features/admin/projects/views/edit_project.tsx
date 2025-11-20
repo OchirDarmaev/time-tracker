@@ -11,16 +11,21 @@ export function EditProject(
   return (
     <div id="edit-project" hx-target="this" hx-swap="outerHTML">
       {errorMessage ? (
-        <div class="mb-4 p-3 bg-red-100 dark:bg-red-900/20 border border-red-400 dark:border-red-600 text-red-700 dark:text-red-400 rounded">
+        <div
+          class="mb-4 p-3 rounded border"
+          style="background-color: rgba(248, 113, 113, 0.12); border-color: var(--error); color: var(--error);"
+        >
           <span safe>{errorMessage}</span>
         </div>
       ) : null}
       <div class="mb-6">
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Edit Project</h1>
-        <p class="text-gray-600 dark:text-gray-400">Update project details</p>
+        <h1 class="text-2xl font-bold mb-2" style="color: var(--text-primary);">
+          Edit Project
+        </h1>
+        <p style="color: var(--text-secondary);">Update project details</p>
       </div>
 
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+      <div class="rounded-lg shadow p-6" style="background-color: var(--bg-secondary);">
         <form
           hx-patch={tsBuildUrl(adminProjectsContract.update, {
             params: { id: project.id },
@@ -35,7 +40,8 @@ export function EditProject(
           <div>
             <label
               for="project-name"
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              class="block text-sm font-medium mb-2"
+              style="color: var(--text-primary);"
             >
               Project Name
             </label>
@@ -45,7 +51,8 @@ export function EditProject(
               name="name"
               value={project.name}
               required
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              class="w-full px-3 py-2 rounded-md focus:outline-none focus:ring-2 input-modern"
+              style="border-color: var(--border); background-color: var(--bg-tertiary); color: var(--text-primary);"
               placeholder="Enter project name"
             />
           </div>
@@ -53,7 +60,8 @@ export function EditProject(
           <div>
             <label
               for="project-color"
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              class="block text-sm font-medium mb-2"
+              style="color: var(--text-primary);"
             >
               Color
             </label>
@@ -63,7 +71,8 @@ export function EditProject(
                 id="project-color"
                 name="color"
                 value={project.color}
-                class="w-20 h-10 border border-gray-300 dark:border-gray-600 rounded-md cursor-pointer"
+                class="w-20 h-10 border rounded-md cursor-pointer"
+                style="border-color: var(--border);"
               />
             </div>
           </div>
@@ -76,13 +85,14 @@ export function EditProject(
                   name="suppressed"
                   value="true"
                   checked={project.suppressed}
-                  class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700"
+                  class="w-4 h-4 rounded focus:ring-2"
+                  style="border-color: var(--border); background-color: var(--bg-tertiary); accent-color: var(--accent);"
                 />
-                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                <span class="text-sm font-medium" style="color: var(--text-primary);">
                   Suppressed (hidden from users)
                 </span>
               </label>
-              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              <p class="mt-1 text-xs" style="color: var(--text-tertiary);">
                 Suppressed projects are hidden from users but their history is preserved
               </p>
             </div>
@@ -91,7 +101,7 @@ export function EditProject(
           <div class="flex items-center gap-4 pt-4">
             <button
               type="submit"
-              class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              class="px-4 py-2 text-white rounded-md focus:outline-none focus:ring-2 btn-primary"
             >
               Save Changes
             </button>
@@ -99,7 +109,7 @@ export function EditProject(
               href={tsBuildUrl(adminProjectsContract.list, {
                 headers: {},
               })}
-              class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 no-underline"
+              class="px-4 py-2 rounded-md focus:outline-none focus:ring-2 no-underline btn-secondary"
             >
               Cancel
             </a>

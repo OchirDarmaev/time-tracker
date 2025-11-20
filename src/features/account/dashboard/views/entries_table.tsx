@@ -7,7 +7,7 @@ export function renderEntriesTable(entries: TimeEntry[], projects: Project[]): J
   if (entries.length === 0) {
     return (
       <div class="text-center py-12">
-        <p class="text-gray-600 dark:text-gray-400 text-sm">No entries for this date.</p>
+        <p class="text-sm" style="color: var(--text-secondary);">No entries for this date.</p>
       </div>
     );
   }
@@ -22,19 +22,19 @@ export function renderEntriesTable(entries: TimeEntry[], projects: Project[]): J
   };
 
   return (
-    <table class="w-full border-separate border-spacing-0 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden shadow-sm">
-      <thead class="bg-gray-200 dark:bg-gray-700">
+    <table class="w-full border-separate border-spacing-0 rounded-lg overflow-hidden shadow-sm" style="background-color: var(--bg-secondary);">
+      <thead style="background-color: var(--bg-tertiary);">
         <tr>
-          <th class="px-5 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600">
+          <th class="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--text-secondary); border-bottom: 1px solid var(--border);">
             Project
           </th>
-          <th class="px-5 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600">
+          <th class="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--text-secondary); border-bottom: 1px solid var(--border);">
             Hours
           </th>
-          <th class="px-5 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600">
+          <th class="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--text-secondary); border-bottom: 1px solid var(--border);">
             Comment
           </th>
-          <th class="px-5 py-4 text-right text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide border-b border-gray-300 dark:border-gray-600">
+          <th class="px-5 py-4 text-right text-xs font-semibold uppercase tracking-wide" style="color: var(--text-secondary); border-bottom: 1px solid var(--border);">
             Actions
           </th>
         </tr>
@@ -44,16 +44,16 @@ export function renderEntriesTable(entries: TimeEntry[], projects: Project[]): J
           const tags = extractTags(entry.comment);
           const commentWithoutTags = entry.comment ? entry.comment.replace(/#\w+/g, "").trim() : "";
           return (
-            <tr id={`entry-${entry.id}`} class="hover:bg-gray-200 dark:hover:bg-gray-700">
-              <td class="px-5 py-4 font-medium text-gray-900 dark:text-gray-100 text-sm">
+            <tr id={`entry-${entry.id}`} style="border-color: var(--border);">
+              <td class="px-5 py-4 font-medium text-sm" style="color: var(--text-primary);">
                 <span safe>{projectMap.get(entry.project_id) || "Unknown"}</span>
               </td>
-              <td class="px-5 py-4 font-semibold text-indigo-600 dark:text-indigo-400 text-sm">
+              <td class="px-5 py-4 font-semibold text-sm" style="color: var(--accent);">
                 <span safe>{entry.hours.toFixed(1)}h</span>
               </td>
               <td class="px-5 py-4 text-sm">
                 {commentWithoutTags ? (
-                  <span class="text-gray-900 dark:text-gray-100" safe>
+                  <span style="color: var(--text-primary);" safe>
                     {commentWithoutTags}
                   </span>
                 ) : (
@@ -63,7 +63,8 @@ export function renderEntriesTable(entries: TimeEntry[], projects: Project[]): J
                   ? tags.map((tag) => (
                       <span
                         safe
-                        class="inline-flex items-center px-2.5 py-1 rounded-xl text-xs font-medium bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 ml-1.5"
+                        class="inline-flex items-center px-2.5 py-1 rounded-xl text-xs font-medium ml-1.5"
+                        style="background-color: rgba(107, 117, 216, 0.12); color: var(--accent); border: 1px solid rgba(107, 117, 216, 0.2);"
                       >
                         {tag}
                       </span>
@@ -79,7 +80,8 @@ export function renderEntriesTable(entries: TimeEntry[], projects: Project[]): J
                   hx-swap="outerHTML transition:true"
                   hx-confirm="Delete this entry?"
                   hx-scroll="false"
-                  class="bg-transparent text-red-500 dark:text-red-400 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-xs font-medium cursor-pointer hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-500 dark:hover:border-red-400"
+                  class="bg-transparent border rounded-lg px-3 py-1.5 text-xs font-medium cursor-pointer"
+                  style="color: var(--error); border-color: var(--border);"
                 >
                   Delete
                 </button>

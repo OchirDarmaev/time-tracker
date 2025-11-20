@@ -43,9 +43,9 @@ export function NavButtons({
 
         if (hasAccess) {
           const baseClasses =
-            "text-gray-600 dark:text-gray-400 no-underline text-sm font-medium px-3 py-2 rounded-md hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-700";
+            "text-gray-700 dark:text-gray-300 no-underline text-sm font-medium px-4 py-2 rounded-lg transition-all duration-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-100 dark:hover:bg-gray-800";
           const activeClasses = isActive
-            ? "text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20"
+            ? "text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 font-semibold shadow-sm"
             : "";
           return (
             <a safe href={item.href} class={`${baseClasses} ${activeClasses}`}>
@@ -59,7 +59,7 @@ export function NavButtons({
           const tooltipText = `role ${requiredRolesText} required`;
           return (
             <span
-              class="text-gray-500 dark:text-gray-500 cursor-not-allowed px-3 py-2 text-sm"
+              class="text-gray-400 dark:text-gray-600 cursor-not-allowed px-4 py-2 text-sm opacity-60"
               title={tooltipText}
               safe
             >

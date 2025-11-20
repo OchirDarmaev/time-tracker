@@ -27,7 +27,7 @@ export interface MonthlyCalendarProps {
 }
 
 // Default color fallback
-const DEFAULT_PROJECT_COLOR = "#14b8a6";
+const DEFAULT_PROJECT_COLOR = "var(--project-default)";
 
 function getProjectColor(projectId: number, projects: Project[]): string {
   const project = projects.find((p) => p.id === projectId);
@@ -203,7 +203,8 @@ export function MonthlyCalendar({ props }: { props: MonthlyCalendarProps }): JSX
     // Small orange circle indicator when hours exceed required
     const overLimitIndicator = isOverLimit ? (
       <span
-        class="absolute top-1 right-1 w-2 h-2 rounded-full bg-orange-500 z-20"
+        class="absolute top-1 right-1 w-2 h-2 rounded-full z-20"
+        style="background-color: var(--orange);"
         title="Over ${REQUIRED_DAILY_HOURS} hours"
       ></span>
     ) : (
@@ -211,24 +212,24 @@ export function MonthlyCalendar({ props }: { props: MonthlyCalendarProps }): JSX
     );
 
     // Background for selected state only
-    const bgClass = isSelected
-      ? "bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900"
+    const bgStyle = isSelected
+      ? "background-color: var(--text-primary); color: var(--bg-primary);"
       : isToday
-        ? "bg-gray-100 dark:bg-gray-800"
+        ? "background-color: var(--bg-tertiary);"
         : "";
 
     // Text color based on day type
-    const textClass = isSelected
+    const textStyle = isSelected
       ? ""
       : isPublicHoliday
-        ? "text-red-600 dark:text-red-400 font-medium"
+        ? "color: var(--error); font-weight: 500;"
         : isWeekend
-          ? "text-gray-400 dark:text-gray-600"
+          ? "color: var(--text-tertiary);"
           : isWorkday
-            ? "text-blue-600 dark:text-blue-400 font-medium"
+            ? "color: var(--info); font-weight: 500;"
             : day.isWeekend
-              ? "text-gray-400 dark:text-gray-600"
-              : "text-gray-700 dark:text-gray-300";
+              ? "color: var(--text-tertiary);"
+              : "color: var(--text-primary);";
 
     // Title with day type information
     let title = `${hours.toFixed(1)}h`;
@@ -243,7 +244,8 @@ export function MonthlyCalendar({ props }: { props: MonthlyCalendarProps }): JSX
     return (
       <button
         type="button"
-        class={`relative flex items-center justify-center aspect-square rounded-lg border border-transparent ${bgClass} ${textClass} hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-150 focus:outline-none focus:ring-1 focus:ring-gray-400 dark:focus:ring-gray-600`}
+        class="relative flex items-center justify-center aspect-square rounded-lg border border-transparent transition-colors duration-150 focus:outline-none"
+        style={`${bgStyle} ${textStyle} border-color: transparent;`}
         hx-get={tsBuildUrl(accountDashboardContract.dashboard, {
           headers: {},
           query: {
@@ -271,7 +273,8 @@ export function MonthlyCalendar({ props }: { props: MonthlyCalendarProps }): JSX
         <div class="flex items-center justify-between mb-4">
           <button
             type="button"
-            class="px-3 py-1 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors duration-150 focus:outline-none focus:ring-1 focus:ring-gray-400 dark:focus:ring-gray-600"
+            class="px-3 py-1 text-sm rounded transition-colors duration-150 focus:outline-none"
+            style="color: var(--text-primary);"
             hx-get={tsBuildUrl(accountDashboardContract.dashboard, {
               headers: {},
               query: {
@@ -285,12 +288,13 @@ export function MonthlyCalendar({ props }: { props: MonthlyCalendarProps }): JSX
           >
             &lt;
           </button>
-          <h3 safe class="text-lg font-light text-gray-900 dark:text-gray-100 tracking-wide">
+          <h3 safe class="text-lg font-light tracking-wide" style="color: var(--text-primary);">
             {`${monthName} ${year}`}
           </h3>
           <button
             type="button"
-            class="px-3 py-1 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors duration-150 focus:outline-none focus:ring-1 focus:ring-gray-400 dark:focus:ring-gray-600"
+            class="px-3 py-1 text-sm rounded transition-colors duration-150 focus:outline-none"
+            style="color: var(--text-primary);"
             hx-get={tsBuildUrl(accountDashboardContract.dashboard, {
               headers: {},
               query: {
@@ -308,7 +312,8 @@ export function MonthlyCalendar({ props }: { props: MonthlyCalendarProps }): JSX
         <div class="flex justify-center mb-4">
           <button
             type="button"
-            class="px-4 py-1 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors duration-150 focus:outline-none focus:ring-1 focus:ring-gray-400 dark:focus:ring-gray-600"
+            class="px-4 py-1 text-sm rounded transition-colors duration-150 focus:outline-none"
+            style="color: var(--text-primary);"
             hx-get={tsBuildUrl(accountDashboardContract.dashboard, {
               headers: {},
               query: {
@@ -326,7 +331,7 @@ export function MonthlyCalendar({ props }: { props: MonthlyCalendarProps }): JSX
       </div>
       <div class="grid grid-cols-7 gap-2">
         {weekDayHeaders.map((day) => (
-          <div safe class="text-center text-xs font-light text-gray-500 dark:text-gray-500 pb-2">
+          <div safe class="text-center text-xs font-light pb-2" style="color: var(--text-tertiary);">
             {day}
           </div>
         ))}

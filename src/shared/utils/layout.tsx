@@ -32,13 +32,13 @@ export function Layout(
       <script src="/static/js/theme.min.js"></script>
       {/* Top Navigation Bar */}
       <nav
-        class="px-6 flex items-center justify-between bg-gray-100 dark:bg-gray-800 border-b border-gray-300 dark:border-gray-700 backdrop-blur-sm sticky top-0 z-100 h-16"
+        class="px-6 flex items-center justify-between bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 backdrop-blur-sm sticky top-0 z-100 h-16 shadow-sm"
         style={{ viewTransitionName: "nav-bar" }}
       >
         <div class="flex items-center">
           <a
             href="/"
-            class="text-lg font-semibold text-gray-900 dark:text-gray-100 hover:text-indigo-600 dark:hover:text-indigo-400 no-underline"
+            class="text-lg font-semibold text-gray-900 dark:text-gray-50 hover:text-indigo-600 dark:hover:text-indigo-400 no-underline transition-colors"
           >
             TimeTrack
           </a>

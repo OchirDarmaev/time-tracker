@@ -18,43 +18,43 @@ export function DailyStatus(props: DailyStatusProps): JSX.Element {
     : true;
   const isOverLimit = requiresDailyHours ? reportedHours > REQUIRED_DAILY_HOURS : false;
   const statusColor = isOverLimit
-    ? "text-orange-600 dark:text-orange-400"
+    ? "var(--orange)"
     : isComplete
-      ? "text-green-600 dark:text-green-400"
+      ? "var(--success)"
       : requiresDailyHours && reportedHours >= 4
-        ? "text-yellow-600 dark:text-yellow-400"
+        ? "var(--warning)"
         : requiresDailyHours
-          ? "text-red-600 dark:text-red-400"
-          : "text-gray-600 dark:text-gray-400";
+          ? "var(--error)"
+          : "var(--text-secondary)";
 
   return (
     <div class="flex-1 min-w-[140px]">
-      <div class="text-[10px] font-medium mb-0.5 text-gray-600 dark:text-gray-400">
+      <div class="text-[10px] font-medium mb-0.5" style="color: var(--text-secondary);">
         Daily Status
       </div>
       <div class="flex items-baseline gap-2 flex-wrap">
-        <span class={`text-2xl font-bold ${statusColor}`} safe>
+        <span class="text-2xl font-bold" style={`color: ${statusColor};`} safe>
           {reportedHours.toFixed(1)}h
         </span>
         {requiresDailyHours ? (
-          <span class="text-sm text-gray-500 dark:text-gray-400">/ {REQUIRED_DAILY_HOURS}h</span>
+          <span class="text-sm" style="color: var(--text-tertiary);">/ {REQUIRED_DAILY_HOURS}h</span>
         ) : (
           ""
         )}
         {requiresDailyHours ? (
           isOverLimit ? (
-            <span class="text-xs text-orange-600 dark:text-orange-400 font-medium">
+            <span class="text-xs font-medium" style="color: var(--orange);">
               ⚠ over limit
             </span>
           ) : isComplete ? (
-            <span class="text-xs text-green-600 dark:text-green-400">✓ Complete</span>
+            <span class="text-xs" style="color: var(--success);">✓ Complete</span>
           ) : (
-            <span class="text-xs text-gray-600 dark:text-gray-400" safe>
+            <span class="text-xs" style="color: var(--text-secondary);" safe>
               ({remainingHours.toFixed(1)}h needed)
             </span>
           )
         ) : (
-          <span class="text-xs text-gray-500 dark:text-gray-400">No time required</span>
+          <span class="text-xs" style="color: var(--text-tertiary);">No time required</span>
         )}
       </div>
     </div>

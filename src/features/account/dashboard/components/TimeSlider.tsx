@@ -50,8 +50,8 @@ function getProjectColor(project: Project): { bg: string; solid: string } {
     };
   }
   return {
-    bg: "linear-gradient(135deg, #14b8a6 0%, #0d9488 100%)",
-    solid: "#14b8a6",
+    bg: "linear-gradient(135deg, var(--project-default) 0%, var(--project-default-dark) 100%)",
+    solid: "var(--project-default)",
   };
 }
 
@@ -78,7 +78,7 @@ export function TimeSlider(props: TimeSliderProps): JSX.Element {
     const leftPercent = reportedHours > 0 ? (currentPosition / reportedHours) * 100 : 0;
 
     const project = projects.find((p) => p.id === segment.project_id);
-    const color = project ? getProjectColor(project) : { bg: "#14b8a6", solid: "#14b8a6" };
+    const color = project ? getProjectColor(project) : { bg: "linear-gradient(135deg, var(--project-default) 0%, var(--project-default-dark) 100%)", solid: "var(--project-default)" };
 
     segmentElements.push(
       <div
@@ -100,10 +100,10 @@ export function TimeSlider(props: TimeSliderProps): JSX.Element {
   });
 
   return (
-    <div class="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-3 shadow-sm my-4 w-full max-w-full box-border">
-      <div class="mb-4 pb-3 border-b border-gray-300 dark:border-gray-700">
+    <div class="rounded-lg p-3 shadow-sm my-4 w-full max-w-full box-border" style="background-color: var(--bg-tertiary); border: 1px solid var(--border);">
+      <div class="mb-4 pb-3" style="border-bottom: 1px solid var(--border);">
         <div class="mb-2">
-          <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 tracking-wide block">
+          <span class="text-xs font-semibold tracking-wide block" style="color: var(--text-secondary);">
             Projects
           </span>
         </div>
@@ -183,37 +183,37 @@ export function TimeSlider(props: TimeSliderProps): JSX.Element {
       <DailyStatus dayType={dayType} reportedHours={reportedHours} />
 
       <div class="relative my-4">
-        <div class="relative h-16 bg-linear-to-r from-gray-200 via-teal-50/5 to-gray-200 dark:from-gray-700 dark:via-teal-900/5 dark:to-gray-700 rounded-md border border-gray-300 dark:border-gray-600 overflow-visible min-h-[64px]">
+        <div class="relative h-16 rounded-md overflow-visible min-h-[64px]" style="background-color: var(--bg-tertiary); border: 1px solid var(--border);">
           {segments.length === 0 ? (
-            <div class="flex items-center justify-center h-full w-full text-xs text-gray-500 dark:text-gray-400">
+            <div class="flex items-center justify-center h-full w-full text-xs" style="color: var(--text-tertiary);">
               Click a project chip to add a time segment
             </div>
           ) : (
             segmentElements
           )}
         </div>
-        <div class="flex justify-between mt-1 text-[10px] text-gray-500 dark:text-gray-400">
+        <div class="flex justify-between mt-1 text-[10px]" style="color: var(--text-tertiary);">
           <span class="font-medium">0h</span>
           <span class="font-medium">{reportedHours}h</span>
         </div>
       </div>
 
-      <div class="mt-4 pt-3 border-t border-gray-300 dark:border-gray-700">
+      <div class="mt-4 pt-3" style="border-top: 1px solid var(--border);">
         {segments.length === 0
           ? ""
           : segments.map((segment, _index) => {
               const project = projects.find((p) => p.id === segment.project_id);
               const color = project
                 ? getProjectColor(project)
-                : { bg: "#14b8a6", solid: "#14b8a6" };
+                : { bg: "linear-gradient(135deg, var(--project-default) 0%, var(--project-default-dark) 100%)", solid: "var(--project-default)" };
               const hours = segment.hours;
 
               return (
-                <div class="flex justify-between items-start p-2 bg-gray-50 dark:bg-gray-900 rounded-md mb-2 border border-gray-200 dark:border-gray-700">
+                <div class="flex justify-between items-start p-2 rounded-md mb-2" style="background-color: var(--bg-tertiary); border: 1px solid var(--border);">
                   <div class="flex items-start gap-3 flex-1">
                     <div class="w-4 h-4 rounded" style={`background: ${color.solid};`}></div>
                     <div class="flex-1">
-                      <div class="text-xs font-medium text-gray-900 dark:text-gray-100">
+                      <div class="text-xs font-medium" style="color: var(--text-primary);">
                         {project ? project.name : "Unknown"}
                       </div>
                       <form
@@ -230,7 +230,8 @@ export function TimeSlider(props: TimeSliderProps): JSX.Element {
                           name="comment"
                           rows="5"
                           placeholder="Add comment..."
-                          class="text-base text-gray-900 dark:text-gray-100 font-normal leading-relaxed bg-transparent border-none outline-none w-full focus:bg-gray-100 dark:focus:bg-gray-800 px-3 py-2 rounded placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                          class="text-base font-normal leading-relaxed bg-transparent border-none outline-none w-full px-3 py-2 rounded"
+                          style="color: var(--text-primary);"
                           safe
                         >
                           {segment.comment || ""}
@@ -253,9 +254,10 @@ export function TimeSlider(props: TimeSliderProps): JSX.Element {
                         value={hours.toFixed(1)}
                         min="0"
                         step="0.5"
-                        class="text-lg font-semibold text-gray-700 dark:text-gray-300 bg-transparent border-none outline-none w-20 text-right focus:bg-gray-100 dark:focus:bg-gray-800 px-1 py-0.5 rounded [&::-webkit-inner-spin-button]:opacity-100 [&::-webkit-outer-spin-button]:opacity-100 [&::-webkit-inner-spin-button]:block [&::-webkit-outer-spin-button]:block"
+                        class="text-lg font-semibold bg-transparent border-none outline-none w-20 text-right px-1 py-0.5 rounded [&::-webkit-inner-spin-button]:opacity-100 [&::-webkit-outer-spin-button]:opacity-100 [&::-webkit-inner-spin-button]:block [&::-webkit-outer-spin-button]:block"
+                        style="color: var(--text-primary);"
                       />
-                      <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">h</span>
+                      <span class="text-xs font-semibold" style="color: var(--text-primary);">h</span>
                     </form>
                   </div>
                   <form
@@ -270,7 +272,8 @@ export function TimeSlider(props: TimeSliderProps): JSX.Element {
                   >
                     <button
                       type="submit"
-                      class="text-xs text-red-600 dark:text-red-400 hover:underline"
+                      class="text-xs hover:underline"
+                      style="color: var(--error);"
                     >
                       Remove
                     </button>

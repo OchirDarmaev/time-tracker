@@ -20,6 +20,10 @@
     --success: #4ade80;
     --warning: #fbbf24;
     --error: #f87171;
+    --info: #3b82f6;
+    --orange: #f97316;
+    --project-default: #14b8a6;
+    --project-default-dark: #0d9488;
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.25);
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
@@ -38,6 +42,10 @@
     --success: #4ade80;
     --warning: #fbbf24;
     --error: #f87171;
+    --info: #3b82f6;
+    --orange: #f97316;
+    --project-default: #14b8a6;
+    --project-default-dark: #0d9488;
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08);

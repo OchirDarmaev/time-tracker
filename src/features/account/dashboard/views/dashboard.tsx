@@ -77,7 +77,7 @@ export function Dashboard(req: Request, authContext: AuthContext): JSX.Element {
       style={{ viewTransitionName: "time-tracking-content" }}
     >
       {/* Enhanced Status Bar */}
-      <div class="bg-linear-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-3 shadow-sm">
+      <div class="rounded-lg p-3 shadow-sm" style="background-color: var(--bg-tertiary); border: 1px solid var(--border);">
         <MonthlySummary reported={reported} expected={expected} />
       </div>
       <div class="flex flex-row gap-4 w-full">

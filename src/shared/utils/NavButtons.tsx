@@ -29,7 +29,7 @@ export function NavButtons({
       }) as string,
       label: "Projects",
       requiredRoles: ["admin"],
-      activeNav: "admin",
+      activeNav: "projects",
     },
     {
       href: tsBuildUrl(adminProjectsContract.manageUsers, {
@@ -38,7 +38,7 @@ export function NavButtons({
       }) as string,
       label: "Users",
       requiredRoles: ["admin"],
-      activeNav: "admin",
+      activeNav: "users",
     },
     {
       href: tsBuildUrl(adminCalendarContract.view, {
@@ -47,7 +47,7 @@ export function NavButtons({
       }) as string,
       label: "Calendar",
       requiredRoles: ["office-manager", "admin"],
-      activeNav: "admin",
+      activeNav: "calendar",
     },
   ];
   // todo <div hx-boost="true">

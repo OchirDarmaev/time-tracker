@@ -50,7 +50,7 @@ export const adminCalendarRouter = s.router(adminCalendarContract, {
 
     return {
       status: 200,
-      body: String(Layout(html, authReq, "admin")),
+      body: String(Layout(html, authReq, "calendar")),
     };
   },
 

@@ -49,7 +49,7 @@ export const adminProjectsRouter = s.router(adminProjectsContract, {
 
     return {
       status: 200,
-      body: String(Layout(html, authReq, "admin")),
+      body: String(Layout(html, authReq, "projects")),
     };
   },
 
@@ -87,7 +87,7 @@ export const adminProjectsRouter = s.router(adminProjectsContract, {
 
     return {
       status: 200,
-      body: String(Layout(html, authReq, "admin")),
+      body: String(Layout(html, authReq, "projects")),
     };
   },
 
@@ -115,14 +115,14 @@ export const adminProjectsRouter = s.router(adminProjectsContract, {
       const html = ProjectsList(projects);
       return {
         status: 200,
-        body: String(Layout(html, authReq, "admin")),
+        body: String(Layout(html, authReq, "projects")),
       };
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "Failed to create project";
       const html = CreateProject(authReq, errorMessage);
       return {
         status: 400,
-        body: String(Layout(html, authReq, "admin")),
+        body: String(Layout(html, authReq, "projects")),
       };
     }
   },
@@ -322,7 +322,7 @@ export const adminProjectsRouter = s.router(adminProjectsContract, {
 
     return {
       status: 200,
-      body: String(Layout(html, authReq, "admin")),
+      body: String(Layout(html, authReq, "projects")),
     };
   },
 
@@ -369,14 +369,14 @@ export const adminProjectsRouter = s.router(adminProjectsContract, {
       const html = ProjectsList(projects);
       return {
         status: 200,
-        body: String(Layout(html, authReq, "admin")),
+        body: String(Layout(html, authReq, "projects")),
       };
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "Failed to update project";
       const html = EditProject(project, authReq, errorMessage);
       return {
         status: 400,
-        body: String(Layout(html, authReq, "admin")),
+        body: String(Layout(html, authReq, "projects")),
       };
     }
   },
@@ -418,7 +418,7 @@ export const adminProjectsRouter = s.router(adminProjectsContract, {
 
     return {
       status: 200,
-      body: String(Layout(html, authReq, "admin")),
+      body: String(Layout(html, authReq, "users")),
     };
   },
 

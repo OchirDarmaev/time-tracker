@@ -46,10 +46,18 @@ CREATE TABLE IF NOT EXISTS calendar (
     updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
+-- Sessions table
+CREATE TABLE IF NOT EXISTS sessions (
+    session_id TEXT PRIMARY KEY,
+    data TEXT NOT NULL,
+    expires_at INTEGER NOT NULL
+);
+
 -- Indexes
 CREATE INDEX IF NOT EXISTS idx_time_entries_user_date ON time_entries(user_id, date);
 CREATE INDEX IF NOT EXISTS idx_time_entries_project_date ON time_entries(project_id, date);
 CREATE INDEX IF NOT EXISTS idx_project_users_user_project ON project_users(user_id, project_id);
 CREATE INDEX IF NOT EXISTS idx_calendar_date ON calendar(date);
 CREATE INDEX IF NOT EXISTS idx_calendar_type ON calendar(day_type);
+CREATE INDEX IF NOT EXISTS idx_sessions_expires_at ON sessions(expires_at);
 

@@ -2,6 +2,7 @@ import express from "express";
 import session from "express-session";
 import cookieParser from "cookie-parser";
 import { initializeDatabase } from "@/shared/config/database.js";
+import { SqliteSessionStore } from "@/shared/config/session_store.js";
 import { createExpressEndpoints } from "@ts-rest/express";
 import { authContract } from "@/features/auth/contract.js";
 import { authRouter } from "@/features/auth/router.js";
@@ -23,6 +24,8 @@ try {
   console.error("Error initializing database:", error);
 }
 
+const sessionStore = new SqliteSessionStore();
+
 app.use(
   express.urlencoded({ extended: true }),
   express.json(),
@@ -31,7 +34,8 @@ app.use(
     secret: "timetrack-secret-key-change-in-production",
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: false },
+    cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 }, // 24 hours
+    store: sessionStore,
   })
 );
 

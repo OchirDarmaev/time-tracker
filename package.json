@@ -14,7 +14,7 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"src/**/*.{ts,json,md}\"",
     "format:check": "prettier --check \"src/**/*.{ts,json,md}\"",
-    "test": "xss-scan"
+    "scan": "xss-scan"
   },
   "dependencies": {
     "@cucumber/gherkin": "^37.0.0",

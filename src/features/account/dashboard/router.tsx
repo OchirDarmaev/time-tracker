@@ -2,14 +2,14 @@ import { initServer } from "@ts-rest/express";
 import { ClientInferRequest } from "@ts-rest/core";
 import { accountDashboardContract } from "./contract.js";
 import { AuthContext } from "@/shared/middleware/auth_stub.js";
-import { isAuthContext } from "@/shared/middleware/isAuthContext.js";
+import { checkAuth, checkAuthFromContext } from "@/shared/utils/auth_helpers.js";
+import { htmxResponse } from "@/shared/utils/htmx_response.js";
 import { timeEntryModel } from "@/shared/models/time_entry.js";
 import { projectModel } from "@/shared/models/project.js";
 import { formatDate } from "@/shared/utils/date_utils.js";
 import { validateDate, validateHours } from "@/shared/utils/validation.js";
 import { renderEntriesTable } from "./views/entries_table.js";
 import { Dashboard } from "./views/dashboard.js";
-import { Layout } from "@/shared/utils/layout.js";
 
 export const REQUIRED_DAILY_HOURS = 8;
 
@@ -18,54 +18,22 @@ const s = initServer();
 export const HOLIDAY_PROJECT_NAME = "Holiday";
 export const accountTimeRouter = s.router(accountDashboardContract, {
   dashboard: async (req) => {
-    if (!isAuthContext(req.req)) {
-      return {
-        status: 401,
-        body: { body: "Unauthorized" },
-      };
+    const authCheck = checkAuth(req, "account");
+    if (!authCheck.success) {
+      return authCheck.response;
     }
 
-    if (!req.req.currentUser) {
-      return {
-        status: 401,
-        body: { body: "Unauthorized" },
-      };
-    }
-    if (!req.req.currentUser.roles.includes("account")) {
-      return {
-        status: 403,
-        body: { body: "Forbidden" },
-      };
-    }
-    if (req.headers["hx-request"] === "true") {
-      return {
-        status: 200,
-        body: String(Dashboard(req, req.req)),
-      };
-    }
-
-    return {
-      status: 200,
-      body: String(Layout(Dashboard(req, req.req), req.req, "account")),
-    };
+    return htmxResponse(req, Dashboard(req, authCheck.authReq), authCheck.authReq, "account");
   },
   accountDashboardEntries: async ({ query, req }) => {
     const authReq = req as unknown as AuthContext;
 
-    if (!authReq.currentUser) {
-      return {
-        status: 401,
-        body: { body: "Unauthorized" },
-      };
-    }
-    if (!authReq.currentUser.roles.includes("account")) {
-      return {
-        status: 403,
-        body: { body: "Forbidden" },
-      };
+    const authError = checkAuthFromContext(authReq, "account");
+    if (authError) {
+      return authError;
     }
 
-    const currentUser = authReq.currentUser;
+    const currentUser = authReq.currentUser!;
     const date = (query?.date as string) || formatDate(new Date());
 
     if (!validateDate(date)) {
@@ -87,20 +55,12 @@ export const accountTimeRouter = s.router(accountDashboardContract, {
   createDashboardEntry: async ({ body, req }) => {
     const authReq = req as unknown as AuthContext;
 
-    if (!authReq.currentUser) {
-      return {
-        status: 401,
-        body: { body: "Unauthorized" },
-      };
-    }
-    if (!authReq.currentUser.roles.includes("account")) {
-      return {
-        status: 403,
-        body: { body: "Forbidden" },
-      };
+    const authError = checkAuthFromContext(authReq, "account");
+    if (authError) {
+      return authError;
     }
 
-    const currentUser = authReq.currentUser;
+    const currentUser = authReq.currentUser!;
     const { project_id, date, hours, comment } = body;
     let localHours = 0;
     if (!hours) {
@@ -144,20 +104,12 @@ export const accountTimeRouter = s.router(accountDashboardContract, {
   deleteDashboardEntry: async ({ params, req }) => {
     const authReq = req as unknown as AuthContext;
 
-    if (!authReq.currentUser) {
-      return {
-        status: 401,
-        body: { body: "Unauthorized" },
-      };
-    }
-    if (!authReq.currentUser.roles.includes("account")) {
-      return {
-        status: 403,
-        body: { body: "Forbidden" },
-      };
+    const authError = checkAuthFromContext(authReq, "account");
+    if (authError) {
+      return authError;
     }
 
-    const currentUser = authReq.currentUser;
+    const currentUser = authReq.currentUser!;
 
     const entry = timeEntryModel.getById(params.entryId);
     if (!entry) {
@@ -192,20 +144,12 @@ export const accountTimeRouter = s.router(accountDashboardContract, {
   addDashboardSegment: async ({ body, req }) => {
     const authReq = req as unknown as AuthContext;
 
-    if (!authReq.currentUser) {
-      return {
-        status: 401,
-        body: { body: "Unauthorized" },
-      };
-    }
-    if (!authReq.currentUser.roles.includes("account")) {
-      return {
-        status: 403,
-        body: { body: "Forbidden" },
-      };
+    const authError = checkAuthFromContext(authReq, "account");
+    if (authError) {
+      return authError;
     }
 
-    const currentUser = authReq.currentUser;
+    const currentUser = authReq.currentUser!;
     const { date, project_id, hours, comment } = body;
 
     let localHours: number;
@@ -244,20 +188,12 @@ export const accountTimeRouter = s.router(accountDashboardContract, {
   updateDashboardSegment: async ({ params, body, req }) => {
     const authReq = req as unknown as AuthContext;
 
-    if (!authReq.currentUser) {
-      return {
-        status: 401,
-        body: { body: "Unauthorized" },
-      };
-    }
-    if (!authReq.currentUser.roles.includes("account")) {
-      return {
-        status: 403,
-        body: { body: "Forbidden" },
-      };
+    const authError = checkAuthFromContext(authReq, "account");
+    if (authError) {
+      return authError;
     }
 
-    const currentUser = authReq.currentUser;
+    const currentUser = authReq.currentUser!;
     const entry = timeEntryModel.getById(params.entryId);
 
     if (!entry) {
@@ -310,20 +246,12 @@ export const accountTimeRouter = s.router(accountDashboardContract, {
   deleteDashboardSegment: async ({ params, req }) => {
     const authReq = req as unknown as AuthContext;
 
-    if (!authReq.currentUser) {
-      return {
-        status: 401,
-        body: { body: "Unauthorized" },
-      };
-    }
-    if (!authReq.currentUser.roles.includes("account")) {
-      return {
-        status: 403,
-        body: { body: "Forbidden" },
-      };
+    const authError = checkAuthFromContext(authReq, "account");
+    if (authError) {
+      return authError;
     }
 
-    const currentUser = authReq.currentUser;
+    const currentUser = authReq.currentUser!;
     const entry = timeEntryModel.getById(params.entryId);
 
     if (!entry) {

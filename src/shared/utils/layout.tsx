@@ -2,25 +2,27 @@ import { AuthContext } from "@/shared/middleware/auth_stub.js";
 import { LogoutButton } from "./LogoutButton";
 import { ThemeToggleButton } from "./ThemeToggleButton";
 import { NavButtons } from "./NavButtons";
+import { Meta } from "./meta";
 
 export const roleLabels: Record<string, string> = {
   account: "Account",
   "office-manager": "Office Manager",
   admin: "Admin",
 };
-export function Layout(
-  content: string | JSX.Element,
-  req: AuthContext,
-  activeNav: string = ""
-): JSX.Element {
+
+interface LayoutProps {
+  content: string | JSX.Element;
+  req: AuthContext;
+  activeNav?: string;
+}
+
+export function Layout({ content, req, activeNav = "" }: LayoutProps): JSX.Element {
   const currentUser = req.currentUser || { email: "Unknown", role: "account", roles: ["account"] };
   const availableRoles: string[] = currentUser.roles || ["account"];
 
   return (
     <html>
-      <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>TimeTrack</title>
+      <Meta title="TimeTrack" />
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
       <link

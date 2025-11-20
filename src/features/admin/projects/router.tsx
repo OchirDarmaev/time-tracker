@@ -1,7 +1,9 @@
 import { initServer } from "@ts-rest/express";
 import { adminProjectsContract } from "./contract.js";
 import { AuthContext } from "@/shared/middleware/auth_stub.js";
-import { isAuthContext } from "@/shared/middleware/isAuthContext.js";
+import { checkAuth, checkAuthFromContext } from "@/shared/utils/auth_helpers.js";
+import { htmxResponse } from "@/shared/utils/htmx_response.js";
+import { Layout } from "@/shared/utils/layout.js";
 import { projectModel } from "@/shared/models/project.js";
 import { projectUserModel } from "@/shared/models/project_user.js";
 import { userModel } from "@/shared/models/user.js";
@@ -9,103 +11,39 @@ import { ProjectsList } from "./views/projects_list.js";
 import { EditProject } from "./views/edit_project.js";
 import { CreateProject } from "./views/create_project.js";
 import { ManageProjectUsers } from "./views/manage_project_users.js";
-import { Layout } from "@/shared/utils/layout.js";
 
 const s = initServer();
 
 export const adminProjectsRouter = s.router(adminProjectsContract, {
   list: async (req) => {
-    if (!isAuthContext(req.req)) {
-      return {
-        status: 401,
-        body: { body: "Unauthorized" },
-      };
-    }
-
-    const authReq = req.req as unknown as AuthContext;
-    if (!authReq.currentUser) {
-      return {
-        status: 401,
-        body: { body: "Unauthorized" },
-      };
-    }
-
-    if (!authReq.currentUser.roles.includes("admin")) {
-      return {
-        status: 403,
-        body: { body: "Forbidden" },
-      };
+    const authCheck = checkAuth(req, "admin");
+    if (!authCheck.success) {
+      return authCheck.response;
     }
 
     const projects = projectModel.getAll(true);
     const html = ProjectsList(projects);
 
-    if (req.headers["hx-request"] === "true") {
-      return {
-        status: 200,
-        body: String(html),
-      };
-    }
-
-    return {
-      status: 200,
-      body: String(Layout(html, authReq, "projects")),
-    };
+    return htmxResponse(req, html, authCheck.authReq, "projects");
   },
 
   createPage: async (req) => {
-    if (!isAuthContext(req.req)) {
-      return {
-        status: 401,
-        body: { body: "Unauthorized" },
-      };
+    const authCheck = checkAuth(req, "admin");
+    if (!authCheck.success) {
+      return authCheck.response;
     }
 
-    const authReq = req.req as unknown as AuthContext;
-    if (!authReq.currentUser) {
-      return {
-        status: 401,
-        body: { body: "Unauthorized" },
-      };
-    }
+    const html = CreateProject(authCheck.authReq);
 
-    if (!authReq.currentUser.roles.includes("admin")) {
-      return {
-        status: 403,
-        body: { body: "Forbidden" },
-      };
-    }
-
-    const html = CreateProject(authReq);
-
-    if (req.headers["hx-request"] === "true") {
-      return {
-        status: 200,
-        body: String(html),
-      };
-    }
-
-    return {
-      status: 200,
-      body: String(Layout(html, authReq, "projects")),
-    };
+    return htmxResponse(req, html, authCheck.authReq, "projects");
   },
 
   create: async ({ body, req }) => {
     const authReq = req as unknown as AuthContext;
 
-    if (!authReq.currentUser) {
-      return {
-        status: 401,
-        body: { body: "Unauthorized" },
-      };
-    }
-
-    if (!authReq.currentUser.roles.includes("admin")) {
-      return {
-        status: 403,
-        body: { body: "Forbidden" },
-      };
+    const authError = checkAuthFromContext(authReq, "admin");
+    if (authError) {
+      return authError;
     }
 
     try {
@@ -115,14 +53,14 @@ export const adminProjectsRouter = s.router(adminProjectsContract, {
       const html = ProjectsList(projects);
       return {
         status: 200,
-        body: String(Layout(html, authReq, "projects")),
+        body: String(<Layout content={html} req={authReq} activeNav="projects" />),
       };
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "Failed to create project";
       const html = CreateProject(authReq, errorMessage);
       return {
         status: 400,
-        body: String(Layout(html, authReq, "projects")),
+        body: String(<Layout content={html} req={authReq} activeNav="projects" />),
       };
     }
   },
@@ -130,18 +68,9 @@ export const adminProjectsRouter = s.router(adminProjectsContract, {
   updateName: async ({ params, body, req }) => {
     const authReq = req as unknown as AuthContext;
 
-    if (!authReq.currentUser) {
-      return {
-        status: 401,
-        body: { body: "Unauthorized" },
-      };
-    }
-
-    if (!authReq.currentUser.roles.includes("admin")) {
-      return {
-        status: 403,
-        body: { body: "Forbidden" },
-      };
+    const authError = checkAuthFromContext(authReq, "admin");
+    if (authError) {
+      return authError;
     }
 
     const project = projectModel.getById(params.id);
@@ -184,18 +113,9 @@ export const adminProjectsRouter = s.router(adminProjectsContract, {
   updateColor: async ({ params, body, req }) => {
     const authReq = req as unknown as AuthContext;
 
-    if (!authReq.currentUser) {
-      return {
-        status: 401,
-        body: { body: "Unauthorized" },
-      };
-    }
-
-    if (!authReq.currentUser.roles.includes("admin")) {
-      return {
-        status: 403,
-        body: { body: "Forbidden" },
-      };
+    const authError = checkAuthFromContext(authReq, "admin");
+    if (authError) {
+      return authError;
     }
 
     const project = projectModel.getById(params.id);
@@ -227,18 +147,9 @@ export const adminProjectsRouter = s.router(adminProjectsContract, {
   toggleSuppress: async ({ params, req }) => {
     const authReq = req as unknown as AuthContext;
 
-    if (!authReq.currentUser) {
-      return {
-        status: 401,
-        body: { body: "Unauthorized" },
-      };
-    }
-
-    if (!authReq.currentUser.roles.includes("admin")) {
-      return {
-        status: 403,
-        body: { body: "Forbidden" },
-      };
+    const authError = checkAuthFromContext(authReq, "admin");
+    if (authError) {
+      return authError;
     }
 
     const project = projectModel.getById(params.id);
@@ -273,28 +184,13 @@ export const adminProjectsRouter = s.router(adminProjectsContract, {
   },
 
   edit: async (req) => {
-    if (!isAuthContext(req.req)) {
-      return {
-        status: 401,
-        body: { body: "Unauthorized" },
-      };
+    const authCheck = checkAuth(req, "admin");
+    if (!authCheck.success) {
+      return authCheck.response;
     }
 
-    const authReq = req.req as unknown as AuthContext;
+    const authReq = authCheck.authReq;
     const params = req.params;
-    if (!authReq.currentUser) {
-      return {
-        status: 401,
-        body: { body: "Unauthorized" },
-      };
-    }
-
-    if (!authReq.currentUser.roles.includes("admin")) {
-      return {
-        status: 403,
-        body: { body: "Forbidden" },
-      };
-    }
 
     const project = projectModel.getById(params.id);
     if (!project) {
@@ -313,34 +209,15 @@ export const adminProjectsRouter = s.router(adminProjectsContract, {
 
     const html = EditProject(project, authReq);
 
-    if (req.headers["hx-request"] === "true") {
-      return {
-        status: 200,
-        body: String(html),
-      };
-    }
-
-    return {
-      status: 200,
-      body: String(Layout(html, authReq, "projects")),
-    };
+    return htmxResponse(req, html, authReq, "projects");
   },
 
   update: async ({ params, body, req }) => {
     const authReq = req as unknown as AuthContext;
 
-    if (!authReq.currentUser) {
-      return {
-        status: 401,
-        body: { body: "Unauthorized" },
-      };
-    }
-
-    if (!authReq.currentUser.roles.includes("admin")) {
-      return {
-        status: 403,
-        body: { body: "Forbidden" },
-      };
+    const authError = checkAuthFromContext(authReq, "admin");
+    if (authError) {
+      return authError;
     }
 
     const project = projectModel.getById(params.id);
@@ -369,39 +246,22 @@ export const adminProjectsRouter = s.router(adminProjectsContract, {
       const html = ProjectsList(projects);
       return {
         status: 200,
-        body: String(Layout(html, authReq, "projects")),
+        body: String(<Layout content={html} req={authReq} activeNav="projects" />),
       };
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "Failed to update project";
       const html = EditProject(project, authReq, errorMessage);
       return {
         status: 400,
-        body: String(Layout(html, authReq, "projects")),
+        body: String(<Layout content={html} req={authReq} activeNav="projects" />),
       };
     }
   },
 
   manageUsers: async (req) => {
-    if (!isAuthContext(req.req)) {
-      return {
-        status: 401,
-        body: { body: "Unauthorized" },
-      };
-    }
-
-    const authReq = req.req as unknown as AuthContext;
-    if (!authReq.currentUser) {
-      return {
-        status: 401,
-        body: { body: "Unauthorized" },
-      };
-    }
-
-    if (!authReq.currentUser.roles.includes("admin")) {
-      return {
-        status: 403,
-        body: { body: "Forbidden" },
-      };
+    const authCheck = checkAuth(req, "admin");
+    if (!authCheck.success) {
+      return authCheck.response;
     }
 
     const users = userModel.getAll();
@@ -409,34 +269,15 @@ export const adminProjectsRouter = s.router(adminProjectsContract, {
     const projectUsers = projectUserModel.getAll();
     const html = ManageProjectUsers({ users, projects, projectUsers });
 
-    if (req.headers["hx-request"] === "true") {
-      return {
-        status: 200,
-        body: String(html),
-      };
-    }
-
-    return {
-      status: 200,
-      body: String(Layout(html, authReq, "users")),
-    };
+    return htmxResponse(req, html, authCheck.authReq, "users");
   },
 
   assignUserToProject: async ({ body, req }) => {
     const authReq = req as unknown as AuthContext;
 
-    if (!authReq.currentUser) {
-      return {
-        status: 401,
-        body: { body: "Unauthorized" },
-      };
-    }
-
-    if (!authReq.currentUser.roles.includes("admin")) {
-      return {
-        status: 403,
-        body: { body: "Forbidden" },
-      };
+    const authError = checkAuthFromContext(authReq, "admin");
+    if (authError) {
+      return authError;
     }
 
     try {
@@ -474,18 +315,9 @@ export const adminProjectsRouter = s.router(adminProjectsContract, {
   removeUserFromProject: async ({ body, req }) => {
     const authReq = req as unknown as AuthContext;
 
-    if (!authReq.currentUser) {
-      return {
-        status: 401,
-        body: { body: "Unauthorized" },
-      };
-    }
-
-    if (!authReq.currentUser.roles.includes("admin")) {
-      return {
-        status: 403,
-        body: { body: "Forbidden" },
-      };
+    const authError = checkAuthFromContext(authReq, "admin");
+    if (authError) {
+      return authError;
     }
 
     try {

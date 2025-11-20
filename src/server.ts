@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import { initializeDatabase } from "@/shared/config/database.js";
 import { SqliteSessionStore } from "@/shared/config/session_store.js";
 import { createExpressEndpoints } from "@ts-rest/express";
+import { AppRouter } from "@ts-rest/core";
 import { authContract } from "@/features/auth/contract.js";
 import { authRouter } from "@/features/auth/router.js";
 import { rootContract } from "@/features/root/contract.js";
@@ -49,46 +50,56 @@ app.use(
 app.use("/static/styles", express.static("dist/static/styles"));
 app.use("/static/js", express.static("dist/static/js"));
 
-createExpressEndpoints(authContract, authRouter, app, {
+// Common endpoint configuration
+const endpointConfig = {
   responseValidation: false,
   jsonQuery: true,
+} as const;
+
+const endpointConfigWithAuth = <T extends AppRouter>(_contract: T) => ({
+  ...endpointConfig,
+  globalMiddleware: [authStubMiddleware<T>],
 });
 
-createExpressEndpoints(rootContract, rootRouter, app, {
-  responseValidation: false,
-  jsonQuery: true,
-  globalMiddleware: [authStubMiddleware<typeof rootContract>],
-});
+// Register routes
+createExpressEndpoints(authContract, authRouter, app, endpointConfig);
 
-createExpressEndpoints(accountDashboardContract, accountTimeRouter, app, {
-  responseValidation: false,
-  jsonQuery: true,
-  globalMiddleware: [authStubMiddleware<typeof accountDashboardContract>],
-});
+createExpressEndpoints(rootContract, rootRouter, app, endpointConfigWithAuth(rootContract));
 
-createExpressEndpoints(adminProjectsContract, adminProjectsRouter, app, {
-  responseValidation: false,
-  jsonQuery: true,
-  globalMiddleware: [authStubMiddleware<typeof adminProjectsContract>],
-});
+createExpressEndpoints(
+  accountDashboardContract,
+  accountTimeRouter,
+  app,
+  endpointConfigWithAuth(accountDashboardContract)
+);
 
-createExpressEndpoints(adminCalendarContract, adminCalendarRouter, app, {
-  responseValidation: false,
-  jsonQuery: true,
-  globalMiddleware: [authStubMiddleware<typeof adminCalendarContract>],
-});
+createExpressEndpoints(
+  adminProjectsContract,
+  adminProjectsRouter,
+  app,
+  endpointConfigWithAuth(adminProjectsContract)
+);
 
-createExpressEndpoints(reportsContract, reportsRouter, app, {
-  responseValidation: false,
-  jsonQuery: true,
-  globalMiddleware: [authStubMiddleware<typeof reportsContract>],
-});
+createExpressEndpoints(
+  adminCalendarContract,
+  adminCalendarRouter,
+  app,
+  endpointConfigWithAuth(adminCalendarContract)
+);
 
-createExpressEndpoints(featuresContract, featuresRouter, app, {
-  responseValidation: false,
-  jsonQuery: true,
-  globalMiddleware: [authStubMiddleware<typeof featuresContract>],
-});
+createExpressEndpoints(
+  reportsContract,
+  reportsRouter,
+  app,
+  endpointConfigWithAuth(reportsContract)
+);
+
+createExpressEndpoints(
+  featuresContract,
+  featuresRouter,
+  app,
+  endpointConfigWithAuth(featuresContract)
+);
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

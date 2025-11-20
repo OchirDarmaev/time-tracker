@@ -204,9 +204,8 @@ export function ReportView(month: string, _authReq: AuthContext): JSX.Element {
         <p
           class="text-sm font-medium"
           style="color: var(--text-primary); min-width: 120px; text-align: center;"
-          safe
         >
-          {monthName} {year}
+          <span safe>{`${monthName} ${year}`}</span>
         </p>
         <button
           type="button"
@@ -256,9 +255,7 @@ export function ReportView(month: string, _authReq: AuthContext): JSX.Element {
                     style={`border: 1px solid var(--border); ${headerStyle} min-width: 28px; max-width: 28px; font-size: 12px;`}
                     title={day.date}
                   >
-                    <div class="font-semibold" safe>
-                      {day.dayNumber}
-                    </div>
+                    <div class="font-semibold">{day.dayNumber}</div>
                     <div class="font-normal opacity-70" style="font-size: 10px;" safe>
                       {day.dayName.substring(0, 1).toLowerCase()}
                     </div>

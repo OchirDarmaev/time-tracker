@@ -3,6 +3,7 @@ import { authContract } from "@/features/auth/contract";
 import { accountDashboardContract } from "@/features/account/dashboard/contract";
 import { AuthContext } from "@/shared/middleware/auth_stub";
 import { userModel, UserRole } from "@/shared/models/user";
+import { Meta } from "@/shared/utils/meta";
 
 const roleLabels: Record<UserRole, string> = {
   account: "User",
@@ -51,9 +52,7 @@ export function renderAuth(req: AuthContext): JSX.Element {
   return (
     <html lang="en" class="dark">
       <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Select User - TimeTrack</title>
+        <Meta title="Select User - TimeTrack" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
         <link

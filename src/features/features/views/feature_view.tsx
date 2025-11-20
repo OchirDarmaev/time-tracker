@@ -88,11 +88,11 @@ export function FeatureView(featureName: string): JSX.Element | null {
           <h1 class="text-3xl font-bold mb-2" style="color: var(--text-primary);">
             <span safe>{title || featureName}</span>
           </h1>
-          {description && (
-            <p class="text-base mt-2" style="color: var(--text-secondary);" safe>
-              {description}
+          {description ? (
+            <p class="text-base mt-2" style="color: var(--text-secondary);">
+              <span safe>{description}</span>
             </p>
-          )}
+          ) : null}
         </div>
 
         <div class="space-y-6">

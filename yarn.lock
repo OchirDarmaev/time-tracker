@@ -12,6 +12,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@cucumber/gherkin@npm:^37.0.0":
+  version: 37.0.0
+  resolution: "@cucumber/gherkin@npm:37.0.0"
+  dependencies:
+    "@cucumber/messages": "npm:>=31.0.0 <32"
+  checksum: 10c0/83c55a11a383c3d7a1c0910b5494be7c5b1dce21e210006e85ce1fdb47d2ddca0d5c9e0c128fd08b5fe0951f9e0139334f5aa491c3aaefd62c599611495fddbc
+  languageName: node
+  linkType: hard
+
+"@cucumber/messages@npm:>=31.0.0 <32":
+  version: 31.0.0
+  resolution: "@cucumber/messages@npm:31.0.0"
+  dependencies:
+    class-transformer: "npm:0.5.1"
+    reflect-metadata: "npm:0.2.2"
+  checksum: 10c0/9338e8bf75c121837fd9ff59a4bdd6e486cc90949cc40f10ec213e28ca424d00e38a693a62d8eb1fec23b33068ebaf4a9458eb7ebbfce4e8acba183c377a29d9
+  languageName: node
+  linkType: hard
+
 "@emnapi/core@npm:^1.5.0, @emnapi/core@npm:^1.6.0":
   version: 1.7.1
   resolution: "@emnapi/core@npm:1.7.1"
@@ -1429,6 +1448,13 @@ __metadata:
   version: 3.0.0
   resolution: "chownr@npm:3.0.0"
   checksum: 10c0/43925b87700f7e3893296c8e9c56cc58f926411cce3a6e5898136daaf08f08b9a8eb76d37d3267e707d0dcc17aed2e2ebdf5848c0c3ce95cf910a919935c1b10
+  languageName: node
+  linkType: hard
+
+"class-transformer@npm:0.5.1":
+  version: 0.5.1
+  resolution: "class-transformer@npm:0.5.1"
+  checksum: 10c0/19809914e51c6db42c036166839906420bb60367df14e15f49c45c8c1231bf25ae661ebe94736ee29cc688b77101ef851a8acca299375cc52fc141b64acde18a
   languageName: node
   linkType: hard
 
@@ -4125,6 +4151,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"reflect-metadata@npm:0.2.2":
+  version: 0.2.2
+  resolution: "reflect-metadata@npm:0.2.2"
+  checksum: 10c0/1cd93a15ea291e420204955544637c264c216e7aac527470e393d54b4bb075f10a17e60d8168ec96600c7e0b9fcc0cb0bb6e91c3fbf5b0d8c9056f04e6ac1ec2
+  languageName: node
+  linkType: hard
+
 "require-directory@npm:^2.1.1":
   version: 2.1.1
   resolution: "require-directory@npm:2.1.1"
@@ -4628,6 +4661,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "timetrack@workspace:."
   dependencies:
+    "@cucumber/gherkin": "npm:^37.0.0"
     "@eslint/js": "npm:^9.0.0"
     "@kitajs/html": "npm:^4.2.11"
     "@kitajs/ts-html-plugin": "npm:^4.1.3"

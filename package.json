@@ -9,7 +9,7 @@
     "sandbox:watch": "tsc --watch & tsx watch src/sandbox.ts",
     "build": "tsc && yarn build:css && yarn build:js",
     "build:css": "NODE_ENV=production postcss ./src/static/styles/input.css -o ./dist/static/styles/output.css",
-  "build:js": "terser src/static/js/theme.js -o dist/static/js/theme.min.js -c -m",
+    "build:js": "terser src/static/js/theme.js -o dist/static/js/theme.min.js -c -m",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"src/**/*.{ts,json,md}\"",
@@ -17,6 +17,7 @@
     "test": "xss-scan"
   },
   "dependencies": {
+    "@cucumber/gherkin": "^37.0.0",
     "@kitajs/html": "^4.2.11",
     "@kitajs/ts-html-plugin": "^4.1.3",
     "@ts-rest/core": "^3.52.1",

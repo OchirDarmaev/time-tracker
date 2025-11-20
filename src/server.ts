@@ -16,6 +16,8 @@ import { adminCalendarContract } from "@/features/admin/calendar/contract.js";
 import { adminCalendarRouter } from "@/features/admin/calendar/router.js";
 import { reportsContract } from "@/features/reports/contract.js";
 import { reportsRouter } from "@/features/reports/router.js";
+import { featuresContract } from "@/features/features/contract.js";
+import { featuresRouter } from "@/features/features/router.js";
 import { authStubMiddleware } from "@/shared/middleware/auth_stub.js";
 
 const app = express();
@@ -80,6 +82,12 @@ createExpressEndpoints(reportsContract, reportsRouter, app, {
   responseValidation: false,
   jsonQuery: true,
   globalMiddleware: [authStubMiddleware<typeof reportsContract>],
+});
+
+createExpressEndpoints(featuresContract, featuresRouter, app, {
+  responseValidation: false,
+  jsonQuery: true,
+  globalMiddleware: [authStubMiddleware<typeof featuresContract>],
 });
 
 app.listen(PORT, () => {

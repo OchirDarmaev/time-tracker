@@ -7,6 +7,7 @@ Feature: Manage users in projects
     Given system projects are always assigned to all users
     And system projects are hidden from the management interface
 
+  # Out of scope for POC
   Scenario: Create a new user
     Given I am an admin
     When I invite a new user with a name and email

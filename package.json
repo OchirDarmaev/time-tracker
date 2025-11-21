@@ -12,7 +12,9 @@
   "devDependencies": {
     "@cloudflare/vite-plugin": "^1.2.3",
     "@cloudflare/workers-types": "4.20251121.0",
+    "@tailwindcss/vite": "^4.1.17",
     "sst": "^3.17.23",
+    "tailwindcss": "^4.1.17",
     "vite": "^6.3.5",
     "vite-ssr-components": "^0.5.1"
   },

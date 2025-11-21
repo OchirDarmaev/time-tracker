@@ -187,9 +187,7 @@ export function MonthlyCalendar({ props }: { props: MonthlyCalendarProps }): JSX
 
     const hours = dayHoursMap[day.date] || 0;
     const isSelected = day.date === selectedDate;
-    const isToday = day.date === today;
     const hasHours = hours > 0;
-    const isOverLimit = hours > REQUIRED_DAILY_HOURS;
     const dayType = dayConfigurations[day.date];
     const isPublicHoliday = dayType === "public_holiday";
     const isWeekend = dayType === "weekend";
@@ -200,36 +198,24 @@ export function MonthlyCalendar({ props }: { props: MonthlyCalendarProps }): JSX
     const breakdown = dayProjectBreakdown[day.date] || [];
     const circleDiagram = hasHours ? CircleDiagram(breakdown, projects, hours, 48) : "";
 
-    // Small orange circle indicator when hours exceed required
-    const overLimitIndicator = isOverLimit ? (
-      <span
-        class="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full z-20"
-        style="background-color: var(--orange); box-shadow: 0 0 8px rgba(249, 115, 22, 0.6);"
-        title="Over ${REQUIRED_DAILY_HOURS} hours"
-      ></span>
-    ) : (
-      ""
-    );
+    // Text color based on day type (always keep day type color)
+    let textColor = "var(--text-primary)";
+    let bgColor = "transparent";
 
-    // Background for selected state only
-    const bgStyle = isSelected
-      ? "background-color: var(--text-primary); color: var(--bg-primary);"
-      : isToday
-        ? "background-color: var(--bg-tertiary);"
-        : "";
+    if (isPublicHoliday) {
+      textColor = "var(--error)";
+    } else if (isWeekend) {
+      textColor = "var(--text-tertiary)";
+    } else if (isWorkday) {
+      textColor = "var(--info)";
+    } else if (day.isWeekend) {
+      textColor = "var(--text-tertiary)";
+    }
 
-    // Text color based on day type
-    const textStyle = isSelected
-      ? ""
-      : isPublicHoliday
-        ? "color: var(--error); font-weight: 500;"
-        : isWeekend
-          ? "color: var(--text-tertiary);"
-          : isWorkday
-            ? "color: var(--info); font-weight: 500;"
-            : day.isWeekend
-              ? "color: var(--text-tertiary);"
-              : "color: var(--text-primary);";
+    // If selected, add background but keep day type color
+    if (isSelected) {
+      bgColor = "var(--accent-light)";
+    }
 
     // Title with day type information
     let title = `${hours.toFixed(1)}h`;
@@ -244,18 +230,8 @@ export function MonthlyCalendar({ props }: { props: MonthlyCalendarProps }): JSX
     return (
       <button
         type="button"
-        class="relative flex items-center justify-center aspect-square rounded-xl border transition-all duration-200 focus:outline-none"
-        style={`${bgStyle} ${textStyle} border-color: ${isSelected ? "transparent" : "var(--border-subtle)"}; box-shadow: ${isSelected ? "var(--shadow-md)" : "var(--shadow-sm)"};`}
-        onmouseover={
-          isSelected
-            ? ""
-            : "this.style.backgroundColor='var(--bg-tertiary)'; this.style.borderColor='var(--border)'; this.style.boxShadow='var(--shadow-md)'; this.style.transform='translateY(-2px)';"
-        }
-        onmouseout={
-          isSelected
-            ? ""
-            : "this.style.backgroundColor=''; this.style.borderColor='var(--border-subtle)'; this.style.boxShadow='var(--shadow-sm)'; this.style.transform='translateY(0)';"
-        }
+        class="relative flex items-center justify-center aspect-square rounded focus:outline-none"
+        style={`background-color: ${bgColor}; color: ${textColor};`}
         hx-get={tsBuildUrl(accountDashboardContract.dashboard, {
           headers: {},
           query: {
@@ -263,16 +239,13 @@ export function MonthlyCalendar({ props }: { props: MonthlyCalendarProps }): JSX
           },
         })}
         hx-target={hxTarget}
-        hx-swap="outerHTML transition:true"
+        hx-swap="outerHTML"
         hx-trigger="click"
         hx-scroll="false"
         title={title}
       >
         {circleDiagram}
-        <span class="text-sm font-medium relative z-10" style="letter-spacing: -0.01em;">
-          {day.dayNumber}
-        </span>
-        {overLimitIndicator}
+        <span class="text-sm font-bold relative z-10">{day.dayNumber}</span>
       </button>
     );
   });
@@ -285,10 +258,8 @@ export function MonthlyCalendar({ props }: { props: MonthlyCalendarProps }): JSX
         <div class="flex items-center gap-4">
           <button
             type="button"
-            class="px-4 py-2 rounded-xl transition-all duration-200 focus:outline-none"
-            style="color: var(--text-secondary); background-color: var(--bg-elevated); border: 1px solid var(--border); box-shadow: var(--shadow-sm); letter-spacing: -0.01em;"
-            onmouseover="this.style.color='var(--text-primary)'; this.style.backgroundColor='var(--bg-tertiary)'; this.style.boxShadow='var(--shadow-md)'; this.style.transform='translateY(-1px)';"
-            onmouseout="this.style.color='var(--text-secondary)'; this.style.backgroundColor='var(--bg-elevated)'; this.style.boxShadow='var(--shadow-sm)'; this.style.transform='translateY(0)';"
+            class="px-4 py-2 rounded border focus:outline-none"
+            style="color: var(--text-secondary); background-color: var(--bg-elevated); border-color: var(--border);"
             hx-get={tsBuildUrl(accountDashboardContract.dashboard, {
               headers: {},
               query: {
@@ -296,25 +267,19 @@ export function MonthlyCalendar({ props }: { props: MonthlyCalendarProps }): JSX
               },
             })}
             hx-target={hxTarget}
-            hx-swap="outerHTML transition:true"
+            hx-swap="outerHTML"
             hx-trigger="click"
             hx-scroll="false"
           >
             &lt;
           </button>
-          <h3
-            safe
-            class="text-2xl font-semibold tracking-tight"
-            style="color: var(--text-primary); letter-spacing: -0.03em;"
-          >
+          <h3 safe class="text-2xl font-semibold" style="color: var(--text-primary);">
             {`${monthName} ${year}`}
           </h3>
           <button
             type="button"
-            class="px-4 py-2 rounded-xl transition-all duration-200 focus:outline-none"
-            style="color: var(--text-secondary); background-color: var(--bg-elevated); border: 1px solid var(--border); box-shadow: var(--shadow-sm); letter-spacing: -0.01em;"
-            onmouseover="this.style.color='var(--text-primary)'; this.style.backgroundColor='var(--bg-tertiary)'; this.style.boxShadow='var(--shadow-md)'; this.style.transform='translateY(-1px)';"
-            onmouseout="this.style.color='var(--text-secondary)'; this.style.backgroundColor='var(--bg-elevated)'; this.style.boxShadow='var(--shadow-sm)'; this.style.transform='translateY(0)';"
+            class="px-4 py-2 rounded border focus:outline-none"
+            style="color: var(--text-secondary); background-color: var(--bg-elevated); border-color: var(--border);"
             hx-get={tsBuildUrl(accountDashboardContract.dashboard, {
               headers: {},
               query: {
@@ -322,7 +287,7 @@ export function MonthlyCalendar({ props }: { props: MonthlyCalendarProps }): JSX
               },
             })}
             hx-target={hxTarget}
-            hx-swap="outerHTML transition:true"
+            hx-swap="outerHTML"
             hx-trigger="click"
             hx-scroll="false"
           >
@@ -332,10 +297,8 @@ export function MonthlyCalendar({ props }: { props: MonthlyCalendarProps }): JSX
         <div class="flex justify-center">
           <button
             type="button"
-            class="px-5 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 focus:outline-none"
-            style="color: var(--accent); background-color: var(--accent-light); border: 1px solid var(--border); box-shadow: var(--shadow-sm); letter-spacing: -0.01em;"
-            onmouseover="this.style.boxShadow='var(--shadow-md)'; this.style.transform='translateY(-1px)';"
-            onmouseout="this.style.boxShadow='var(--shadow-sm)'; this.style.transform='translateY(0)';"
+            class="px-5 py-2.5 text-sm font-medium rounded border focus:outline-none"
+            style="color: var(--accent); background-color: var(--accent-light); border-color: var(--accent);"
             hx-get={tsBuildUrl(accountDashboardContract.dashboard, {
               headers: {},
               query: {
@@ -343,7 +306,7 @@ export function MonthlyCalendar({ props }: { props: MonthlyCalendarProps }): JSX
               },
             })}
             hx-target={hxTarget}
-            hx-swap="outerHTML transition:true"
+            hx-swap="outerHTML"
             hx-trigger="click"
             hx-scroll="false"
           >
@@ -355,8 +318,8 @@ export function MonthlyCalendar({ props }: { props: MonthlyCalendarProps }): JSX
         {weekDayHeaders.map((day) => (
           <div
             safe
-            class="text-center text-xs font-medium pb-3"
-            style="color: var(--text-tertiary); letter-spacing: 0.05em; text-transform: uppercase;"
+            class="text-center text-xs font-medium pb-3 uppercase"
+            style="color: var(--text-tertiary);"
           >
             {day}
           </div>

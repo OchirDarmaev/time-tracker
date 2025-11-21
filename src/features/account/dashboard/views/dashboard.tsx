@@ -67,21 +67,17 @@ export function Dashboard(req: Request, authContext: AuthContext): JSX.Element {
 
   const selectedDayType = selectedDayConfig?.day_type;
 
-  const { reported, expected } = getMonthlySummaryData(selectedDate, currentUser);
+  const monthlySummaryData = getMonthlySummaryData(selectedDate, currentUser);
   const timeSliderData = getTimeSliderData(currentUser, selectedDate);
 
   return (
-    <div
-      id="time-tracking-content"
-      class="space-y-8"
-      style={{ viewTransitionName: "time-tracking-content" }}
-    >
+    <div id="time-tracking-content" class="space-y-8">
       {/* Enhanced Status Bar */}
       <div
-        class="rounded-2xl p-6"
-        style="background-color: var(--bg-elevated); border: 1px solid var(--border-subtle); box-shadow: var(--shadow-sm);"
+        class="rounded p-6 border"
+        style="background-color: var(--bg-elevated); border-color: var(--border-subtle);"
       >
-        <MonthlySummary reported={reported} expected={expected} />
+        <MonthlySummary {...monthlySummaryData} />
       </div>
       <div class="flex flex-row gap-8 w-full">
         <div class="w-1/2">

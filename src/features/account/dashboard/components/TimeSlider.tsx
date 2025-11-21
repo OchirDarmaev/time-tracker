@@ -87,8 +87,8 @@ export function TimeSlider(props: TimeSliderProps): JSX.Element {
 
     segmentElements.push(
       <div
-        class="absolute top-0 h-full rounded-xl flex items-center justify-center overflow-hidden transition-all duration-200"
-        style={`left: ${leftPercent}%; width: ${segmentWidth}%; background: ${color.bg}; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);`}
+        class="absolute top-0 h-full rounded flex items-center justify-center overflow-hidden"
+        style={`left: ${leftPercent}%; width: ${segmentWidth}%; background: ${color.bg};`}
       >
         <div class="text-center pointer-events-none">
           <div class="text-xs font-bold text-white drop-shadow-md" style="letter-spacing: -0.01em;">
@@ -110,8 +110,8 @@ export function TimeSlider(props: TimeSliderProps): JSX.Element {
 
   return (
     <div
-      class="rounded-2xl p-6 my-4 w-full max-w-full box-border"
-      style="background-color: var(--bg-elevated); border: 1px solid var(--border-subtle); box-shadow: var(--shadow-sm);"
+      class="rounded p-6 my-4 w-full max-w-full box-border border"
+      style="background-color: var(--bg-elevated); border-color: var(--border-subtle);"
     >
       <div class="mb-6 pb-4" style="border-bottom: 1px solid var(--border-subtle);">
         <div class="mb-3">
@@ -132,7 +132,7 @@ export function TimeSlider(props: TimeSliderProps): JSX.Element {
             if (isDisabled) {
               return (
                 <div
-                  class="px-3 py-1.5 text-xs font-medium rounded-xl border cursor-not-allowed opacity-40 transition-all duration-200"
+                  class="px-3 py-1.5 text-xs font-medium rounded border cursor-not-allowed opacity-40"
                   style={`border-color: ${color.solid}; color: ${color.solid}; background-color: var(--bg-tertiary);`}
                   safe
                 >
@@ -150,7 +150,7 @@ export function TimeSlider(props: TimeSliderProps): JSX.Element {
                     },
                   })}
                   hx-target={hxTarget}
-                  hx-swap="outerHTML transition:true"
+                  hx-swap="outerHTML"
                   hx-trigger="submit"
                   hx-scroll="false"
                   class="inline-block"
@@ -160,10 +160,8 @@ export function TimeSlider(props: TimeSliderProps): JSX.Element {
                   <input type="hidden" name="comment" value="" />
                   <button
                     type="submit"
-                    class="px-3 py-1.5 text-xs font-semibold rounded-xl border transition-all duration-200"
-                    style={`border-color: ${color.solid}; color: ${color.solid}; background-color: ${color.solid}15; box-shadow: var(--shadow-sm); letter-spacing: -0.01em;`}
-                    onmouseover={`this.style.boxShadow='var(--shadow-md)'; this.style.transform='translateY(-1px)';`}
-                    onmouseout={`this.style.boxShadow='var(--shadow-sm)'; this.style.transform='translateY(0)';`}
+                    class="px-3 py-1.5 text-xs font-semibold rounded border"
+                    style={`border-color: ${color.solid}; color: ${color.solid}; background-color: ${color.solid}15;`}
                     safe
                   >
                     {project.name}
@@ -185,10 +183,8 @@ export function TimeSlider(props: TimeSliderProps): JSX.Element {
                 <input type="hidden" name="hours" value={String(0)} />
                 <button
                   type="submit"
-                  class="px-3 py-1.5 text-xs font-medium rounded-xl border transition-all duration-200"
-                  style={`border-color: ${color.solid}; color: ${color.solid}; background-color: var(--bg-elevated); letter-spacing: -0.01em;`}
-                  onmouseover={`this.style.backgroundColor='var(--bg-tertiary)'; this.style.boxShadow='var(--shadow-sm)'; this.style.transform='translateY(-1px)';`}
-                  onmouseout={`this.style.backgroundColor='var(--bg-elevated)'; this.style.boxShadow='none'; this.style.transform='translateY(0)';`}
+                  class="px-3 py-1.5 text-xs font-medium rounded border"
+                  style={`border-color: ${color.solid}; color: ${color.solid}; background-color: var(--bg-elevated);`}
                   safe
                 >
                   {project.name}
@@ -203,8 +199,8 @@ export function TimeSlider(props: TimeSliderProps): JSX.Element {
 
       <div class="relative my-6">
         <div
-          class="relative h-20 rounded-xl overflow-visible min-h-[80px]"
-          style="background-color: var(--bg-tertiary); border: 1px solid var(--border-subtle); box-shadow: var(--shadow-sm);"
+          class="relative h-20 rounded overflow-visible min-h-[80px] border"
+          style="background-color: var(--bg-tertiary); border-color: var(--border-subtle);"
         >
           {segments.length === 0 ? (
             <div
@@ -241,15 +237,13 @@ export function TimeSlider(props: TimeSliderProps): JSX.Element {
 
               return (
                 <div
-                  class="flex justify-between items-start p-4 rounded-xl mb-3 transition-all duration-200"
-                  style="background-color: var(--bg-tertiary); border: 1px solid var(--border-subtle); box-shadow: var(--shadow-sm);"
-                  onmouseover="this.style.boxShadow='var(--shadow-md)'; this.style.borderColor='var(--border)';"
-                  onmouseout="this.style.boxShadow='var(--shadow-sm)'; this.style.borderColor='var(--border-subtle)';"
+                  class="flex justify-between items-start p-4 rounded mb-3 border"
+                  style="background-color: var(--bg-tertiary); border-color: var(--border-subtle);"
                 >
                   <div class="flex items-start gap-4 flex-1">
                     <div
-                      class="w-5 h-5 rounded-lg mt-0.5"
-                      style={`background: ${color.solid}; box-shadow: 0 2px 8px ${color.solid}40;`}
+                      class="w-5 h-5 rounded mt-0.5"
+                      style={`background: ${color.solid};`}
                     ></div>
                     <div class="flex-1">
                       <div
@@ -263,7 +257,7 @@ export function TimeSlider(props: TimeSliderProps): JSX.Element {
                           params: { entryId: segment.entry_id! },
                         })}
                         hx-target={hxTarget}
-                        hx-swap="outerHTML transition:true"
+                        hx-swap="outerHTML"
                         hx-trigger="change delay:500ms"
                         hx-scroll="false"
                         class="mt-1"
@@ -272,10 +266,8 @@ export function TimeSlider(props: TimeSliderProps): JSX.Element {
                           name="comment"
                           rows="3"
                           placeholder="Add comment..."
-                          class="text-sm font-normal leading-relaxed bg-transparent border-none outline-none w-full px-3 py-2 rounded-lg transition-all duration-200"
-                          style="color: var(--text-primary); resize: none;"
-                          hx-on:focus="this.style.backgroundColor='var(--bg-elevated)'; this.style.border='1px solid var(--border)';"
-                          hx-on:blur="this.style.backgroundColor='transparent'; this.style.border='none';"
+                          class="text-sm font-normal leading-relaxed bg-transparent border outline-none w-full px-3 py-2 rounded"
+                          style="color: var(--text-primary); resize: none; border-color: var(--border-subtle);"
                           safe
                         >
                           {segment.comment || ""}
@@ -287,7 +279,7 @@ export function TimeSlider(props: TimeSliderProps): JSX.Element {
                         params: { entryId: segment.entry_id! },
                       })}
                       hx-target={hxTarget}
-                      hx-swap="outerHTML transition:true"
+                      hx-swap="outerHTML"
                       hx-trigger="change"
                       hx-scroll="false"
                       class="flex items-center gap-1.5"
@@ -298,10 +290,8 @@ export function TimeSlider(props: TimeSliderProps): JSX.Element {
                         value={hours.toFixed(1)}
                         min="0"
                         step="0.5"
-                        class="text-xl font-bold bg-transparent border-none outline-none w-24 text-right px-2 py-1 rounded-lg transition-all duration-200 [&::-webkit-inner-spin-button]:opacity-100 [&::-webkit-outer-spin-button]:opacity-100 [&::-webkit-inner-spin-button]:block [&::-webkit-outer-spin-button]:block"
-                        style="color: var(--text-primary); letter-spacing: -0.02em;"
-                        onfocus="this.style.backgroundColor='var(--bg-elevated)'; this.style.border='1px solid var(--border)';"
-                        onblur="this.style.backgroundColor='transparent'; this.style.border='none';"
+                        class="text-xl font-bold bg-transparent border outline-none w-24 text-right px-2 py-1 rounded [&::-webkit-inner-spin-button]:opacity-100 [&::-webkit-outer-spin-button]:opacity-100 [&::-webkit-inner-spin-button]:block [&::-webkit-outer-spin-button]:block"
+                        style="color: var(--text-primary); border-color: var(--border-subtle);"
                       />
                       <span
                         class="text-sm font-semibold"
@@ -316,17 +306,15 @@ export function TimeSlider(props: TimeSliderProps): JSX.Element {
                       params: { entryId: segment.entry_id! },
                     })}
                     hx-target={hxTarget}
-                    hx-swap="outerHTML transition:true"
+                    hx-swap="outerHTML"
                     hx-trigger="submit"
                     hx-scroll="false"
                     class="ml-4"
                   >
                     <button
                       type="submit"
-                      class="text-xs font-medium px-3 py-1.5 rounded-lg transition-all duration-200"
+                      class="text-xs font-medium px-3 py-1.5 rounded"
                       style="color: var(--error);"
-                      onmouseover="this.style.backgroundColor='var(--error-light)';"
-                      onmouseout="this.style.backgroundColor='transparent';"
                     >
                       Remove
                     </button>

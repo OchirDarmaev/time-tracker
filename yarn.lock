@@ -3120,7 +3120,6 @@ __metadata:
     sst: "npm:^3.17.23"
     vite: "npm:^6.3.5"
     vite-ssr-components: "npm:^0.5.1"
-    wrangler: "npm:^4.17.0"
   languageName: unknown
   linkType: soft
 
@@ -3357,7 +3356,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"wrangler@npm:4.50.0, wrangler@npm:^4.17.0":
+"wrangler@npm:4.50.0":
   version: 4.50.0
   resolution: "wrangler@npm:4.50.0"
   dependencies:

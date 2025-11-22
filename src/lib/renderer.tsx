@@ -1,5 +1,5 @@
 import { jsxRenderer } from 'hono/jsx-renderer'
-import { Link, Script, ViteClient } from 'vite-ssr-components/hono'
+import { Link, ViteClient } from 'vite-ssr-components/hono'
 
 
 export const renderer = jsxRenderer(({ children }) => {
@@ -17,7 +17,7 @@ export const renderer = jsxRenderer(({ children }) => {
           rel="stylesheet"
         />
         <Link href="/src/static/style.css" rel="stylesheet" />
-        <Script src="/src/static/index.ts" />
+        <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js" integrity="sha384-/TgkGk7p307TH7EXJDuUlgG3Ce1UVolAOFopFekQkkXihi5u/6OCvVKyz1W+idaz" crossorigin="anonymous"></script>
       </head>
       <body>{children}</body>
     </html>

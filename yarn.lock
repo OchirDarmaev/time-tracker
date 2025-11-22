@@ -575,6 +575,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@hono/standard-validator@npm:^0.2.0":
+  version: 0.2.0
+  resolution: "@hono/standard-validator@npm:0.2.0"
+  peerDependencies:
+    "@standard-schema/spec": 1.0.0
+    hono: ">=3.9.0"
+  checksum: 10c0/1ead4abd04486dbe91fefd901769ece72713bb328690c663f5ed3a3f2b6cedbf38cdce2a96c59a4b289f0970feef996efa10fe0de68b70ef24518bab4d34a3ed
+  languageName: node
+  linkType: hard
+
 "@img/sharp-darwin-arm64@npm:0.33.5":
   version: 0.33.5
   resolution: "@img/sharp-darwin-arm64@npm:0.33.5"
@@ -3498,11 +3508,13 @@ __metadata:
   dependencies:
     "@cloudflare/vite-plugin": "npm:^1.2.3"
     "@cloudflare/workers-types": "npm:4.20251121.0"
+    "@hono/standard-validator": "npm:^0.2.0"
     "@tailwindcss/vite": "npm:^4.1.17"
     hono: "npm:^4.10.6"
     htmx.org: "npm:^2.0.8"
     sst: "npm:^3.17.23"
     tailwindcss: "npm:^4.1.17"
+    valibot: "npm:^1.1.0"
     vite: "npm:^6.3.5"
     vite-ssr-components: "npm:^0.5.1"
   languageName: unknown
@@ -3613,6 +3625,18 @@ __metadata:
   bin:
     uuid: dist/bin/uuid
   checksum: 10c0/e62301a1c6102da5ce9a147b492a4b5cfa14d2e8fdf4a6ebfda7929cb72d186f84173815ec18fa4160a03bf9724b16ece3737b3ac6701815bc965f8fa4279298
+  languageName: node
+  linkType: hard
+
+"valibot@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "valibot@npm:1.1.0"
+  peerDependencies:
+    typescript: ">=5"
+  peerDependenciesMeta:
+    typescript:
+      optional: true
+  checksum: 10c0/39580b4e4683cc44398fb775e88c03639dbaa7e6f587df416125916cb6307292d45df18f656054e8846093ced13a2d2fdc98659da6dd104d1d20180edcbd99d4
   languageName: node
   linkType: hard
 

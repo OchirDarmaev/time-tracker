@@ -6,9 +6,11 @@
     "sst": "sst"
   },
   "dependencies": {
+    "@hono/standard-validator": "^0.2.0",
     "hono": "^4.10.6",
     "htmx.org": "^2.0.8",
-    "sst": "3.17.23"
+    "sst": "3.17.23",
+    "valibot": "^1.1.0"
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "^1.2.3",

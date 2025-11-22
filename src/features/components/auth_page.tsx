@@ -8,8 +8,6 @@ const roleLabels: Record<UserRole, string> = {
   admin: "Admin",
 } as const;
 
-const setUserUrl = "/auth/set-user";
-const setRoleUrl = "/auth/set-role";
 const userOptions = [
   { value: "1", label: "User 1" },
   { value: "2", label: "User 2" },
@@ -38,19 +36,22 @@ export const AuthPage = () => (
         </p>
 
         <div class="space-y-6">
-          <form method="post" action={setUserUrl}>
+          <form 
+            hx-post={client.auth.stubLogin.$url().pathname}
+            hx-target="body"
+            hx-push-url="true"
+          >
             <div>
               <label
-                for="user_id"
+                for="userId"
                 class="block text-sm font-medium mb-2 text-gray-300"
               >
                 User
               </label>
               <select
-                id="user_id"
-                name="user_id"
+                id="userId"
+                name="userId"
                 value={currentUser.id}
-                onchange="this.form.submit()"
                 class="w-full bg-gray-800 border border-gray-700 text-gray-100 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 cursor-pointer"
               >
                 {userOptions.map((option) => (
@@ -60,9 +61,6 @@ export const AuthPage = () => (
                 ))}
               </select>
             </div>
-          </form>
-
-          <form method="post" action={setRoleUrl}>
             <div>
               <label
                 for="role"
@@ -73,6 +71,7 @@ export const AuthPage = () => (
               <select
                 id="role"
                 name="role"
+                value={currentUser.role}
                 class="w-full bg-gray-800 border border-gray-700 text-gray-100 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 cursor-pointer"
               >
                 {roleOptions.map((option) => (
@@ -82,18 +81,16 @@ export const AuthPage = () => (
                 ))}
               </select>
             </div>
+            <input type="hidden" name="redirectUrl" value={client.dashboard.$url().pathname} />
+            <div class="pt-4">
+              <button
+                type="submit"
+                class="block w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors duration-200 text-center"
+              >
+                Continue to Dashboard →
+              </button>
+            </div>
           </form>
-
-          <div class="pt-4">
-            <a
-              href={client.index.$url().pathname}
-              hx-target="body"
-              hx-push-url="true"
-              class="block w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors duration-200 text-center"
-            >
-              Continue to Dashboard →
-            </a>
-          </div>
         </div>
 
         {currentUser.email ? (

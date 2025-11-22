@@ -39,11 +39,9 @@ export const HomePage = () => (
         </div>
       </section>
 
-      <div hx-boost="true">
+      <div hx-boost="true" hx-push-url="true">
         <a
           href={client.auth.login.$url().pathname}
-          hx-target="body"
-          hx-push-url="true"
           class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-8 py-3 rounded-lg transition-colors duration-200 text-lg"
         >
           Get Started →

@@ -1,12 +1,11 @@
 import { Hono } from 'hono'
-import { renderer } from './renderer'
+import { renderer } from './lib/renderer'
+import home from './features/home'
 
 const app = new Hono()
 
 app.use(renderer)
 
-app.get('/', (c) => {
-  return c.render(<h1 className="text-3xl font-bold underline">Hello!</h1>)
-})
+app.route('/', home)
 
 export default app

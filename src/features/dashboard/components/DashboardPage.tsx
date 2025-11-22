@@ -14,7 +14,8 @@ export default function DashboardPage() {
           },
         })}
         hx-swap="outerHTML"
-        hx-trigger="load" />
+        hx-trigger="load"
+      />
     </div>
   );
 }

@@ -7,7 +7,8 @@ export function quickTimeReporturl(
     query: {
       date: string;
     };
-  }) {
+  }
+) {
   const t = client.partials.quickTimeReport.$url();
   Object.entries(params.query || {}).forEach(([key, value]) => {
     t.searchParams.set(key, value as string);

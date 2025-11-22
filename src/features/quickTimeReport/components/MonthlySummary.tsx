@@ -85,24 +85,27 @@ export default function MonthlySummary({
 
   return (
     <div class="space-y-2">
-      <div class="rounded border border-[var(--border-subtle)] p-2">
+      <div class="rounded border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-2">
+        <div class="mb-1.5 text-xs font-semibold text-[var(--text-primary)]">
+          Summary
+        </div>
         <div class="overflow-x-auto">
           <table class="w-full text-xs">
             <thead>
               <tr class="border-b border-[var(--border-subtle)]">
-                <th class="px-2 py-1 text-left font-medium text-[var(--text-secondary)]">
+                <th class="px-2 py-1 text-left font-medium text-[var(--text-primary)]">
                   Category
                 </th>
-                <th class="px-2 py-1 text-right font-medium text-[var(--text-secondary)]">
+                <th class="px-2 py-1 text-right font-medium text-[var(--text-primary)]">
                   Reported Hours
                 </th>
-                <th class="px-2 py-1 text-right font-medium text-[var(--text-secondary)]">
+                <th class="px-2 py-1 text-right font-medium text-[var(--text-primary)]">
                   Expected Hours
                 </th>
-                <th class="px-2 py-1 text-right font-medium text-[var(--text-secondary)]">
+                <th class="px-2 py-1 text-right font-medium text-[var(--text-primary)]">
                   Reported Days
                 </th>
-                <th class="px-2 py-1 text-right font-medium text-[var(--text-secondary)]">
+                <th class="px-2 py-1 text-right font-medium text-[var(--text-primary)]">
                   Expected Days
                 </th>
               </tr>
@@ -111,7 +114,7 @@ export default function MonthlySummary({
               <tr class="border-b border-[var(--border-subtle)]">
                 <td class="px-2 py-1 text-[var(--text-primary)]">Workdays</td>
                 <td
-                  class="px-2 py-1 text-right text-[var(--text-primary)]"
+                  class="px-2 py-1 text-right font-medium text-[var(--text-primary)]"
                   safe
                 >
                   {reported.workdaysHours.toFixed(1)}h
@@ -123,7 +126,7 @@ export default function MonthlySummary({
                   {expected.workdaysHours.toFixed(1)}h
                 </td>
                 <td
-                  class="px-2 py-1 text-right text-[var(--text-primary)]"
+                  class="px-2 py-1 text-right font-medium text-[var(--text-primary)]"
                   safe
                 >
                   {workdaysReportedDays.toFixed(1)}
@@ -138,7 +141,7 @@ export default function MonthlySummary({
               <tr class="border-b border-[var(--border-subtle)]">
                 <td class="px-2 py-1 text-[var(--text-primary)]">Holidays</td>
                 <td
-                  class="px-2 py-1 text-right text-[var(--text-primary)]"
+                  class="px-2 py-1 text-right font-medium text-[var(--text-primary)]"
                   safe
                 >
                   {reported.public_holidaysHours.toFixed(1)}h
@@ -150,7 +153,7 @@ export default function MonthlySummary({
                   {expected.public_holidaysHours.toFixed(1)}h
                 </td>
                 <td
-                  class="px-2 py-1 text-right text-[var(--text-primary)]"
+                  class="px-2 py-1 text-right font-medium text-[var(--text-primary)]"
                   safe
                 >
                   {holidaysReportedDays.toFixed(1)}
@@ -162,7 +165,7 @@ export default function MonthlySummary({
                   {holidaysExpectedDays.toFixed(1)}
                 </td>
               </tr>
-              <tr class="font-medium">
+              <tr class="border-t border-[var(--border-subtle)] font-medium">
                 <td class="px-2 py-1 text-[var(--text-primary)]">Total</td>
                 <td
                   class="px-2 py-1 text-right text-[var(--text-primary)]"
@@ -193,16 +196,23 @@ export default function MonthlySummary({
           </table>
         </div>
       </div>
-      <div class={`rounded p-2 ${getStatusBg(overallStatus)}`}>
+
+      <div
+        class={`rounded border p-2 ${getStatusBg(overallStatus)} ${getStatusColor(overallStatus)}`}
+        style={
+          overallStatus === "good"
+            ? "border-color: var(--success);"
+            : overallStatus === "warning"
+              ? "border-color: var(--warning);"
+              : "border-color: var(--error);"
+        }
+      >
         <div class="flex items-center gap-2">
-          <span
-            class={`text-lg font-bold ${getStatusColor(overallStatus)}`}
-            safe
-          >
+          <span class="text-lg font-bold" safe>
             {getStatusIcon(overallStatus)}
           </span>
           <div class="flex-1">
-            <div class="text-sm font-medium text-[var(--text-primary)]" safe>
+            <div class="text-sm font-medium" safe>
               {overallStatus === "good"
                 ? "All hours reported correctly"
                 : overallStatus === "warning" && totalOverReported
@@ -216,8 +226,8 @@ export default function MonthlySummary({
       </div>
 
       <div class="grid grid-cols-1 gap-2 md:grid-cols-2">
-        <div class="rounded border border-[var(--border-subtle)] p-2">
-          <div class="mb-1 flex items-center justify-between">
+        <div class="rounded border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-2">
+          <div class="mb-1.5 flex items-center justify-between border-b border-[var(--border-subtle)] pb-1">
             <div class="text-sm font-medium text-[var(--text-primary)]">
               Workdays
             </div>
@@ -238,7 +248,7 @@ export default function MonthlySummary({
               </span>
             </div>
           </div>
-          <div class="space-y-1">
+          <div class="space-y-1 pt-1">
             <div class="flex items-baseline gap-1">
               <span class="text-lg font-bold text-[var(--text-primary)]" safe>
                 {reported.workdaysHours.toFixed(1)}h
@@ -261,7 +271,7 @@ export default function MonthlySummary({
               </div>
             )}
             {workdayOverReported && (
-              <div class="text-xs text-[var(--warning)]" safe>
+              <div class="text-xs font-medium text-[var(--warning)]" safe>
                 Over-reported by{" "}
                 {(reported.workdaysHours - expected.workdaysHours).toFixed(1)}h
               </div>
@@ -269,13 +279,15 @@ export default function MonthlySummary({
             {issues.missingWorkdayHours === 0 &&
               issues.incompleteWorkdays === 0 &&
               !workdayOverReported && (
-                <div class="text-xs text-[var(--success)]">Complete</div>
+                <div class="text-xs font-medium text-[var(--success)]">
+                  Complete
+                </div>
               )}
           </div>
         </div>
 
-        <div class="rounded border border-[var(--border-subtle)] p-2">
-          <div class="mb-1 flex items-center justify-between">
+        <div class="rounded border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-2">
+          <div class="mb-1.5 flex items-center justify-between border-b border-[var(--border-subtle)] pb-1">
             <div class="text-sm font-medium text-[var(--text-primary)]">
               Public Holidays
             </div>
@@ -296,7 +308,7 @@ export default function MonthlySummary({
               </span>
             </div>
           </div>
-          <div class="space-y-1">
+          <div class="space-y-1 pt-1">
             <div class="flex items-baseline gap-1">
               <span class="text-lg font-bold text-[var(--text-primary)]" safe>
                 {reported.public_holidaysHours.toFixed(1)}h
@@ -319,7 +331,7 @@ export default function MonthlySummary({
               </div>
             )}
             {holidayOverReported && (
-              <div class="text-xs text-[var(--warning)]" safe>
+              <div class="text-xs font-medium text-[var(--warning)]" safe>
                 Over-reported by{" "}
                 {(
                   reported.public_holidaysHours - expected.public_holidaysHours
@@ -330,12 +342,12 @@ export default function MonthlySummary({
             {issues.missingPublicHolidayHours === 0 &&
               issues.incompletePublicHolidays === 0 &&
               !holidayOverReported && (
-                <div class="text-xs text-[var(--success)]">Complete</div>
+                <div class="text-xs font-medium text-[var(--success)]">
+                  Complete
+                </div>
               )}
             {expected.public_holidaysHours === 0 && (
-              <div class="text-xs text-[var(--text-secondary)]">
-                No holidays
-              </div>
+              <div class="text-xs text-[var(--text-secondary)]">No holidays</div>
             )}
           </div>
         </div>
@@ -344,15 +356,16 @@ export default function MonthlySummary({
       {(issues.missingWorkdayHours > 0 ||
         issues.missingPublicHolidayHours > 0 ||
         issues.overtimeHours > 0) && (
-        <div class="rounded border border-[var(--border-subtle)] p-2">
-          <div class="mb-1 text-xs font-medium text-[var(--text-primary)]">
+        <div class="rounded border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-2">
+          <div class="mb-1.5 text-sm font-medium text-[var(--text-primary)]">
             What to do:
           </div>
           <ul class="space-y-1 text-xs text-[var(--text-secondary)]">
             {issues.missingWorkdayHours > 0 && (
-              <li>
+              <li class="flex items-start gap-1.5">
+                <span>•</span>
                 <span safe>
-                  {`• Report ${issues.missingWorkdayHours.toFixed(1)}h for workdays`}
+                  {`Report ${issues.missingWorkdayHours.toFixed(1)}h for workdays`}
                 </span>
                 {issues.incompleteWorkdays > 0 && (
                   <span>
@@ -364,9 +377,10 @@ export default function MonthlySummary({
               </li>
             )}
             {issues.missingPublicHolidayHours > 0 && (
-              <li>
+              <li class="flex items-start gap-1.5">
+                <span>•</span>
                 <span safe>
-                  {`• Report ${issues.missingPublicHolidayHours.toFixed(1)}h for public holidays`}
+                  {`Report ${issues.missingPublicHolidayHours.toFixed(1)}h for public holidays`}
                 </span>
                 {issues.incompletePublicHolidays > 0 && (
                   <span>
@@ -378,8 +392,9 @@ export default function MonthlySummary({
               </li>
             )}
             {issues.overtimeHours > 0 && (
-              <li class="text-[var(--warning)]" safe>
-                • {issues.overtimeHours.toFixed(1)}h overtime
+              <li class="flex items-start gap-1.5 font-medium text-[var(--warning)]" safe>
+                <span>•</span>
+                <span>{issues.overtimeHours.toFixed(1)}h overtime</span>
               </li>
             )}
           </ul>

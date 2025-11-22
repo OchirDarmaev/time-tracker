@@ -1,6 +1,6 @@
 import { client } from "../../../lib/client";
 
-export default function NavBar({ currentPath }: { currentPath: string; }) {
+export default function NavBar({ currentPath }: { currentPath: string }) {
   const dashboardPath = client.dashboard.$url().pathname;
 
   const navItems = [

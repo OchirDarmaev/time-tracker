@@ -77,11 +77,11 @@ export default async function QuickTimeReportView({
 
   return (
     <div id="time-tracking-content" class="space-y-8">
-      <div class="rounded border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-6">
-        <MonthlySummary {...monthlySummaryData} />
-      </div>
       <div class="flex w-full flex-row gap-8">
-        <div class="w-1/2">
+        <div class="w-1/3">
+          <MonthlySummary {...monthlySummaryData} />
+        </div>
+        <div class="w-1/3">
           <MonthlyCalendar
             props={{
               selectedDate: selectedDate,
@@ -97,7 +97,7 @@ export default async function QuickTimeReportView({
             }}
           />
         </div>
-        <div class="w-1/2">
+        <div class="w-1/3">
           <TimeSlider
             dayType={selectedDayType}
             reportedHours={timeSliderData.sliderTotalHours}

@@ -2,7 +2,10 @@ import { client } from "../../../lib/client";
 import { CurrentUser, RoleOption, UserOption } from "../types";
 
 export default function AuthPage({
-  currentUser, userOptions, roleOptions, currentUserRoleLabel,
+  currentUser,
+  userOptions,
+  roleOptions,
+  currentUserRoleLabel,
 }: {
   currentUser: CurrentUser;
   userOptions: UserOption[];
@@ -69,7 +72,8 @@ export default function AuthPage({
               <input
                 type="hidden"
                 name="redirectUrl"
-                value={client.dashboard.$url().pathname} />
+                value={client.dashboard.$url().pathname}
+              />
               <div class="pt-4">
                 <button
                   type="submit"

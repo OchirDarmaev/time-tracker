@@ -1,7 +1,8 @@
 import NavBar from "./NavBar";
 
 export default function DashboardLayout({
-  children, currentPath,
+  children,
+  currentPath,
 }: {
   children: unknown;
   currentPath: string;

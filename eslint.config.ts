@@ -3,7 +3,6 @@ import globals from "globals";
 import tseslint from "typescript-eslint";
 import json from "@eslint/json";
 import markdown from "@eslint/markdown";
-import css from "@eslint/css";
 import prettier from "eslint-config-prettier";
 import { defineConfig } from "eslint/config";
 
@@ -15,6 +14,7 @@ export default defineConfig([
       "**/node_modules/**",
       "sst-env.d.ts",
       "tsconfig.json",
+      "src/static/style.css",
     ],
   },
   {
@@ -42,12 +42,6 @@ export default defineConfig([
     plugins: { markdown },
     language: "markdown/commonmark",
     extends: ["markdown/recommended"],
-  },
-  {
-    files: ["**/*.css"],
-    plugins: { css },
-    language: "css/css",
-    extends: ["css/recommended"],
   },
   prettier,
 ]);

@@ -25,6 +25,7 @@ export const renderer = jsxRenderer(({ children }) => {
           integrity="sha384-/TgkGk7p307TH7EXJDuUlgG3Ce1UVolAOFopFekQkkXihi5u/6OCvVKyz1W+idaz"
           crossorigin="anonymous"
         ></script>
+        <script src="/src/static/theme.js"></script>
       </head>
       <body>{children}</body>
     </html>

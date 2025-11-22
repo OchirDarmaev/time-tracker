@@ -347,7 +347,9 @@ export default function MonthlySummary({
                 </div>
               )}
             {expected.public_holidaysHours === 0 && (
-              <div class="text-xs text-[var(--text-secondary)]">No holidays</div>
+              <div class="text-xs text-[var(--text-secondary)]">
+                No holidays
+              </div>
             )}
           </div>
         </div>
@@ -392,7 +394,10 @@ export default function MonthlySummary({
               </li>
             )}
             {issues.overtimeHours > 0 && (
-              <li class="flex items-start gap-1.5 font-medium text-[var(--warning)]" safe>
+              <li
+                class="flex items-start gap-1.5 font-medium text-[var(--warning)]"
+                safe
+              >
                 <span>•</span>
                 <span>{issues.overtimeHours.toFixed(1)}h overtime</span>
               </li>

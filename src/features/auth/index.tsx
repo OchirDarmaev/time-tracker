@@ -1,17 +1,25 @@
 import { Hono } from 'hono'
-import { AuthPage } from '../components/auth_page'
+import { AuthPage } from './components/auth_page'
 import * as v from 'valibot'
 import { sValidator } from '@hono/standard-validator'
 import { setCookie } from 'hono/cookie'
-import { client } from '../../lib/client'
-
-const schema = v.object({
-  name: v.string(),
-  age: v.number(),
-})
+import { getCurrentUser, getRoleLabel, roleOptions, userOptions } from './service'
 
 const app = new Hono()
-.get('/login', (c) => c.render(<AuthPage />))
+.get('/login', async (c) => {
+  const currentUser = await getCurrentUser();
+  const currentUserRoleLabel = getRoleLabel(currentUser.role);
+  
+  return c.render(
+    <AuthPage 
+        currentUser={currentUser}
+        userOptions={userOptions}
+        roleOptions={roleOptions}
+        currentUserRoleLabel={currentUserRoleLabel}
+        
+    />
+  );
+})
 .post('/stubLogin', sValidator(
     'form',
     v.object({

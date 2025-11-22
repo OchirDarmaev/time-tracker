@@ -1,17 +1,14 @@
 import { client } from "../../../lib/client";
 import { CurrentUser, RoleOption, UserOption } from "../types";
 
-export const AuthPage = ({
-  currentUser,
-  userOptions,
-  roleOptions,
-  currentUserRoleLabel,
+export default function AuthPage({
+  currentUser, userOptions, roleOptions, currentUserRoleLabel,
 }: {
   currentUser: CurrentUser;
   userOptions: UserOption[];
   roleOptions: RoleOption[];
   currentUserRoleLabel: string;
-}) => {
+}) {
   return (
     <div class="flex min-h-screen items-center justify-center bg-gray-950 text-gray-100">
       <div class="mx-auto w-full max-w-md px-4 sm:px-6 lg:px-8">
@@ -72,8 +69,7 @@ export const AuthPage = ({
               <input
                 type="hidden"
                 name="redirectUrl"
-                value={client.dashboard.$url().pathname}
-              />
+                value={client.dashboard.$url().pathname} />
               <div class="pt-4">
                 <button
                   type="submit"
@@ -108,4 +104,4 @@ export const AuthPage = ({
       </div>
     </div>
   );
-};
+}

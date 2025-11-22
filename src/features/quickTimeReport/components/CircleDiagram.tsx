@@ -4,7 +4,7 @@ import {
   Project,
   REQUIRED_DAILY_HOURS,
   getProjectColor,
-} from "./monthly_calendar";
+} from "./MonthlyCalendar";
 
 export type CircleDiagramProps = {
   breakdown: DayProjectBreakdown[];

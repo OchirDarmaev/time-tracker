@@ -4,13 +4,13 @@ import {
   timeEntryModel,
   calendarModel,
 } from "../../../lib/models";
-import { MonthlyCalendar } from "./monthly_calendar";
-import { getMonthlySummaryData } from "../get_monthly_summary_data";
-import { MonthlySummary } from "./monthly_summary";
-import { TimeSlider } from "./time_slider";
-import { getTimeSliderData } from "../get_time_slider_data";
+import { MonthlyCalendar } from "./MonthlyCalendar";
+import { getMonthlySummaryData } from "../getMonthlySummaryData";
+import MonthlySummary from "./MonthlySummary";
+import TimeSlider from "./TimeSlider";
+import { getTimeSliderData } from "../getTimeSliderData";
 
-export async function QuickTimeReportView({
+export default async function QuickTimeReportView({
   currentUser,
   selectedDate,
 }: {

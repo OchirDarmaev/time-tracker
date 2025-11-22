@@ -1,8 +1,8 @@
 import { quickTimeReporturl } from "../quickTimeReporturl";
 import CircleDiagram from "./CircleDiagram";
-import { DayType, GridDay } from "./monthly_calendar";
-import { DayProjectBreakdown } from "./monthly_calendar";
-import { Project } from "./monthly_calendar";
+import { DayType, GridDay } from "./MonthlyCalendar";
+import { DayProjectBreakdown } from "./MonthlyCalendar";
+import { Project } from "./MonthlyCalendar";
 
 export type DayButtonProps = {
   day: GridDay;

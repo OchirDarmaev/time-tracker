@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { jsxRenderer } from "hono/jsx-renderer";
-import { DashboardPage } from "./components/dashboard_page";
-import { DashboardLayout } from "./components/dashboard_layout";
+import DashboardPage from "./components/DashboardPage";
+import DashboardLayout from "./components/DashboardLayout";
 import { requireAuth } from "../auth/middleware";
 
 const app = new Hono()

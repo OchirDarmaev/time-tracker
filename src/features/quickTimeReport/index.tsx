@@ -2,13 +2,13 @@ import { Hono } from "hono";
 import { getCookie } from "hono/cookie";
 import * as v from "valibot";
 import { sValidator } from "@hono/standard-validator";
-import { QuickTimeReportView } from "./components/quick-time-report-view";
-import { EntriesTable } from "./components/entries_table";
+import QuickTimeReportView from "./components/QuickTimeReportView";
+import { EntriesTable } from "./components/EntriesTable";
 import { formatDate } from "../../lib/date_utils";
 import { projectModel } from "../../lib/models";
 import { timeEntryModel } from "../../lib/models";
 import { mockDb } from "../../lib/mock_db";
-import { REQUIRED_DAILY_HOURS } from "./get_monthly_summary_data";
+import { REQUIRED_DAILY_HOURS } from "./getMonthlySummaryData";
 import { requireAuth } from "../auth/middleware";
 
 // const DateOnlySchema = v.pipe(

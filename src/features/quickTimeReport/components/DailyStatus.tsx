@@ -1,4 +1,4 @@
-import { DayType } from "./monthly_calendar";
+import { DayType } from "./MonthlyCalendar";
 
 const REQUIRED_DAILY_HOURS = 8;
 

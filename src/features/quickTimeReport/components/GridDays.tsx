@@ -1,5 +1,5 @@
 import { DayButton } from "./DayButton";
-import { Day, DayType, DayProjectBreakdown, Project } from "./monthly_calendar";
+import { Day, DayType, DayProjectBreakdown, Project } from "./MonthlyCalendar";
 
 export type GridDaysProps = {
   mondayBasedFirstDay: number;

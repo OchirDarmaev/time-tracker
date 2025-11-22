@@ -1,6 +1,6 @@
 import { JSX } from "hono/jsx";
-import { DailyStatus } from "./daily_status";
-import { DayType } from "./monthly_calendar";
+import { DailyStatus } from "./DailyStatus";
+import { DayType } from "./MonthlyCalendar";
 
 export interface Segment {
   entry_id?: number;
@@ -54,7 +54,7 @@ function getProjectColor(project: Project): { bg: string; solid: string } {
   };
 }
 
-export function TimeSlider(props: TimeSliderProps) {
+export default function TimeSlider(props: TimeSliderProps) {
   const { reportedHours, dayType, segments, projects, date, hxTarget } = props;
 
   // Sort projects: regular projects first, then system projects

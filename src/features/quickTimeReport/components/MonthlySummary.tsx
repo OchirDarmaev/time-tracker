@@ -1,7 +1,7 @@
 import {
   MonthlySummaryData,
   REQUIRED_DAILY_HOURS,
-} from "../get_monthly_summary_data";
+} from "../getMonthlySummaryData";
 
 type StatusType = "good" | "warning" | "critical";
 
@@ -36,7 +36,7 @@ function getStatusBg(status: StatusType): string {
   return "bg-[var(--error)]/10";
 }
 
-export function MonthlySummary({
+export default function MonthlySummary({
   reported,
   expected,
   issues,

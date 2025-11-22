@@ -283,39 +283,46 @@ const app = new Hono()
       );
     }
   )
-  .delete("/segments/:entryId", async (c) => {
-    const userId = getCookie(c, "user_id");
-    if (!userId) {
-      return c.text("Unauthorized", 401);
+  .delete(
+    "/segments/:entryId",
+    sValidator(
+      "param",
+      v.object({ entryId: v.pipe(v.string(), v.transform(Number)) })
+    ),
+    async (c) => {
+      const userId = getCookie(c, "user_id");
+      if (!userId) {
+        return c.text("Unauthorized", 401);
+      }
+
+      const user = await mockDb.findUserById(Number(userId));
+      if (!user) {
+        return c.text("Unauthorized", 401);
+      }
+
+      const entryId = Number(c.req.param("entryId"));
+      const currentUser = {
+        id: user.id,
+        email: user.email,
+        role: JSON.parse(user.roles)[0] || "account",
+      };
+
+      const entry = await timeEntryModel.getById(entryId);
+      if (!entry) {
+        return c.text("Entry not found", 404);
+      }
+
+      if (entry.user_id !== currentUser.id) {
+        return c.text("Access denied", 403);
+      }
+
+      const date = entry.date;
+      await timeEntryModel.delete(entryId);
+
+      return c.render(
+        <QuickTimeReportView currentUser={currentUser} selectedDate={date} />
+      );
     }
-
-    const user = await mockDb.findUserById(Number(userId));
-    if (!user) {
-      return c.text("Unauthorized", 401);
-    }
-
-    const entryId = Number(c.req.param("entryId"));
-    const currentUser = {
-      id: user.id,
-      email: user.email,
-      role: JSON.parse(user.roles)[0] || "account",
-    };
-
-    const entry = await timeEntryModel.getById(entryId);
-    if (!entry) {
-      return c.text("Entry not found", 404);
-    }
-
-    if (entry.user_id !== currentUser.id) {
-      return c.text("Access denied", 403);
-    }
-
-    const date = entry.date;
-    await timeEntryModel.delete(entryId);
-
-    return c.render(
-      <QuickTimeReportView currentUser={currentUser} selectedDate={date} />
-    );
-  });
+  );
 
 export default app;

@@ -29,4 +29,3 @@ export const getCurrentUser = (): Promise<CurrentUser> => {
 export const getRoleLabel = (role: UserRole): string => {
   return roleLabels[role];
 };
-

@@ -3,4 +3,5 @@ dist
 .sst
 *.lock
 yarn.lock
+sst-env.d.ts
 

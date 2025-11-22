@@ -1,16 +1,16 @@
 # 🚀 Project Architecture Overview
 
-*A fast, minimal, scalable foundation for building from POC → MVP → Production*
+_A fast, minimal, scalable foundation for building from POC → MVP → Production_
 
 This project is built to deliver **maximum development speed**, **excellent DX**, and **a simple, predictable architecture** that scales without increasing complexity.
 Our core priorities:
 
-* **Fast feature delivery**
-* **Minimal infrastructure overhead**
-* **Zero-bundle frontend where possible**
-* **Cheap global deployment**
-* **Clear, maintainable code structure**
-* **One-command reproducible environments**
+- **Fast feature delivery**
+- **Minimal infrastructure overhead**
+- **Zero-bundle frontend where possible**
+- **Cheap global deployment**
+- **Clear, maintainable code structure**
+- **One-command reproducible environments**
 
 We achieve this with an **edge-native**, **SSR-first**, **HTML-driven** architecture.
 
@@ -20,33 +20,33 @@ We achieve this with an **edge-native**, **SSR-first**, **HTML-driven** architec
 
 ### **Frontend Rendering**
 
-* **HTMX**
+- **HTMX**
   Declarative UI interactions without client-side frameworks.
   Turns server routes into interactive components with minimal code.
 
-* **Vite SSR Components**
+- **Vite SSR Components**
   Enables small, typed UI components without introducing a SPA.
   Used only when needed — complements HTMX for reusable UI blocks.
 
-* **TailwindCSS**
+- **TailwindCSS**
   Fast styling, predictable design system, no CSS architecture burden.
 
 ---
 
 ### **Backend / Runtime**
 
-* **Hono**
+- **Hono**
   Ultra-fast, minimal, type-safe Edge framework.
   Clear routing, validation, and excellent DX.
 
-* **Cloudflare Workers**
+- **Cloudflare Workers**
   Global, cheap, low-latency execution.
   Perfect for an SSR architecture with many small HTMX interactions.
 
-* **Cloudflare D1 (initial DB)**
+- **Cloudflare D1 (initial DB)**
   Zero-config SQLite for POC/MVP, replaceable later if needed.
 
-* **Vite + @cloudflare/vite-plugin**
+- **Vite + @cloudflare/vite-plugin**
   First-class Edge bundle handling.
   Ensures compatibility between Hono, Workers, and SSR components.
 
@@ -54,7 +54,7 @@ We achieve this with an **edge-native**, **SSR-first**, **HTML-driven** architec
 
 ### **Infrastructure & Operations**
 
-* **SST**
+- **SST**
   One-command environments (dev/stage/prod).
   Simple deployments.
   Scales better than Wrangler for multi-service setups.
@@ -74,9 +74,9 @@ Most features are “HTML in → HTML out,” which shortens development cycles.
 
 With SSR-first and type-safe backend routes, we focus on:
 
-* domain logic
-* features
-* user flows
+- domain logic
+- features
+- user flows
   Not on build systems or client framework complexity.
 
 ### **3. Minimal Cost**
@@ -125,16 +125,15 @@ vite.config.ts                  → Vite + Cloudflare config
 
 ```
 
-
 Vite SSR Components supplement HTMX when we need reusable or complex UI bits—without committing to a full SPA.
 
 ### **5. Future-proof Without Lock-in**
 
 If needed, we can later swap:
 
-* D1 → Turso / Neon
-* HTMX templates → more SSR components
-* Workers → router-based microservices
+- D1 → Turso / Neon
+- HTMX templates → more SSR components
+- Workers → router-based microservices
   with minimal architectural changes.
 
 ---
@@ -143,12 +142,12 @@ If needed, we can later swap:
 
 This repository is a **lean, high-DX platform** designed for rapid evolution with:
 
-* simple mental models
-* minimal code
-* strong type safety
-* edge-native performance
-* low operational costs
-* effortless onboarding for teammates
+- simple mental models
+- minimal code
+- strong type safety
+- edge-native performance
+- low operational costs
+- effortless onboarding for teammates
 
 It follows a “**server-powered UI**” philosophy:
 **small components, SSR everywhere, HTML as the API.**

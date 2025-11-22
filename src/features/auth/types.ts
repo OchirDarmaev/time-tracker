@@ -15,5 +15,3 @@ export type CurrentUser = {
   email: string;
   role: UserRole;
 };
-
-

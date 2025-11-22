@@ -1,9 +1,6 @@
-import { Hono } from 'hono'
-import { HomePage } from './components/home_page'
+import { Hono } from "hono";
+import { HomePage } from "./components/home_page";
 
-const app = new Hono()
-.get('/', (c) => c.render(<HomePage />))
+const app = new Hono().get("/", (c) => c.render(<HomePage />));
 
-export default app
-
-
+export default app;

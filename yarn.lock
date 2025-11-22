@@ -2148,6 +2148,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"htmx.org@npm:^2.0.8":
+  version: 2.0.8
+  resolution: "htmx.org@npm:2.0.8"
+  checksum: 10c0/7f866a705d2f1d8bf8a1e0743cb2d6f2d8bb7635d6de85165ef6cc4d87d7210ee6cdf9b411497d1fc58aadae99a69f11266013f68092764cfffde23a44e9681f
+  languageName: node
+  linkType: hard
+
 "http-cache-semantics@npm:^4.1.1":
   version: 4.2.0
   resolution: "http-cache-semantics@npm:4.2.0"
@@ -3493,6 +3500,7 @@ __metadata:
     "@cloudflare/workers-types": "npm:4.20251121.0"
     "@tailwindcss/vite": "npm:^4.1.17"
     hono: "npm:^4.10.6"
+    htmx.org: "npm:^2.0.8"
     sst: "npm:^3.17.23"
     tailwindcss: "npm:^4.1.17"
     vite: "npm:^6.3.5"

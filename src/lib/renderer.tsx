@@ -1,5 +1,6 @@
 import { jsxRenderer } from 'hono/jsx-renderer'
-import { Link, ViteClient } from 'vite-ssr-components/hono'
+import { Link, Script, ViteClient } from 'vite-ssr-components/hono'
+
 
 export const renderer = jsxRenderer(({ children }) => {
   return (
@@ -16,6 +17,7 @@ export const renderer = jsxRenderer(({ children }) => {
           rel="stylesheet"
         />
         <Link href="/src/static/style.css" rel="stylesheet" />
+        <Script src="/src/static/index.ts" />
       </head>
       <body>{children}</body>
     </html>

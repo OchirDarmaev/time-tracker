@@ -12,6 +12,7 @@ export const AuthPage = ({
   roleOptions: RoleOption[];
   currentUserRoleLabel: string;
 }) => {
+  
   return (
     <div class="bg-gray-950 text-gray-100 min-h-screen flex items-center justify-center">
       <div class="max-w-md w-full mx-auto px-4 sm:px-6 lg:px-8">

@@ -16,7 +16,7 @@ We achieve this with an **edge-native**, **SSR-first**, **HTML-driven** architec
 
 ---
 
-# 🧩 Technology Stack
+## 🧩 Technology Stack
 
 ### **Frontend Rendering**
 
@@ -62,7 +62,7 @@ We achieve this with an **edge-native**, **SSR-first**, **HTML-driven** architec
 
 ---
 
-# 🛠 Why This Architecture Works
+## 🛠 Why This Architecture Works
 
 ### **1. Fast Development**
 
@@ -139,7 +139,7 @@ If needed, we can later swap:
 
 ---
 
-# 🎯 Summary
+## 🎯 Summary
 
 This repository is a **lean, high-DX platform** designed for rapid evolution with:
 

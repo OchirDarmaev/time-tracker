@@ -660,6 +660,10 @@ class MockDB {
     return Promise.resolve(true);
   }
 
+  async findAllProjectUsers(): Promise<ProjectUser[]> {
+    return Promise.resolve([...this.projectUsers]);
+  }
+
   // TimeEntries methods
   async findTimeEntryById(id: number): Promise<TimeEntry | null> {
     return Promise.resolve(this.timeEntries.find((te) => te.id === id) || null);

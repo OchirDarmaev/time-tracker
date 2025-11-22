@@ -419,7 +419,7 @@ body {
 }
 
 /* View Transitions API */
-@view-transition {
+/* @view-transition {
   navigation: auto;
 }
 
@@ -484,7 +484,7 @@ tr[id] {
 ::view-transition-new(nav-bar) {
   animation: none !important;
   opacity: 1 !important;
-}
+} */
 
 /* Scrollbar styling - minimal CSS for browser-specific styling */
 /* Default (dark theme) */

@@ -13,6 +13,10 @@ export function getMonthFromDate(dateString: string): string {
   return `${year}-${month}`;
 }
 
+export function parseDate(dateString: string): Date {
+  return new Date(dateString + "T00:00:00");
+}
+
 export function getAllDaysInMonth(dateString: string): Array<{
   date: string;
   dayNumber: number;

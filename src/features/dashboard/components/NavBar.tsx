@@ -1,6 +1,10 @@
 import { client } from "../../../lib/client";
 
-export default function NavBar({ currentPath }: { currentPath: string }) {
+interface NavBarProps {
+  currentPath: string;
+}
+
+export default function NavBar({ currentPath }: NavBarProps) {
   const dashboardPath = client.dashboard.$url().pathname;
 
   const navItems = [
@@ -14,6 +18,16 @@ export default function NavBar({ currentPath }: { currentPath: string }) {
       label: "Reports",
       path: `${dashboardPath}/reports`,
       routePath: "/dashboard/reports",
+    },
+    {
+      label: "Projects",
+      path: "/admin/projects",
+      routePath: "/admin/projects",
+    },
+    {
+      label: "Calendar",
+      path: "/admin/calendar",
+      routePath: "/admin/calendar",
     },
   ];
 
@@ -30,7 +44,7 @@ export default function NavBar({ currentPath }: { currentPath: string }) {
             </a>
             <div class="flex space-x-4">
               {navItems.map((item) => {
-                const isActive = item.routePath === currentPath;
+                const isActive = currentPath.startsWith(item.routePath);
                 return (
                   <a
                     key={item.routePath}

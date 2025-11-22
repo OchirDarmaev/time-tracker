@@ -82,7 +82,7 @@ export function EntriesTable({
                 <button
                   hx-delete={`/dashboard/entries/${entry.id}`}
                   hx-target="#time-tracking-content"
-                  hx-swap="outerHTML transition:true"
+                  hx-swap="outerHTML"
                   hx-confirm="Delete this entry?"
                   hx-scroll="false"
                   class="cursor-pointer rounded-lg border border-[var(--border)] bg-transparent px-3 py-1.5 text-xs font-medium text-[var(--error)]"

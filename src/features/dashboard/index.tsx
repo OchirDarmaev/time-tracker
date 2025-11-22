@@ -1,23 +1,14 @@
 import { Hono } from "hono";
-import { jsxRenderer } from "hono/jsx-renderer";
 import DashboardPage from "./components/DashboardPage";
 import DashboardLayout from "./components/DashboardLayout";
 import { requireAuth } from "../auth/middleware";
 
 const app = new Hono()
   .use(requireAuth)
-  .use(
-    "*",
-    jsxRenderer(({ children, Layout }, c) => {
-      return (
-        <Layout>
-          <DashboardLayout currentPath={c.req.path}>{children}</DashboardLayout>
-        </Layout>
-      );
-    })
-  )
+ 
   .get("/", (c) => {
-    return c.render(<DashboardPage />);
+    return c.render(
+      <DashboardLayout currentPath={c.req.path}><DashboardPage /></DashboardLayout>);
   });
 
 export default app;

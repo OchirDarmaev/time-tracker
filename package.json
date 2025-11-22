@@ -5,6 +5,7 @@
     "build": "vite build",
     "dev": "vite dev",
     "sst": "sst",
+    "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format:write": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,md}\" --",

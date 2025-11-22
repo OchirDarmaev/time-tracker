@@ -175,7 +175,7 @@ export default function TimeSlider(props: TimeSliderProps) {
                   client.partials.quickTimeReport.segments.$url().pathname
                 }
                 hx-target={hxTarget}
-                hx-swap="outerHTML transition:true"
+                hx-swap="outerHTML"
                 hx-trigger="submit"
                 hx-scroll="false"
                 class="inline-block"

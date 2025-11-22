@@ -11,7 +11,7 @@ import {
 } from "./service";
 
 const app = new Hono()
-  .get("/login", async (c) => {
+  .get("/", async (c) => {
     const currentUser = await getCurrentUser();
     const currentUserRoleLabel = getRoleLabel(currentUser.role);
 

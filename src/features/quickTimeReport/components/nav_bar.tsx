@@ -23,7 +23,7 @@ export const NavBar = ({ currentPath }: { currentPath: string }) => {
         <div class="flex h-16 items-center justify-between">
           <div class="flex items-center space-x-8">
             <a
-              href={client.index.$url().pathname}
+              href={dashboardPath}
               class="bg-linear-to-r from-indigo-400 to-purple-400 bg-clip-text text-xl font-bold text-transparent"
             >
               TimeTrack

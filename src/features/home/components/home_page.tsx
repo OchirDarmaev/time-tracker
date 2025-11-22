@@ -1,37 +1,37 @@
 import { client } from "../../../lib/client";
 
 export const HomePage = () => (
-  <div class="bg-gray-950 text-gray-100 min-h-screen flex items-center justify-center">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
-      <h1 class="text-6xl font-bold mb-6 bg-linear-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+  <div class="flex min-h-screen items-center justify-center bg-gray-950 text-gray-100">
+    <div class="mx-auto max-w-4xl px-4 py-20 text-center sm:px-6 lg:px-8">
+      <h1 class="mb-6 bg-linear-to-r from-indigo-400 to-purple-400 bg-clip-text text-6xl font-bold text-transparent">
         TimeTrack
       </h1>
-      <p class="text-xl text-gray-400 mb-16 max-w-xl mx-auto">
+      <p class="mx-auto mb-16 max-w-xl text-xl text-gray-400">
         Track time across projects. Get warnings. View reports.
       </p>
 
       <section class="mb-16">
-        <h2 class="text-2xl font-semibold mb-8">
+        <h2 class="mb-8 text-2xl font-semibold">
           How We Solve the Time Tracking Problem
         </h2>
-        <div class="grid md:grid-cols-3 gap-6">
-          <div class="bg-gray-900 rounded-lg p-6 border border-gray-800">
-            <div class="text-3xl mb-3">📊</div>
-            <h3 class="font-semibold mb-2">Track Multiple Projects</h3>
+        <div class="grid gap-6 md:grid-cols-3">
+          <div class="rounded-lg border border-gray-800 bg-gray-900 p-6">
+            <div class="mb-3 text-3xl">📊</div>
+            <h3 class="mb-2 font-semibold">Track Multiple Projects</h3>
             <p class="text-sm text-gray-400">
               Log time across all your projects in one place
             </p>
           </div>
-          <div class="bg-gray-900 rounded-lg p-6 border border-gray-800">
-            <div class="text-3xl mb-3">⚠️</div>
-            <h3 class="font-semibold mb-2">Smart Warnings</h3>
+          <div class="rounded-lg border border-gray-800 bg-gray-900 p-6">
+            <div class="mb-3 text-3xl">⚠️</div>
+            <h3 class="mb-2 font-semibold">Smart Warnings</h3>
             <p class="text-sm text-gray-400">
               Automatic alerts when hours fall short
             </p>
           </div>
-          <div class="bg-gray-900 rounded-lg p-6 border border-gray-800">
-            <div class="text-3xl mb-3">📈</div>
-            <h3 class="font-semibold mb-2">Better Reports</h3>
+          <div class="rounded-lg border border-gray-800 bg-gray-900 p-6">
+            <div class="mb-3 text-3xl">📈</div>
+            <h3 class="mb-2 font-semibold">Better Reports</h3>
             <p class="text-sm text-gray-400">
               Aggregated insights for managers and admins
             </p>
@@ -41,8 +41,8 @@ export const HomePage = () => (
 
       <div hx-boost="true" hx-push-url="true">
         <a
-          href={client.auth.login.$url().pathname}
-          class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-8 py-3 rounded-lg transition-colors duration-200 text-lg"
+          href={client.auth.$url().pathname}
+          class="inline-block rounded-lg bg-indigo-600 px-8 py-3 text-lg font-semibold text-white transition-colors duration-200 hover:bg-indigo-700"
         >
           Get Started →
         </a>

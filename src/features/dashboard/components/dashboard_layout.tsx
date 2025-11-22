@@ -7,8 +7,8 @@ export const DashboardLayout = ({
   children: unknown;
   currentPath: string;
 }) => (
-  <div class="bg-gray-950 text-gray-100 min-h-screen">
+  <div class="min-h-screen bg-gray-950 text-gray-100">
     <NavBar currentPath={currentPath} />
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">{children}</div>
+    <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">{children}</div>
   </div>
 );

@@ -30,6 +30,7 @@
     "globals": "^16.5.0",
     "jiti": "^2.6.1",
     "prettier": "^3.6.2",
+    "prettier-plugin-tailwindcss": "^0.7.1",
     "sst": "^3.17.23",
     "tailwindcss": "^4.1.17",
     "typescript": "^5.7.3",

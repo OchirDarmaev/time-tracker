@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import AuthPage from "./components/AuthPage";
+import AuthPage from "./pages/AuthPage";
 import * as v from "valibot";
 import { sValidator } from "@hono/standard-validator";
 import { setCookie } from "hono/cookie";
@@ -36,8 +36,6 @@ const app = new Hono()
     ),
     (c) => {
       const data = c.req.valid("form");
-      console.log(data);
-
       setCookie(c, "user_id", data.userId);
 
       return c.redirect(data.redirectUrl, 302);

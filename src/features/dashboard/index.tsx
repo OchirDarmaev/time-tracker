@@ -1,6 +1,6 @@
 import { Hono } from "hono";
-import DashboardPage from "./components/DashboardPage";
-import AppLayout from "./components/AppLayout";
+import DashboardPage from "./DashboardPage";
+import AppLayout from "../../lib/layoutes/AppLayout";
 import { requireAuth } from "../auth/middleware";
 
 const app = new Hono()

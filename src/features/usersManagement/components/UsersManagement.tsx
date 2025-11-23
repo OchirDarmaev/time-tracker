@@ -10,7 +10,7 @@ interface ManageProjectUsersProps {
   projectUsers: ProjectUser[];
 }
 
-export function ManageProjectUsers({
+export function UsersManagement({
   users,
   projects,
   projectUsers,
@@ -154,8 +154,8 @@ export function ManageProjectUsers({
                             checked={assigned && !suppressed}
                             hx-post={
                               assigned && !suppressed
-                                ? "/admin/projects/users/remove"
-                                : "/admin/projects/users/assign"
+                                ? "/partials/usersManagement/remove"
+                                : "/partials/usersManagement/assign"
                             }
                             hx-vals={JSON.stringify({
                               user_id: user.id,

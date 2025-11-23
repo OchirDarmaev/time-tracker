@@ -5,7 +5,6 @@ import {
   getMonthFromDate,
 } from "../../../lib/date_utils";
 import { mockDb } from "../../../lib/mock_db";
-import AppLayout from "../../dashboard/components/AppLayout";
 
 const REQUIRED_DAILY_HOURS = 8;
 
@@ -192,207 +191,198 @@ export async function ReportView({ month }: { month: string }) {
   const monthName = monthNames[monthNum - 1];
 
   return (
-    <AppLayout currentPath="/reports">
-      <div id="reports-content" class="space-y-6">
-        <div>
-          <h1
-            class="mb-2 text-3xl font-bold"
-            style="color: var(--text-primary);"
-          >
-            Time Tracking Report
-          </h1>
-        </div>
-        <div class="flex items-center justify-center gap-4">
-          <a
-            href={`/reports?month=${prevMonthStr}`}
-            class="rounded-xl px-4 py-2 transition-all duration-200 focus:outline-none"
-            style="color: var(--text-secondary); background-color: var(--bg-elevated); border: 1px solid var(--border); box-shadow: var(--shadow-sm); letter-spacing: -0.01em; text-decoration: none;"
-            onmouseover="this.style.color='var(--text-primary)'; this.style.backgroundColor='var(--bg-tertiary)'; this.style.boxShadow='var(--shadow-md)'; this.style.transform='translateY(-1px)';"
-            onmouseout="this.style.color='var(--text-secondary)'; this.style.backgroundColor='var(--bg-elevated)'; this.style.boxShadow='var(--shadow-sm)'; this.style.transform='translateY(0)';"
-          >
-            &lt;
-          </a>
-          <p
-            class="text-sm font-medium"
-            style="color: var(--text-primary); min-width: 120px; text-align: center;"
-          >
-            <span safe>{`${monthName} ${year}`}</span>
-          </p>
-          <a
-            href={`/reports?month=${nextMonthStr}`}
-            class="rounded-xl px-4 py-2 transition-all duration-200 focus:outline-none"
-            style="color: var(--text-secondary); background-color: var(--bg-elevated); border: 1px solid var(--border); box-shadow: var(--shadow-sm); letter-spacing: -0.01em; text-decoration: none;"
-            onmouseover="this.style.color='var(--text-primary)'; this.style.backgroundColor='var(--bg-tertiary)'; this.style.boxShadow='var(--shadow-md)'; this.style.transform='translateY(-1px)';"
-            onmouseout="this.style.color='var(--text-secondary)'; this.style.backgroundColor='var(--bg-elevated)'; this.style.boxShadow='var(--shadow-sm)'; this.style.transform='translateY(0)';"
-          >
-            &gt;
-          </a>
-        </div>
+    <div id="reports-content" class="space-y-6">
+      <div>
+        <h1 class="mb-2 text-3xl font-bold" style="color: var(--text-primary);">
+          Time Tracking Report
+        </h1>
+      </div>
+      <div class="flex items-center justify-center gap-4">
+        <a
+          href={`/reports?month=${prevMonthStr}`}
+          class="rounded-xl px-4 py-2 transition-all duration-200 focus:outline-none"
+          style="color: var(--text-secondary); background-color: var(--bg-elevated); border: 1px solid var(--border); box-shadow: var(--shadow-sm); letter-spacing: -0.01em; text-decoration: none;"
+          onmouseover="this.style.color='var(--text-primary)'; this.style.backgroundColor='var(--bg-tertiary)'; this.style.boxShadow='var(--shadow-md)'; this.style.transform='translateY(-1px)';"
+          onmouseout="this.style.color='var(--text-secondary)'; this.style.backgroundColor='var(--bg-elevated)'; this.style.boxShadow='var(--shadow-sm)'; this.style.transform='translateY(0)';"
+        >
+          &lt;
+        </a>
+        <p
+          class="text-sm font-medium"
+          style="color: var(--text-primary); min-width: 120px; text-align: center;"
+        >
+          <span safe>{`${monthName} ${year}`}</span>
+        </p>
+        <a
+          href={`/reports?month=${nextMonthStr}`}
+          class="rounded-xl px-4 py-2 transition-all duration-200 focus:outline-none"
+          style="color: var(--text-secondary); background-color: var(--bg-elevated); border: 1px solid var(--border); box-shadow: var(--shadow-sm); letter-spacing: -0.01em; text-decoration: none;"
+          onmouseover="this.style.color='var(--text-primary)'; this.style.backgroundColor='var(--bg-tertiary)'; this.style.boxShadow='var(--shadow-md)'; this.style.transform='translateY(-1px)';"
+          onmouseout="this.style.color='var(--text-secondary)'; this.style.backgroundColor='var(--bg-elevated)'; this.style.boxShadow='var(--shadow-sm)'; this.style.transform='translateY(0)';"
+        >
+          &gt;
+        </a>
+      </div>
 
-        <div class="overflow-x-auto">
-          <table
-            class="w-full border-collapse"
-            style="border: 1px solid var(--border);"
-          >
-            <thead>
-              <tr style="background-color: var(--bg-tertiary);">
-                <th
-                  class="sticky left-0 z-10 px-2 py-1.5 text-left font-semibold"
-                  style="border: 1px solid var(--border); background-color: var(--bg-tertiary); min-width: 140px; box-shadow: 2px 0 2px -2px rgba(0,0,0,0.1); font-size: 13px;"
-                >
-                  User
-                </th>
-                {days.map((day) => {
-                  const dayType = dayTypeMap.get(day.date);
-                  const isWeekend = day.isWeekend;
-                  let headerStyle = "";
-                  if (dayType === "public_holiday") {
-                    headerStyle =
-                      "background-color: rgba(239, 68, 68, 0.2); color: var(--error);";
-                  } else if (dayType === "weekend" || isWeekend) {
-                    headerStyle =
-                      "background-color: var(--bg-secondary); color: var(--text-tertiary);";
-                  } else if (dayType === "workday") {
-                    headerStyle =
-                      "background-color: rgba(59, 130, 246, 0.1); color: var(--info);";
-                  } else {
-                    // Default for undefined day types
-                    headerStyle = "background-color: var(--bg-tertiary);";
-                  }
-                  return (
-                    <th
-                      class="px-0 py-1 text-center font-semibold"
-                      style={`border: 1px solid var(--border); ${headerStyle} min-width: 28px; max-width: 28px; font-size: 12px;`}
-                      title={day.date}
-                    >
-                      <div class="font-semibold">{day.dayNumber}</div>
-                      <div
-                        class="font-normal opacity-70"
-                        style="font-size: 10px;"
-                        safe
-                      >
-                        {day.dayName.substring(0, 1).toLowerCase()}
-                      </div>
-                    </th>
-                  );
-                })}
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((user) => {
-                const wrongHolidayCount = hasWrongHolidayCount(user.id);
-                const expectedDays = getExpectedHolidayDays();
-                const reportedDays = getUserReportedHolidayDays(user.id);
-
+      <div class="overflow-x-auto">
+        <table
+          class="w-full border-collapse"
+          style="border: 1px solid var(--border);"
+        >
+          <thead>
+            <tr style="background-color: var(--bg-tertiary);">
+              <th
+                class="sticky left-0 z-10 px-2 py-1.5 text-left font-semibold"
+                style="border: 1px solid var(--border); background-color: var(--bg-tertiary); min-width: 140px; box-shadow: 2px 0 2px -2px rgba(0,0,0,0.1); font-size: 13px;"
+              >
+                User
+              </th>
+              {days.map((day) => {
+                const dayType = dayTypeMap.get(day.date);
+                const isWeekend = day.isWeekend;
+                let headerStyle = "";
+                if (dayType === "public_holiday") {
+                  headerStyle =
+                    "background-color: rgba(239, 68, 68, 0.2); color: var(--error);";
+                } else if (dayType === "weekend" || isWeekend) {
+                  headerStyle =
+                    "background-color: var(--bg-secondary); color: var(--text-tertiary);";
+                } else if (dayType === "workday") {
+                  headerStyle =
+                    "background-color: rgba(59, 130, 246, 0.1); color: var(--info);";
+                } else {
+                  // Default for undefined day types
+                  headerStyle = "background-color: var(--bg-tertiary);";
+                }
                 return (
-                  <tr style="background-color: var(--bg-primary);">
-                    <td
-                      class="sticky left-0 z-10 px-2 py-1.5 font-medium"
-                      style="border: 1px solid var(--border); background-color: var(--bg-primary); box-shadow: 2px 0 2px -2px rgba(0,0,0,0.1); white-space: nowrap; font-size: 13px;"
+                  <th
+                    class="px-0 py-1 text-center font-semibold"
+                    style={`border: 1px solid var(--border); ${headerStyle} min-width: 28px; max-width: 28px; font-size: 12px;`}
+                    title={day.date}
+                  >
+                    <div class="font-semibold">{day.dayNumber}</div>
+                    <div
+                      class="font-normal opacity-70"
+                      style="font-size: 10px;"
+                      safe
                     >
-                      <div class="flex items-center gap-1.5">
-                        <span safe>{user.email}</span>
-                        {wrongHolidayCount && (
-                          <span
-                            class="rounded px-1 py-0.5"
-                            style="background-color: rgba(239, 68, 68, 0.15); color: var(--error); font-size: 11px;"
-                            title={`Holiday days mismatch: Expected ${expectedDays} days, reported ${reportedDays} days`}
-                          >
-                            ⚠️
-                          </span>
-                        )}
-                      </div>
-                    </td>
-                    {days.map((day) => {
-                      const content = getCellContent(user.id, day.date);
-                      const dayType = dayTypeMap.get(day.date);
-                      const totalHours = getTotalHours(user.id, day.date);
-                      const cellStyle = getCellStyle(content);
-                      const unreported = isUnreported(
-                        user.id,
-                        day.date,
-                        dayType
-                      );
-
-                      let displayContent = content;
-                      if (unreported && !content) {
-                        displayContent = "-";
-                      }
-
-                      let title = `${user.email} - ${day.date}: ${content || "No entries"}`;
-                      if (unreported) {
-                        title += ` (Missing ${(REQUIRED_DAILY_HOURS - totalHours).toFixed(1)} hours)`;
-                      }
-
-                      return (
-                        <td
-                          class="px-0 py-1 text-center"
-                          style={`border: 1px solid var(--border); ${cellStyle} font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;`}
-                          title={title}
-                        >
-                          <span safe>{displayContent}</span>
-                        </td>
-                      );
-                    })}
-                  </tr>
+                      {day.dayName.substring(0, 1).toLowerCase()}
+                    </div>
+                  </th>
                 );
               })}
-            </tbody>
-          </table>
-        </div>
+            </tr>
+          </thead>
+          <tbody>
+            {users.map((user) => {
+              const wrongHolidayCount = hasWrongHolidayCount(user.id);
+              const expectedDays = getExpectedHolidayDays();
+              const reportedDays = getUserReportedHolidayDays(user.id);
 
+              return (
+                <tr style="background-color: var(--bg-primary);">
+                  <td
+                    class="sticky left-0 z-10 px-2 py-1.5 font-medium"
+                    style="border: 1px solid var(--border); background-color: var(--bg-primary); box-shadow: 2px 0 2px -2px rgba(0,0,0,0.1); white-space: nowrap; font-size: 13px;"
+                  >
+                    <div class="flex items-center gap-1.5">
+                      <span safe>{user.email}</span>
+                      {wrongHolidayCount && (
+                        <span
+                          class="rounded px-1 py-0.5"
+                          style="background-color: rgba(239, 68, 68, 0.15); color: var(--error); font-size: 11px;"
+                          title={`Holiday days mismatch: Expected ${expectedDays} days, reported ${reportedDays} days`}
+                        >
+                          ⚠️
+                        </span>
+                      )}
+                    </div>
+                  </td>
+                  {days.map((day) => {
+                    const content = getCellContent(user.id, day.date);
+                    const dayType = dayTypeMap.get(day.date);
+                    const totalHours = getTotalHours(user.id, day.date);
+                    const cellStyle = getCellStyle(content);
+                    const unreported = isUnreported(user.id, day.date, dayType);
+
+                    let displayContent = content;
+                    if (unreported && !content) {
+                      displayContent = "-";
+                    }
+
+                    let title = `${user.email} - ${day.date}: ${content || "No entries"}`;
+                    if (unreported) {
+                      title += ` (Missing ${(REQUIRED_DAILY_HOURS - totalHours).toFixed(1)} hours)`;
+                    }
+
+                    return (
+                      <td
+                        class="px-0 py-1 text-center"
+                        style={`border: 1px solid var(--border); ${cellStyle} font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;`}
+                        title={title}
+                      >
+                        <span safe>{displayContent}</span>
+                      </td>
+                    );
+                  })}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      <div
+        class="mt-4 w-1/3 rounded-lg p-3"
+        style=" background-color: var(--bg-elevated); border: 1px solid var(--border);"
+      >
         <div
-          class="mt-4 w-1/3 rounded-lg p-3"
-          style=" background-color: var(--bg-elevated); border: 1px solid var(--border);"
+          class="mb-2 text-sm font-semibold"
+          style="color: var(--text-primary);"
         >
-          <div
-            class="mb-2 text-sm font-semibold"
-            style="color: var(--text-primary);"
-          >
-            Legend
+          Legend
+        </div>
+        <div
+          class="grid grid-cols-2 gap-2 text-xs"
+          style="color: var(--text-secondary);"
+        >
+          <div class="flex items-center gap-2">
+            <span
+              class="rounded px-1.5 py-0.5"
+              style="background-color: rgba(59, 130, 246, 0.15); color: var(--info); font-weight: 600;"
+            >
+              w
+            </span>
+            <span>Work</span>
           </div>
-          <div
-            class="grid grid-cols-2 gap-2 text-xs"
-            style="color: var(--text-secondary);"
-          >
-            <div class="flex items-center gap-2">
-              <span
-                class="rounded px-1.5 py-0.5"
-                style="background-color: rgba(59, 130, 246, 0.15); color: var(--info); font-weight: 600;"
-              >
-                w
-              </span>
-              <span>Work</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <span
-                class="rounded px-1.5 py-0.5"
-                style="background-color: rgba(245, 158, 11, 0.15); color: var(--warning); font-weight: 600;"
-              >
-                v
-              </span>
-              <span>Vacation</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <span
-                class="rounded px-1.5 py-0.5"
-                style="background-color: rgba(239, 68, 68, 0.15); color: var(--error); font-weight: 600;"
-              >
-                h
-              </span>
-              <span>Holiday</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <span>-</span>
-              <span>Not reported (required day)</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <span class="text-base">⚠️</span>
-              <span>Holiday days count mismatch (on user name)</span>
-            </div>
+          <div class="flex items-center gap-2">
+            <span
+              class="rounded px-1.5 py-0.5"
+              style="background-color: rgba(245, 158, 11, 0.15); color: var(--warning); font-weight: 600;"
+            >
+              v
+            </span>
+            <span>Vacation</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span
+              class="rounded px-1.5 py-0.5"
+              style="background-color: rgba(239, 68, 68, 0.15); color: var(--error); font-weight: 600;"
+            >
+              h
+            </span>
+            <span>Holiday</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span>-</span>
+            <span>Not reported (required day)</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-base">⚠️</span>
+            <span>Holiday days count mismatch (on user name)</span>
           </div>
         </div>
       </div>
-    </AppLayout>
+    </div>
   );
 }

@@ -2,17 +2,14 @@ import { Hono } from "hono";
 import * as v from "valibot";
 import { sValidator } from "@hono/standard-validator";
 import { projectService } from "./service";
-import { userService } from "./service";
-import { projectUserService } from "./service";
 import { calendarService } from "./service";
-import { ProjectsList } from "./components/projects_list";
-import { CreateProject } from "./components/create_project";
-import { EditProject } from "./components/edit_project";
-import { ManageProjectUsers } from "./components/manage_project_users";
+import { ProjectsList } from "./pages/projects_list";
+import { CreateProject } from "./pages/create_project";
+import { EditProject } from "./pages/edit_project";
 import { CalendarManagement } from "./components/calendar_management";
 import { requireAuth } from "../auth/middleware";
 import { getMonthFromDate, formatDate } from "../../lib/date_utils";
-import AppLayout from "../dashboard/components/AppLayout";
+import AppLayout from "../../lib/layoutes/AppLayout";
 import { type Calendar } from "../../lib/mock_db";
 
 const app = new Hono()
@@ -185,107 +182,6 @@ const app = new Hono()
             <EditProject project={project} errorMessage={errorMessage} />
           );
         }
-        return c.text(errorMessage, 400);
-      }
-    }
-  )
-  .get("/projects/users", async (c) => {
-    const users = await userService.getAll();
-    const projects = await projectService.getAll(true);
-    const projectUsers = await projectUserService.getAll();
-    return c.render(
-      <ManageProjectUsers
-        users={users}
-        projects={projects}
-        projectUsers={projectUsers}
-      />
-    );
-  })
-  .post(
-    "/projects/users/assign",
-    sValidator(
-      "form",
-      v.object({
-        user_id: v.pipe(v.string(), v.transform(Number)),
-        project_id: v.pipe(v.string(), v.transform(Number)),
-      })
-    ),
-    async (c) => {
-      try {
-        const { user_id, project_id } = c.req.valid("form");
-        const existing = await projectUserService.getByUserAndProject(
-          user_id,
-          project_id
-        );
-        if (existing) {
-          if (existing.suppressed === 1) {
-            await projectUserService.toggleSuppressByUserAndProject(
-              user_id,
-              project_id
-            );
-          }
-        } else {
-          await projectUserService.create(user_id, project_id);
-        }
-        const users = await userService.getAll();
-        const projects = await projectService.getAll(true);
-        const projectUsers = await projectUserService.getAll();
-        return c.render(
-          <ManageProjectUsers
-            users={users}
-            projects={projects}
-            projectUsers={projectUsers}
-          />
-        );
-      } catch (error: unknown) {
-        const errorMessage =
-          error instanceof Error
-            ? error.message
-            : "Failed to assign user to project";
-        return c.text(errorMessage, 400);
-      }
-    }
-  )
-  .post(
-    "/projects/users/remove",
-    sValidator(
-      "form",
-      v.object({
-        user_id: v.pipe(v.string(), v.transform(Number)),
-        project_id: v.pipe(v.string(), v.transform(Number)),
-      })
-    ),
-    async (c) => {
-      try {
-        const { user_id, project_id } = c.req.valid("form");
-        const existing = await projectUserService.getByUserAndProject(
-          user_id,
-          project_id
-        );
-        if (!existing) {
-          return c.text("User is not assigned to this project", 400);
-        }
-        if (existing.suppressed === 0) {
-          await projectUserService.toggleSuppressByUserAndProject(
-            user_id,
-            project_id
-          );
-        }
-        const users = await userService.getAll();
-        const projects = await projectService.getAll(true);
-        const projectUsers = await projectUserService.getAll();
-        return c.render(
-          <ManageProjectUsers
-            users={users}
-            projects={projects}
-            projectUsers={projectUsers}
-          />
-        );
-      } catch (error: unknown) {
-        const errorMessage =
-          error instanceof Error
-            ? error.message
-            : "Failed to remove user from project";
         return c.text(errorMessage, 400);
       }
     }

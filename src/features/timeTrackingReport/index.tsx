@@ -3,7 +3,7 @@ import * as v from "valibot";
 import { sValidator } from "@hono/standard-validator";
 import { requireAuth } from "../auth/middleware";
 import { getMonthFromDate, formatDate } from "../../lib/date_utils";
-import { ReportView } from "../timeTrackingReport/components/report_view";
+import { ReportView } from "./components/report_view";
 
 const app = new Hono()
   .use(requireAuth)

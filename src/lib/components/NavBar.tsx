@@ -1,4 +1,4 @@
-import { client } from "../../../lib/client";
+import { client } from "../client";
 
 interface NavBarProps {
   currentPath: string;
@@ -18,6 +18,11 @@ export default function NavBar({ currentPath }: NavBarProps) {
       label: "Projects",
       path: "/admin/projects",
       routePath: "/admin/projects",
+    },
+    {
+      label: "Users Management",
+      path: "/users",
+      routePath: "/users",
     },
     {
       label: "Calendar",

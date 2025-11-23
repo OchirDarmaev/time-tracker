@@ -1,3 +1,5 @@
+import { client } from "../../../lib/client";
+
 interface CreateProjectProps {
   errorMessage?: string;
 }
@@ -47,9 +49,9 @@ export function CreateProject({ errorMessage }: CreateProjectProps) {
         style="background-color: var(--bg-secondary); border: 1px solid var(--border);"
       >
         <form
-          hx-post="/projects"
+          hx-post={client.projects.$url().pathname}
           hx-target="body"
-          hx-push-url="/projects"
+          hx-push-url={client.projects.$url().pathname}
           class="space-y-6"
         >
           <div>

@@ -142,9 +142,11 @@ export default function TimeSlider(props: TimeSliderProps) {
               )!.entry_id!;
               return (
                 <form
-                  hx-delete={client.partials.quickTimeReport.entries[
-                    ":entryId"
-                  ].$url({ param: { entryId: entryId.toString() } })}
+                  hx-delete={
+                    client.partials.quickTimeReport.entries[":entryId"].$url({
+                      param: { entryId: entryId.toString() },
+                    }).pathname
+                  }
                   hx-target={hxTarget}
                   hx-swap="outerHTML"
                   hx-trigger="submit"
@@ -292,11 +294,11 @@ export default function TimeSlider(props: TimeSliderProps) {
                     </form>
                   </div>
                   <form
-                    hx-delete={client.partials.quickTimeReport.segments[
-                      ":entryId"
-                    ].$url({
-                      param: { entryId: segment.entry_id!.toString() },
-                    })}
+                    hx-delete={
+                      client.partials.quickTimeReport.segments[":entryId"].$url({
+                        param: { entryId: segment.entry_id!.toString() },
+                      }).pathname
+                    }
                     hx-target={hxTarget}
                     hx-swap="outerHTML"
                     hx-trigger="submit"

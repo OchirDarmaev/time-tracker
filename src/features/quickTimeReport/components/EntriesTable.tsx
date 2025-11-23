@@ -1,3 +1,4 @@
+import { client } from "../../../lib/client";
 import type { TimeEntry, Project } from "../../../lib/mock_db";
 
 export function EntriesTable({
@@ -80,7 +81,11 @@ export function EntriesTable({
               </td>
               <td class="px-5 py-4 text-right">
                 <button
-                  hx-delete={`/dashboard/entries/${entry.id}`}
+                  hx-delete={
+                    client.partials.quickTimeReport.entries[":entryId"].$url({
+                      param: { entryId: entry.id.toString() },
+                    }).pathname
+                  }
                   hx-target="#time-tracking-content"
                   hx-swap="outerHTML"
                   hx-confirm="Delete this entry?"

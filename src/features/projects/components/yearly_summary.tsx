@@ -1,5 +1,7 @@
-import { type Calendar } from "../../../lib/mock_db";
+import { client } from "../../../lib/client";
 import { getAllDaysInMonth } from "../../../lib/date_utils";
+import { buildUrl } from "../../../lib/url";
+import { type Calendar } from "../../../lib/mock_db";
 
 interface YearlySummaryProps {
   year: number;
@@ -123,6 +125,12 @@ export function YearlySummary({
           <tbody>
             {yearlySummary.map((summary) => {
               const isCurrentMonth = summary.month === currentMonth;
+              const calendarManagementUrl = buildUrl(
+                client.partials.calendarManagement,
+                {
+                  query: { month: summary.month },
+                }
+              );
               return (
                 <tr
                   class={isCurrentMonth ? "font-semibold" : ""}
@@ -130,8 +138,8 @@ export function YearlySummary({
                 >
                   <td class="px-3 py-2" style="color: var(--text-primary);">
                     <a
-                      href={`/partials/calendarManagement?month=${summary.month}`}
-                      hx-get={`/partials/calendarManagement?month=${summary.month}`}
+                      href={calendarManagementUrl}
+                      hx-get={calendarManagementUrl}
                       hx-target="#calendar-management-content"
                       hx-swap="outerHTML"
                       class="flex items-center gap-2 no-underline hover:underline"

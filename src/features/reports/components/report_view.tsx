@@ -6,6 +6,7 @@ import {
 } from "../../../lib/date_utils";
 import { mockDb } from "../../../lib/mock_db";
 import { client } from "../../../lib/client";
+import { buildUrl } from "../../../lib/url";
 
 const REQUIRED_DAILY_HOURS = 8;
 
@@ -190,12 +191,12 @@ export async function ReportView({ month }: { month: string }) {
   const prevMonthStr = getMonthFromDate(formatDate(prevMonth));
   const nextMonthStr = getMonthFromDate(formatDate(nextMonth));
   const monthName = monthNames[monthNum - 1];
-  const prevMonthUrl = client.reports.$url({
+  const prevMonthUrl = buildUrl(client.reports, {
     query: { month: prevMonthStr },
-  }).pathname;
-  const nextMonthUrl = client.reports.$url({
+  });
+  const nextMonthUrl = buildUrl(client.reports, {
     query: { month: nextMonthStr },
-  }).pathname;
+  });
 
   return (
     <div id="reports-content" class="space-y-6">

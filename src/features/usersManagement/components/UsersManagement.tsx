@@ -3,6 +3,8 @@ import {
   type Project,
   type ProjectUser,
 } from "../../../lib/mock_db";
+import { client } from "../../../lib/client";
+import { buildUrl } from "../../../lib/url";
 
 interface ManageProjectUsersProps {
   users: User[];
@@ -17,6 +19,8 @@ export function UsersManagement({
 }: ManageProjectUsersProps) {
   // Filter out system projects - they are always assigned to all users
   const customProjects = projects.filter((p) => !p.isSystem);
+  const assignUrl = buildUrl(client.partials.usersManagement.assign);
+  const removeUrl = buildUrl(client.partials.usersManagement.remove);
 
   // Create a map for quick lookup: user_id -> project_id -> ProjectUser
   const projectUserMap = new Map<number, Map<number, ProjectUser>>();
@@ -136,11 +140,7 @@ export function UsersManagement({
                             type="checkbox"
                             id={cellId}
                             checked={assigned && !suppressed}
-                            hx-post={
-                              assigned && !suppressed
-                                ? "/partials/usersManagement/remove"
-                                : "/partials/usersManagement/assign"
-                            }
+                            hx-post={assigned && !suppressed ? removeUrl : assignUrl}
                             hx-vals={JSON.stringify({
                               user_id: user.id,
                               project_id: project.id,

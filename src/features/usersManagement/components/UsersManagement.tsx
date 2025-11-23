@@ -44,22 +44,6 @@ export function UsersManagement({
 
   return (
     <div id="manage-project-users" hx-target="this" hx-swap="outerHTML">
-      <div class="mb-6 flex items-center justify-between">
-        <div>
-          <h1
-            class="mb-2 text-3xl font-bold"
-            style="color: var(--text-primary);"
-          >
-            Manage Project Users
-          </h1>
-          <p style="color: var(--text-secondary);">
-            Assign users to projects by checking the boxes below. System
-            projects are always assigned to all users and are hidden from this
-            view.
-          </p>
-        </div>
-      </div>
-
       <div
         class="overflow-hidden rounded-xl shadow-sm"
         style="background-color: var(--bg-secondary); border: 1px solid var(--border);"

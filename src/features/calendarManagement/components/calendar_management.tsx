@@ -18,17 +18,6 @@ export function CalendarManagement({
 
   return (
     <div id="calendar-management-content" class="space-y-6">
-      <div class="flex items-center justify-between">
-        <div>
-          <h1
-            class="mb-2 text-3xl font-bold"
-            style="color: var(--text-primary);"
-          >
-            Manage Calendar
-          </h1>
-        </div>
-      </div>
-
       <div class="flex gap-6">
         <YearlySummary
           year={year}

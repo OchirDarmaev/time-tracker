@@ -89,8 +89,7 @@ export default function TimeSlider(props: TimeSliderProps) {
 
     segmentElements.push(
       <div
-        class="absolute top-0 flex h-full items-center justify-center overflow-hidden rounded"
-        style={`left: ${leftPercent}%; width: ${segmentWidth}%; background: ${color.bg};`}
+        class={`absolute top-0 flex h-full items-center justify-center overflow-hidden rounded [left:${leftPercent}%] [width:${segmentWidth}%] [background:${color.bg}]`}
       >
         <div class="pointer-events-none text-center">
           <div class="text-xs font-bold tracking-[-0.01em] text-white drop-shadow-md">
@@ -127,8 +126,7 @@ export default function TimeSlider(props: TimeSliderProps) {
             if (isDisabled) {
               return (
                 <div
-                  class="cursor-not-allowed rounded border bg-[var(--bg-tertiary)] px-3 py-1.5 text-xs font-medium opacity-40"
-                  style={`border-color: ${color.solid}; color: ${color.solid};`}
+                  class={`cursor-not-allowed rounded border bg-[var(--bg-tertiary)] px-3 py-1.5 text-xs font-medium opacity-40 [border-color:${color.solid}] text-[${color.solid}]`}
                   safe
                 >
                   {project.name}
@@ -160,8 +158,7 @@ export default function TimeSlider(props: TimeSliderProps) {
                   <input type="hidden" name="comment" value="" />
                   <button
                     type="submit"
-                    class="rounded border px-3 py-1.5 text-xs font-semibold"
-                    style={`border-color: ${color.solid}; color: ${color.solid}; background-color: ${color.solid}15;`}
+                    class={`rounded border px-3 py-1.5 text-xs font-semibold [border-color:${color.solid}] text-[${color.solid}] [background-color:${color.solid}15]`}
                     safe
                   >
                     {project.name}
@@ -189,8 +186,7 @@ export default function TimeSlider(props: TimeSliderProps) {
                 <input type="hidden" name="hours" value={String(0)} />
                 <button
                   type="submit"
-                  class="rounded border bg-[var(--bg-elevated)] px-3 py-1.5 text-xs font-medium"
-                  style={`border-color: ${color.solid}; color: ${color.solid};`}
+                  class={`rounded border bg-[var(--bg-elevated)] px-3 py-1.5 text-xs font-medium [border-color:${color.solid}] text-[${color.solid}]`}
                   safe
                 >
                   {project.name}
@@ -236,8 +232,7 @@ export default function TimeSlider(props: TimeSliderProps) {
                 <div class="mb-3 flex items-start justify-between rounded border border-[var(--border-subtle)] bg-[var(--bg-tertiary)] p-4">
                   <div class="flex flex-1 items-start gap-4">
                     <div
-                      class="mt-0.5 h-5 w-5 rounded"
-                      style={`background: ${color.solid};`}
+                      class={`mt-0.5 h-5 w-5 rounded [background:${color.solid}]`}
                     ></div>
                     <div class="flex-1">
                       <div class="mb-2 text-sm font-semibold tracking-[-0.01em] text-[var(--text-primary)]">

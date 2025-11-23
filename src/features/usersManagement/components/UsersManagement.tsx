@@ -44,32 +44,23 @@ export function UsersManagement({
 
   return (
     <div id="manage-project-users" hx-target="this" hx-swap="outerHTML">
-      <div
-        class="overflow-hidden rounded-xl shadow-sm"
-        style="background-color: var(--bg-secondary); border: 1px solid var(--border);"
-      >
+      <div class="overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--bg-secondary)] shadow-sm">
         <div class="overflow-x-auto">
-          <table
-            class="min-w-full divide-y"
-            style="border-color: var(--border);"
-          >
-            <thead style="background-color: var(--bg-tertiary);">
+          <table class="min-w-full divide-y border border-[var(--border)]">
+            <thead class="bg-[var(--bg-tertiary)]">
               <tr>
                 <th
-                  class="sticky left-0 z-10 px-4 py-3 text-left text-xs font-semibold tracking-wider uppercase"
-                  style="background-color: var(--bg-tertiary); color: var(--text-secondary); border-right: 1px solid var(--border);"
+                  class="sticky left-0 z-10 border-r border-[var(--border)] bg-[var(--bg-tertiary)] px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]"
                 >
                   User
                 </th>
                 {customProjects.map((project) => (
                   <th
-                    class="px-4 py-3 text-center text-xs font-semibold tracking-wider uppercase"
-                    style="color: var(--text-secondary); min-width: 120px;"
+                    class="min-w-[120px] px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]"
                   >
                     <div class="flex items-center justify-center gap-2">
                       <div
-                        class="h-3 w-3 shrink-0 rounded"
-                        style={`background-color: ${project.color}`}
+                        class={`h-3 w-3 shrink-0 rounded bg-[${project.color}]`}
                       ></div>
                       <span
                         safe
@@ -83,32 +74,25 @@ export function UsersManagement({
                 ))}
               </tr>
             </thead>
-            <tbody
-              class="divide-y"
-              style="background-color: var(--bg-secondary); border-color: var(--border);"
-            >
+            <tbody class="divide-y divide-[var(--border)] bg-[var(--bg-secondary)]">
               {users.map((user) => (
                 <tr
-                  class="transition-colors"
-                  style="border-color: var(--border);"
+                  class="border-b border-[var(--border)] transition-colors"
                   id={`user-row-${user.id}`}
                 >
                   <td
-                    class="sticky left-0 z-10 px-4 py-3 whitespace-nowrap"
-                    style="background-color: var(--bg-secondary); border-right: 1px solid var(--border);"
+                    class="sticky left-0 z-10 whitespace-nowrap border-r border-[var(--border)] bg-[var(--bg-secondary)] px-4 py-3"
                   >
                     <div class="flex items-center gap-2">
                       <span
                         safe
-                        class="text-sm font-medium"
-                        style="color: var(--text-primary);"
+                        class="text-sm font-medium text-[var(--text-primary)]"
                       >
                         {user.email}
                       </span>
                       {!user.active && (
                         <span
-                          class="rounded-full px-2 py-0.5 text-xs font-semibold"
-                          style="background-color: var(--bg-tertiary); color: var(--text-secondary);"
+                          class="rounded-full bg-[var(--bg-tertiary)] px-2 py-0.5 text-xs font-semibold text-[var(--text-secondary)]"
                         >
                           Inactive
                         </span>
@@ -128,8 +112,7 @@ export function UsersManagement({
 
                     return (
                       <td
-                        class="px-4 py-3 text-center"
-                        style={suppressed ? "opacity: 0.5;" : ""}
+                        class={`px-4 py-3 text-center ${suppressed ? "opacity-50" : ""}`}
                       >
                         <div class="flex items-center justify-center">
                           <input
@@ -148,8 +131,7 @@ export function UsersManagement({
                             hx-target="#manage-project-users"
                             hx-swap="outerHTML"
                             hx-trigger="change"
-                            class="h-4 w-4 rounded"
-                            style="cursor: pointer; accent-color: var(--accent);"
+                            class="h-4 w-4 cursor-pointer rounded accent-[var(--accent)]"
                           />
                         </div>
                       </td>

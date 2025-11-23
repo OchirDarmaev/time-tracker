@@ -9,21 +9,17 @@ export function ProjectsList({ projects }: ProjectsListProps) {
     <div id="projects-list" hx-target="this" hx-swap="outerHTML">
       <div class="mb-6 flex items-center justify-between">
         <div>
-          <h1
-            class="mb-2 text-3xl font-bold"
-            style="color: var(--text-primary);"
-          >
+          <h1 class="mb-2 text-3xl font-bold text-[var(--text-primary)]">
             Project Management
           </h1>
-          <p style="color: var(--text-secondary);">
+          <p class="text-[var(--text-secondary)]">
             Create and manage projects for time tracking
           </p>
         </div>
         <div class="flex items-center gap-3">
           <a
             href="/projects/new"
-            class="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 font-medium text-white no-underline shadow-sm transition-all hover:shadow-md focus:ring-2 focus:outline-none"
-            style="background-color: var(--accent);"
+            class="inline-flex items-center gap-2 rounded-lg bg-[var(--accent)] px-4 py-2.5 font-medium text-white no-underline shadow-sm transition-all hover:shadow-md focus:ring-2 focus:outline-none"
           >
             <svg
               class="h-5 w-5"
@@ -44,22 +40,17 @@ export function ProjectsList({ projects }: ProjectsListProps) {
       </div>
 
       <div
-        class="overflow-hidden rounded-xl shadow-sm"
-        style="background-color: var(--bg-secondary); border: 1px solid var(--border);"
+        class="overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--bg-secondary)] shadow-sm"
       >
-        <div
-          class="px-6 py-4"
-          style="border-bottom: 1px solid var(--border); background-color: var(--bg-tertiary);"
-        >
-          <h2 class="text-lg font-semibold" style="color: var(--text-primary);">
+        <div class="border-b border-[var(--border)] bg-[var(--bg-tertiary)] px-6 py-4">
+          <h2 class="text-lg font-semibold text-[var(--text-primary)]">
             Projects ({projects.length})
           </h2>
         </div>
         {projects.length === 0 ? (
           <div class="px-6 py-16 text-center">
             <svg
-              class="mx-auto h-12 w-12"
-              style="color: var(--text-tertiary);"
+              class="mx-auto h-12 w-12 text-[var(--text-tertiary)]"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -72,69 +63,59 @@ export function ProjectsList({ projects }: ProjectsListProps) {
               />
             </svg>
             <h3
-              class="mt-4 text-sm font-medium"
-              style="color: var(--text-primary);"
+              class="mt-4 text-sm font-medium text-[var(--text-primary)]"
             >
               No projects
             </h3>
-            <p class="mt-2 text-sm" style="color: var(--text-tertiary);">
+            <p class="mt-2 text-sm text-[var(--text-tertiary)]">
               Get started by creating a new project above.
             </p>
           </div>
         ) : (
           <div class="overflow-x-auto">
             <table
-              class="min-w-full divide-y"
-              style="border-color: var(--border);"
+              class="min-w-full divide-y border border-[var(--border)]"
             >
-              <thead style="background-color: var(--bg-tertiary);">
+              <thead class="bg-[var(--bg-tertiary)]">
                 <tr>
                   <th
-                    class="px-6 py-3 text-left text-xs font-semibold tracking-wider uppercase"
-                    style="color: var(--text-secondary);"
+                    class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]"
                   >
                     Project
                   </th>
                   <th
-                    class="px-6 py-3 text-left text-xs font-semibold tracking-wider uppercase"
-                    style="color: var(--text-secondary);"
+                    class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]"
                   >
                     Status
                   </th>
                   <th
-                    class="px-6 py-3 text-left text-xs font-semibold tracking-wider uppercase"
-                    style="color: var(--text-secondary);"
+                    class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]"
                   >
                     Type
                   </th>
                   <th
-                    class="px-6 py-3 text-right text-xs font-semibold tracking-wider uppercase"
-                    style="color: var(--text-secondary);"
+                    class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]"
                   >
                     Actions
                   </th>
                 </tr>
               </thead>
               <tbody
-                class="divide-y"
-                style="background-color: var(--bg-secondary); border-color: var(--border);"
+                class="divide-y bg-[var(--bg-secondary)] divide-[var(--border)]"
               >
                 {projects.map((project) => (
                   <tr
-                    class={`transition-colors ${project.suppressed ? "opacity-60" : ""}`}
-                    style="border-color: var(--border);"
+                    class={`border-b border-[var(--border)] transition-colors ${project.suppressed ? "opacity-60" : ""}`}
                     id={`project-row-${project.id}`}
                   >
                     <td class="px-6 py-4 whitespace-nowrap">
                       <div class="flex items-center gap-3">
                         <div
-                          class="h-4 w-4 flex-shrink-0 rounded"
-                          style={`background-color: ${project.color}`}
+                          class={`h-4 w-4 flex-shrink-0 rounded bg-[${project.color}]`}
                         ></div>
                         <span
                           safe
-                          class="text-sm font-medium"
-                          style="color: var(--text-primary);"
+                          class="text-sm font-medium text-[var(--text-primary)]"
                         >
                           {project.name}
                         </span>
@@ -142,12 +123,11 @@ export function ProjectsList({ projects }: ProjectsListProps) {
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                       <span
-                        class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold"
-                        style={
+                        class={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${
                           project.suppressed
-                            ? "background-color: var(--bg-tertiary); color: var(--text-secondary);"
-                            : "background-color: rgba(74, 222, 128, 0.12); color: var(--success);"
-                        }
+                            ? "bg-[var(--bg-tertiary)] text-[var(--text-secondary)]"
+                            : "bg-[rgba(74,222,128,0.12)] text-[var(--success)]"
+                        }`}
                       >
                         {project.suppressed ? "Suppressed" : "Active"}
                       </span>
@@ -155,8 +135,7 @@ export function ProjectsList({ projects }: ProjectsListProps) {
                     <td class="px-6 py-4 whitespace-nowrap">
                       {project.isSystem ? (
                         <span
-                          class="inline-flex items-center gap-1.5 text-xs"
-                          style="color: var(--text-secondary);"
+                          class="inline-flex items-center gap-1.5 text-xs text-[var(--text-secondary)]"
                           title="System project - cannot be edited or suppressed"
                         >
                           <svg
@@ -173,10 +152,7 @@ export function ProjectsList({ projects }: ProjectsListProps) {
                           System
                         </span>
                       ) : (
-                        <span
-                          class="text-xs"
-                          style="color: var(--text-tertiary);"
-                        >
+                        <span class="text-xs text-[var(--text-tertiary)]">
                           Custom
                         </span>
                       )}
@@ -187,8 +163,7 @@ export function ProjectsList({ projects }: ProjectsListProps) {
                           <>
                             <a
                               href={`/projects/${project.id}/edit`}
-                              class="rounded-md px-3 py-1.5 text-sm no-underline transition-colors"
-                              style="color: var(--accent);"
+                              class="rounded-md px-3 py-1.5 text-sm text-[var(--accent)] no-underline transition-colors"
                             >
                               Edit
                             </a>
@@ -196,11 +171,12 @@ export function ProjectsList({ projects }: ProjectsListProps) {
                               hx-patch={`/projects/${project.id}/suppress`}
                               hx-target="#projects-list"
                               hx-swap="outerHTML"
-                              class="rounded-md px-3 py-1.5 text-sm transition-colors"
-                              style={
-                                project.suppressed
-                                  ? "color: var(--success);"
-                                  : "color: var(--warning);"
+                              class={
+                                `rounded-md px-3 py-1.5 text-sm transition-colors ${
+                                  project.suppressed
+                                    ? "text-[var(--success)]"
+                                    : "text-[var(--warning)]"
+                                }`
                               }
                             >
                               {project.suppressed ? "Restore" : "Suppress"}
@@ -208,10 +184,7 @@ export function ProjectsList({ projects }: ProjectsListProps) {
                           </>
                         )}
                         {project.isSystem && (
-                          <span
-                            class="text-xs italic"
-                            style="color: var(--text-tertiary);"
-                          >
+                          <span class="text-xs italic text-[var(--text-tertiary)]">
                             Read-only
                           </span>
                         )}

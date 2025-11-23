@@ -36,6 +36,12 @@ function getStatusBg(status: StatusType): string {
   return "bg-[var(--error)]/10";
 }
 
+function getStatusBorder(status: StatusType): string {
+  if (status === "good") return "border-[var(--success)]";
+  if (status === "warning") return "border-[var(--warning)]";
+  return "border-[var(--error)]";
+}
+
 export default function MonthlySummary({
   reported,
   expected,
@@ -198,14 +204,7 @@ export default function MonthlySummary({
       </div>
 
       <div
-        class={`rounded border p-2 ${getStatusBg(overallStatus)} ${getStatusColor(overallStatus)}`}
-        style={
-          overallStatus === "good"
-            ? "border-color: var(--success);"
-            : overallStatus === "warning"
-              ? "border-color: var(--warning);"
-              : "border-color: var(--error);"
-        }
+        class={`rounded border p-2 ${getStatusBg(overallStatus)} ${getStatusColor(overallStatus)} ${getStatusBorder(overallStatus)}`}
       >
         <div class="flex items-center gap-2">
           <span class="text-lg font-bold" safe>

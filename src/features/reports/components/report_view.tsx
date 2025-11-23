@@ -158,13 +158,13 @@ export async function ReportView({ month }: { month: string }) {
       return "";
     }
     if (content.includes("v")) {
-      return "background-color: rgba(245, 158, 11, 0.15); color: var(--warning);";
+      return "bg-[rgba(245,158,11,0.15)] text-[var(--warning)]";
     }
     if (content.includes("h")) {
-      return "background-color: rgba(239, 68, 68, 0.15); color: var(--error);";
+      return "bg-[rgba(239,68,68,0.15)] text-[var(--error)]";
     }
     if (content.includes("w")) {
-      return "background-color: rgba(59, 130, 246, 0.15); color: var(--info);";
+      return "bg-[rgba(59,130,246,0.15)] text-[var(--info)]";
     }
     return "";
   }
@@ -200,77 +200,64 @@ export async function ReportView({ month }: { month: string }) {
   return (
     <div id="reports-content" class="space-y-6">
       <div>
-        <h1 class="mb-2 text-3xl font-bold" style="color: var(--text-primary);">
+        <h1 class="mb-2 text-3xl font-bold text-[var(--text-primary)]">
           Time Tracking Report
         </h1>
       </div>
       <div class="flex items-center justify-center gap-4">
         <a
           href={prevMonthUrl}
-          class="rounded-xl px-4 py-2 transition-all duration-200 focus:outline-none"
-          style="color: var(--text-secondary); background-color: var(--bg-elevated); border: 1px solid var(--border); box-shadow: var(--shadow-sm); letter-spacing: -0.01em; text-decoration: none;"
-          onmouseover="this.style.color='var(--text-primary)'; this.style.backgroundColor='var(--bg-tertiary)'; this.style.boxShadow='var(--shadow-md)'; this.style.transform='translateY(-1px)';"
-          onmouseout="this.style.color='var(--text-secondary)'; this.style.backgroundColor='var(--bg-elevated)'; this.style.boxShadow='var(--shadow-sm)'; this.style.transform='translateY(0)';"
+          class="rounded-xl border border-[var(--border)] bg-[var(--bg-elevated)] px-4 py-2 text-[var(--text-secondary)] shadow-[var(--shadow-sm)] transition-all duration-200 hover:-translate-y-px hover:bg-[var(--bg-tertiary)] hover:text-[var(--text-primary)] hover:shadow-[var(--shadow-md)] focus:outline-none no-underline tracking-[-0.01em]"
         >
           &lt;
         </a>
         <p
-          class="text-sm font-medium"
-          style="color: var(--text-primary); min-width: 120px; text-align: center;"
+          class="min-w-[120px] text-center text-sm font-medium text-[var(--text-primary)]"
         >
           <span safe>{`${monthName} ${year}`}</span>
         </p>
         <a
           href={nextMonthUrl}
-          class="rounded-xl px-4 py-2 transition-all duration-200 focus:outline-none"
-          style="color: var(--text-secondary); background-color: var(--bg-elevated); border: 1px solid var(--border); box-shadow: var(--shadow-sm); letter-spacing: -0.01em; text-decoration: none;"
-          onmouseover="this.style.color='var(--text-primary)'; this.style.backgroundColor='var(--bg-tertiary)'; this.style.boxShadow='var(--shadow-md)'; this.style.transform='translateY(-1px)';"
-          onmouseout="this.style.color='var(--text-secondary)'; this.style.backgroundColor='var(--bg-elevated)'; this.style.boxShadow='var(--shadow-sm)'; this.style.transform='translateY(0)';"
+          class="rounded-xl border border-[var(--border)] bg-[var(--bg-elevated)] px-4 py-2 text-[var(--text-secondary)] shadow-[var(--shadow-sm)] transition-all duration-200 hover:-translate-y-px hover:bg-[var(--bg-tertiary)] hover:text-[var(--text-primary)] hover:shadow-[var(--shadow-md)] focus:outline-none no-underline tracking-[-0.01em]"
         >
           &gt;
         </a>
       </div>
 
       <div class="overflow-x-auto">
-        <table
-          class="w-full border-collapse"
-          style="border: 1px solid var(--border);"
-        >
+        <table class="w-full border-collapse border border-[var(--border)]">
           <thead>
-            <tr style="background-color: var(--bg-tertiary);">
+            <tr class="bg-[var(--bg-tertiary)]">
               <th
-                class="sticky left-0 z-10 px-2 py-1.5 text-left font-semibold"
-                style="border: 1px solid var(--border); background-color: var(--bg-tertiary); min-width: 140px; box-shadow: 2px 0 2px -2px rgba(0,0,0,0.1); font-size: 13px;"
+                class="sticky left-0 z-10 min-w-[140px] border border-[var(--border)] bg-[var(--bg-tertiary)] px-2 py-1.5 text-left text-[13px] font-semibold shadow-[2px_0_2px_-2px_rgba(0,0,0,0.1)]"
               >
                 User
               </th>
               {days.map((day) => {
                 const dayType = dayTypeMap.get(day.date);
                 const isWeekend = day.isWeekend;
-                let headerStyle = "";
+                let headerStyle = "bg-[var(--bg-tertiary)]";
                 if (dayType === "public_holiday") {
                   headerStyle =
-                    "background-color: rgba(239, 68, 68, 0.2); color: var(--error);";
+                    "bg-[rgba(239,68,68,0.2)] text-[var(--error)]";
                 } else if (dayType === "weekend" || isWeekend) {
                   headerStyle =
-                    "background-color: var(--bg-secondary); color: var(--text-tertiary);";
+                    "bg-[var(--bg-secondary)] text-[var(--text-tertiary)]";
                 } else if (dayType === "workday") {
                   headerStyle =
-                    "background-color: rgba(59, 130, 246, 0.1); color: var(--info);";
+                    "bg-[rgba(59,130,246,0.1)] text-[var(--info)]";
                 } else {
                   // Default for undefined day types
-                  headerStyle = "background-color: var(--bg-tertiary);";
+                  headerStyle = "bg-[var(--bg-tertiary)]";
                 }
                 return (
                   <th
-                    class="px-0 py-1 text-center font-semibold"
-                    style={`border: 1px solid var(--border); ${headerStyle} min-width: 28px; max-width: 28px; font-size: 12px;`}
+                    class={`border border-[var(--border)] px-0 py-1 text-center text-[12px] font-semibold ${headerStyle} min-w-[28px] max-w-[28px]`}
                     title={day.date}
                   >
                     <div class="font-semibold">{day.dayNumber}</div>
                     <div
-                      class="font-normal opacity-70"
-                      style="font-size: 10px;"
+                      class="text-[10px] font-normal opacity-70"
                       safe
                     >
                       {day.dayName.substring(0, 1).toLowerCase()}
@@ -287,17 +274,15 @@ export async function ReportView({ month }: { month: string }) {
               const reportedDays = getUserReportedHolidayDays(user.id);
 
               return (
-                <tr style="background-color: var(--bg-primary);">
+                <tr class="bg-[var(--bg-primary)]">
                   <td
-                    class="sticky left-0 z-10 px-2 py-1.5 font-medium"
-                    style="border: 1px solid var(--border); background-color: var(--bg-primary); box-shadow: 2px 0 2px -2px rgba(0,0,0,0.1); white-space: nowrap; font-size: 13px;"
+                    class="sticky left-0 z-10 whitespace-nowrap border border-[var(--border)] bg-[var(--bg-primary)] px-2 py-1.5 text-[13px] font-medium shadow-[2px_0_2px_-2px_rgba(0,0,0,0.1)]"
                   >
                     <div class="flex items-center gap-1.5">
                       <span safe>{user.email}</span>
                       {wrongHolidayCount && (
                         <span
-                          class="rounded px-1 py-0.5"
-                          style="background-color: rgba(239, 68, 68, 0.15); color: var(--error); font-size: 11px;"
+                          class="rounded bg-[rgba(239,68,68,0.15)] px-1 py-0.5 text-[11px] text-[var(--error)]"
                           title={`Holiday days mismatch: Expected ${expectedDays} days, reported ${reportedDays} days`}
                         >
                           ⚠️
@@ -324,8 +309,7 @@ export async function ReportView({ month }: { month: string }) {
 
                     return (
                       <td
-                        class="px-0 py-1 text-center"
-                        style={`border: 1px solid var(--border); ${cellStyle} font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;`}
+                        class={`border border-[var(--border)] px-0 py-1 text-center text-[12px] whitespace-nowrap overflow-hidden text-ellipsis ${cellStyle}`}
                         title={title}
                       >
                         <span safe>{displayContent}</span>
@@ -340,23 +324,19 @@ export async function ReportView({ month }: { month: string }) {
       </div>
 
       <div
-        class="mt-4 w-1/3 rounded-lg p-3"
-        style=" background-color: var(--bg-elevated); border: 1px solid var(--border);"
+        class="mt-4 w-1/3 rounded-lg border border-[var(--border)] bg-[var(--bg-elevated)] p-3"
       >
         <div
-          class="mb-2 text-sm font-semibold"
-          style="color: var(--text-primary);"
+          class="mb-2 text-sm font-semibold text-[var(--text-primary)]"
         >
           Legend
         </div>
         <div
-          class="grid grid-cols-2 gap-2 text-xs"
-          style="color: var(--text-secondary);"
+          class="grid grid-cols-2 gap-2 text-xs text-[var(--text-secondary)]"
         >
           <div class="flex items-center gap-2">
             <span
-              class="rounded px-1.5 py-0.5"
-              style="background-color: rgba(59, 130, 246, 0.15); color: var(--info); font-weight: 600;"
+              class="rounded bg-[rgba(59,130,246,0.15)] px-1.5 py-0.5 font-semibold text-[var(--info)]"
             >
               w
             </span>
@@ -364,8 +344,7 @@ export async function ReportView({ month }: { month: string }) {
           </div>
           <div class="flex items-center gap-2">
             <span
-              class="rounded px-1.5 py-0.5"
-              style="background-color: rgba(245, 158, 11, 0.15); color: var(--warning); font-weight: 600;"
+              class="rounded bg-[rgba(245,158,11,0.15)] px-1.5 py-0.5 font-semibold text-[var(--warning)]"
             >
               v
             </span>
@@ -373,8 +352,7 @@ export async function ReportView({ month }: { month: string }) {
           </div>
           <div class="flex items-center gap-2">
             <span
-              class="rounded px-1.5 py-0.5"
-              style="background-color: rgba(239, 68, 68, 0.15); color: var(--error); font-weight: 600;"
+              class="rounded bg-[rgba(239,68,68,0.15)] px-1.5 py-0.5 font-semibold text-[var(--error)]"
             >
               h
             </span>

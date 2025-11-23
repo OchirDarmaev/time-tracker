@@ -7,14 +7,12 @@ export function CreateProject({ errorMessage }: CreateProjectProps) {
     <div id="create-project" hx-target="this" hx-swap="outerHTML">
       {errorMessage ? (
         <div
-          class="mb-6 rounded-r-md p-4"
-          style="background-color: rgba(248, 113, 113, 0.12); border-left: 4px solid var(--error);"
+          class="mb-6 rounded-r-md border-l-4 border-l-[var(--error)] bg-[rgba(248,113,113,0.12)] p-4"
         >
           <div class="flex">
             <div class="flex-shrink-0">
               <svg
-                class="h-5 w-5"
-                style="color: var(--error);"
+                class="h-5 w-5 text-[var(--error)]"
                 viewBox="0 0 20 20"
                 fill="currentColor"
               >
@@ -26,7 +24,7 @@ export function CreateProject({ errorMessage }: CreateProjectProps) {
               </svg>
             </div>
             <div class="ml-3">
-              <p class="text-sm" style="color: var(--error);" safe>
+              <p class="text-sm text-[var(--error)]" safe>
                 {errorMessage}
               </p>
             </div>
@@ -34,18 +32,15 @@ export function CreateProject({ errorMessage }: CreateProjectProps) {
         </div>
       ) : null}
       <div class="mb-8">
-        <h1 class="mb-2 text-3xl font-bold" style="color: var(--text-primary);">
+        <h1 class="mb-2 text-3xl font-bold text-[var(--text-primary)]">
           Create New Project
         </h1>
-        <p style="color: var(--text-secondary);">
+        <p class="text-[var(--text-secondary)]">
           Add a new project for time tracking
         </p>
       </div>
 
-      <div
-        class="rounded-xl p-6 shadow-sm"
-        style="background-color: var(--bg-secondary); border: 1px solid var(--border);"
-      >
+      <div class="rounded-xl border border-[var(--border)] bg-[var(--bg-secondary)] p-6 shadow-sm">
         <form
           hx-post="/projects"
           hx-target="body"
@@ -55,8 +50,7 @@ export function CreateProject({ errorMessage }: CreateProjectProps) {
           <div>
             <label
               for="project-name"
-              class="mb-2 block text-sm font-medium"
-              style="color: var(--text-primary);"
+              class="mb-2 block text-sm font-medium text-[var(--text-primary)]"
             >
               Project Name
             </label>
@@ -65,8 +59,7 @@ export function CreateProject({ errorMessage }: CreateProjectProps) {
               id="project-name"
               name="name"
               required
-              class="input-modern w-full rounded-lg px-4 py-2.5 transition-all focus:ring-2 focus:outline-none"
-              style="border-color: var(--border); background-color: var(--bg-tertiary); color: var(--text-primary);"
+              class="input-modern w-full rounded-lg border-[var(--border)] bg-[var(--bg-tertiary)] px-4 py-2.5 text-[var(--text-primary)] transition-all focus:outline-none focus:ring-2"
               placeholder="e.g., Marketing Campaign, Product Development"
             />
           </div>
@@ -74,8 +67,7 @@ export function CreateProject({ errorMessage }: CreateProjectProps) {
           <div>
             <label
               for="project-color"
-              class="mb-2 block text-sm font-medium"
-              style="color: var(--text-primary);"
+              class="mb-2 block text-sm font-medium text-[var(--text-primary)]"
             >
               Color
             </label>
@@ -86,31 +78,25 @@ export function CreateProject({ errorMessage }: CreateProjectProps) {
                 name="color"
                 value="#14b8a6"
                 oninput="document.getElementById('color-value').textContent = this.value"
-                class="h-12 w-20 cursor-pointer rounded-lg border-2 transition-colors"
-                style="border-color: var(--border);"
+                class="h-12 w-20 cursor-pointer rounded-lg border-2 border-[var(--border)] transition-colors"
               />
               <div
-                class="flex h-12 flex-1 items-center justify-center rounded-lg border-2"
-                style="border-color: var(--border); background-color: var(--bg-tertiary);"
+                class="flex h-12 flex-1 items-center justify-center rounded-lg border-2 border-[var(--border)] bg-[var(--bg-tertiary)]"
               >
                 <span
-                  class="font-mono text-xs"
-                  style="color: var(--text-secondary);"
+                  class="font-mono text-xs text-[var(--text-secondary)]"
                   id="color-value"
                 >
                   #14b8a6
                 </span>
               </div>
             </div>
-            <p class="mt-2 text-xs" style="color: var(--text-tertiary);">
+            <p class="mt-2 text-xs text-[var(--text-tertiary)]">
               Choose a color to help identify this project visually
             </p>
           </div>
 
-          <div
-            class="flex items-center gap-4 pt-4"
-            style="border-top: 1px solid var(--border);"
-          >
+          <div class="flex items-center gap-4 border-t border-[var(--border)] pt-4">
             <button
               type="submit"
               class="btn-primary rounded-lg px-6 py-2.5 font-medium text-white shadow-sm transition-all hover:shadow-md focus:ring-2 focus:outline-none"

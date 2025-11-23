@@ -130,8 +130,8 @@ export function YearlySummary({
                 >
                   <td class="px-3 py-2" style="color: var(--text-primary);">
                     <a
-                      href={`/admin/partials/calendar?month=${summary.month}`}
-                      hx-get={`/admin/partials/calendar?month=${summary.month}`}
+                      href={`/partials/calendarManagement?month=${summary.month}`}
+                      hx-get={`/partials/calendarManagement?month=${summary.month}`}
                       hx-target="#calendar-management-content"
                       hx-swap="outerHTML"
                       class="flex items-center gap-2 no-underline hover:underline"

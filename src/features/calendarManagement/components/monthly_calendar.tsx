@@ -102,7 +102,7 @@ export function MonthlyCalendar({ month, calendarDays }: MonthlyCalendarProps) {
             style="color: var(--text-secondary); background-color: var(--bg-elevated); border: 1px solid var(--border); box-shadow: var(--shadow-sm); width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;"
             onmouseover="this.style.color='var(--text-primary)'; this.style.backgroundColor='var(--bg-tertiary)'; this.style.boxShadow='var(--shadow-md)'; this.style.transform='translateY(-1px)';"
             onmouseout="this.style.color='var(--text-secondary)'; this.style.backgroundColor='var(--bg-elevated)'; this.style.boxShadow='var(--shadow-sm)'; this.style.transform='translateY(0)';"
-            hx-get={`/admin/partials/calendar?month=${prevMonthStr}`}
+            hx-get={`/partials/calendarManagement?month=${prevMonthStr}`}
             hx-target="#calendar-management-content"
             hx-swap="outerHTML"
           >
@@ -121,7 +121,7 @@ export function MonthlyCalendar({ month, calendarDays }: MonthlyCalendarProps) {
             style="color: var(--text-secondary); background-color: var(--bg-elevated); border: 1px solid var(--border); box-shadow: var(--shadow-sm); width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;"
             onmouseover="this.style.color='var(--text-primary)'; this.style.backgroundColor='var(--bg-tertiary)'; this.style.boxShadow='var(--shadow-md)'; this.style.transform='translateY(-1px)';"
             onmouseout="this.style.color='var(--text-secondary)'; this.style.backgroundColor='var(--bg-elevated)'; this.style.boxShadow='var(--shadow-sm)'; this.style.transform='translateY(0)';"
-            hx-get={`/admin/partials/calendar?month=${nextMonthStr}`}
+            hx-get={`/partials/calendarManagement?month=${nextMonthStr}`}
             hx-target="#calendar-management-content"
             hx-swap="outerHTML"
           >
@@ -281,7 +281,7 @@ export function MonthlyCalendar({ month, calendarDays }: MonthlyCalendarProps) {
 
           return (
             <form
-              hx-post="/admin/partials/calendar/day-type"
+              hx-post="/partials/calendarManagement/day-type"
               hx-target="#calendar-management-content"
               hx-swap="outerHTML"
               hx-trigger="submit"

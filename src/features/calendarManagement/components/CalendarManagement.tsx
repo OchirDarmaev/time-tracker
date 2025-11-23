@@ -1,7 +1,7 @@
 import { parseDate } from "../../../lib/date_utils";
 import { type Calendar } from "../../../lib/mock_db";
-import { YearlySummary } from "./yearly_summary";
-import { MonthlyCalendar } from "./monthly_calendar";
+import { YearlySummary } from "./YearlySummary";
+import { MonthlyCalendar } from "./MonthlyCalendar";
 
 interface CalendarManagementProps {
   month: string;

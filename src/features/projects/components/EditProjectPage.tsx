@@ -5,13 +5,11 @@ interface EditProjectProps {
   errorMessage?: string;
 }
 
-export function EditProject({ project, errorMessage }: EditProjectProps) {
+export function EditProjectPage({ project, errorMessage }: EditProjectProps) {
   return (
     <div id="edit-project" hx-target="this" hx-swap="outerHTML">
       {errorMessage ? (
-        <div
-          class="mb-4 rounded border border-[var(--error)] bg-[rgba(248,113,113,0.12)] p-3 text-[var(--error)]"
-        >
+        <div class="mb-4 rounded border border-[var(--error)] bg-[rgba(248,113,113,0.12)] p-3 text-[var(--error)]">
           <span safe>{errorMessage}</span>
         </div>
       ) : null}
@@ -42,7 +40,7 @@ export function EditProject({ project, errorMessage }: EditProjectProps) {
               name="name"
               value={project.name}
               required
-              class="input-modern w-full rounded-md border-[var(--border)] bg-[var(--bg-tertiary)] px-3 py-2 text-[var(--text-primary)] focus:outline-none focus:ring-2"
+              class="input-modern w-full rounded-md border-[var(--border)] bg-[var(--bg-tertiary)] px-3 py-2 text-[var(--text-primary)] focus:ring-2 focus:outline-none"
               placeholder="Enter project name"
             />
           </div>
@@ -75,9 +73,7 @@ export function EditProject({ project, errorMessage }: EditProjectProps) {
                   checked={project.suppressed === 1}
                   class="h-4 w-4 rounded border-[var(--border)] bg-[var(--bg-tertiary)] accent-[var(--accent)] focus:ring-2"
                 />
-                <span
-                  class="text-sm font-medium text-[var(--text-primary)]"
-                >
+                <span class="text-sm font-medium text-[var(--text-primary)]">
                   Suppressed (hidden from users)
                 </span>
               </label>

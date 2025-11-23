@@ -6,7 +6,7 @@ import {
 } from "../../../lib/date_utils";
 import { mockDb } from "../../../lib/mock_db";
 import { client } from "../../../lib/client";
-import AppLayout from "../../../lib/layoutes/AppLayout";
+import DashboardLayout from "../../../lib/layouts/DashboardLayout";
 
 const REQUIRED_DAILY_HOURS = 8;
 
@@ -200,44 +200,36 @@ export async function ReportView({ month }: { month: string }) {
   }).pathname;
 
   return (
-    <AppLayout currentPath={reportsPath}>
+    <DashboardLayout currentPath={reportsPath}>
       <div id="reports-content" class="space-y-6">
         <div>
-          <h1
-            class="mb-2 text-3xl font-bold text-[var(--text-primary)]"
-          >
+          <h1 class="mb-2 text-3xl font-bold text-[var(--text-primary)]">
             Time Tracking Report
           </h1>
         </div>
         <div class="flex items-center justify-center gap-4">
           <a
             href={prevMonthUrl}
-            class="rounded-xl border border-[var(--border)] bg-[var(--bg-elevated)] px-4 py-2 text-[var(--text-secondary)] shadow-[var(--shadow-sm)] transition-all duration-200 hover:-translate-y-px hover:bg-[var(--bg-tertiary)] hover:text-[var(--text-primary)] hover:shadow-[var(--shadow-md)] focus:outline-none no-underline tracking-[-0.01em]"
+            class="rounded-xl border border-[var(--border)] bg-[var(--bg-elevated)] px-4 py-2 tracking-[-0.01em] text-[var(--text-secondary)] no-underline shadow-[var(--shadow-sm)] transition-all duration-200 hover:-translate-y-px hover:bg-[var(--bg-tertiary)] hover:text-[var(--text-primary)] hover:shadow-[var(--shadow-md)] focus:outline-none"
           >
             &lt;
           </a>
-          <p
-            class="min-w-[120px] text-center text-sm font-medium text-[var(--text-primary)]"
-          >
+          <p class="min-w-[120px] text-center text-sm font-medium text-[var(--text-primary)]">
             <span safe>{`${monthName} ${year}`}</span>
           </p>
           <a
             href={nextMonthUrl}
-            class="rounded-xl border border-[var(--border)] bg-[var(--bg-elevated)] px-4 py-2 text-[var(--text-secondary)] shadow-[var(--shadow-sm)] transition-all duration-200 hover:-translate-y-px hover:bg-[var(--bg-tertiary)] hover:text-[var(--text-primary)] hover:shadow-[var(--shadow-md)] focus:outline-none no-underline tracking-[-0.01em]"
+            class="rounded-xl border border-[var(--border)] bg-[var(--bg-elevated)] px-4 py-2 tracking-[-0.01em] text-[var(--text-secondary)] no-underline shadow-[var(--shadow-sm)] transition-all duration-200 hover:-translate-y-px hover:bg-[var(--bg-tertiary)] hover:text-[var(--text-primary)] hover:shadow-[var(--shadow-md)] focus:outline-none"
           >
             &gt;
           </a>
         </div>
 
         <div class="overflow-x-auto">
-          <table
-            class="w-full border-collapse border border-[var(--border)]"
-          >
+          <table class="w-full border-collapse border border-[var(--border)]">
             <thead>
               <tr class="bg-[var(--bg-tertiary)]">
-                <th
-                  class="sticky left-0 z-10 min-w-[140px] border border-[var(--border)] bg-[var(--bg-tertiary)] px-2 py-1.5 text-left text-[13px] font-semibold shadow-[2px_0_2px_-2px_rgba(0,0,0,0.1)]"
-                >
+                <th class="sticky left-0 z-10 min-w-[140px] border border-[var(--border)] bg-[var(--bg-tertiary)] px-2 py-1.5 text-left text-[13px] font-semibold shadow-[2px_0_2px_-2px_rgba(0,0,0,0.1)]">
                   User
                 </th>
                 {days.map((day) => {
@@ -259,14 +251,11 @@ export async function ReportView({ month }: { month: string }) {
                   }
                   return (
                     <th
-                      class={`border border-[var(--border)] px-0 py-1 text-center text-[12px] font-semibold ${headerStyle} min-w-[28px] max-w-[28px]`}
+                      class={`border border-[var(--border)] px-0 py-1 text-center text-[12px] font-semibold ${headerStyle} max-w-[28px] min-w-[28px]`}
                       title={day.date}
                     >
                       <div class="font-semibold">{day.dayNumber}</div>
-                      <div
-                        class="text-[10px] font-normal opacity-70"
-                        safe
-                      >
+                      <div class="text-[10px] font-normal opacity-70" safe>
                         {day.dayName.substring(0, 1).toLowerCase()}
                       </div>
                     </th>
@@ -282,9 +271,7 @@ export async function ReportView({ month }: { month: string }) {
 
                 return (
                   <tr class="bg-[var(--bg-primary)]">
-                    <td
-                      class="sticky left-0 z-10 whitespace-nowrap border border-[var(--border)] bg-[var(--bg-primary)] px-2 py-1.5 text-[13px] font-medium shadow-[2px_0_2px_-2px_rgba(0,0,0,0.1)]"
-                    >
+                    <td class="sticky left-0 z-10 border border-[var(--border)] bg-[var(--bg-primary)] px-2 py-1.5 text-[13px] font-medium whitespace-nowrap shadow-[2px_0_2px_-2px_rgba(0,0,0,0.1)]">
                       <div class="flex items-center gap-1.5">
                         <span safe>{user.email}</span>
                         {wrongHolidayCount && (
@@ -320,7 +307,7 @@ export async function ReportView({ month }: { month: string }) {
 
                       return (
                         <td
-                          class={`border border-[var(--border)] px-0 py-1 text-center text-[12px] whitespace-nowrap overflow-hidden text-ellipsis ${cellStyle}`}
+                          class={`overflow-hidden border border-[var(--border)] px-0 py-1 text-center text-[12px] text-ellipsis whitespace-nowrap ${cellStyle}`}
                           title={title}
                         >
                           <span safe>{displayContent}</span>
@@ -334,37 +321,25 @@ export async function ReportView({ month }: { month: string }) {
           </table>
         </div>
 
-        <div
-          class="mt-4 w-1/3 rounded-lg border border-[var(--border)] bg-[var(--bg-elevated)] p-3"
-        >
-          <div
-            class="mb-2 text-sm font-semibold text-[var(--text-primary)]"
-          >
+        <div class="mt-4 w-1/3 rounded-lg border border-[var(--border)] bg-[var(--bg-elevated)] p-3">
+          <div class="mb-2 text-sm font-semibold text-[var(--text-primary)]">
             Legend
           </div>
-          <div
-            class="grid grid-cols-2 gap-2 text-xs text-[var(--text-secondary)]"
-          >
+          <div class="grid grid-cols-2 gap-2 text-xs text-[var(--text-secondary)]">
             <div class="flex items-center gap-2">
-              <span
-                class="rounded bg-[rgba(59,130,246,0.15)] px-1.5 py-0.5 font-semibold text-[var(--info)]"
-              >
+              <span class="rounded bg-[rgba(59,130,246,0.15)] px-1.5 py-0.5 font-semibold text-[var(--info)]">
                 w
               </span>
-            <span>Work</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span
-                class="rounded bg-[rgba(245,158,11,0.15)] px-1.5 py-0.5 font-semibold text-[var(--warning)]"
-              >
+              <span>Work</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="rounded bg-[rgba(245,158,11,0.15)] px-1.5 py-0.5 font-semibold text-[var(--warning)]">
                 v
               </span>
-            <span>Vacation</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span
-                class="rounded bg-[rgba(239,68,68,0.15)] px-1.5 py-0.5 font-semibold text-[var(--error)]"
-              >
+              <span>Vacation</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="rounded bg-[rgba(239,68,68,0.15)] px-1.5 py-0.5 font-semibold text-[var(--error)]">
                 h
               </span>
               <span>Holiday</span>
@@ -380,6 +355,6 @@ export async function ReportView({ month }: { month: string }) {
           </div>
         </div>
       </div>
-    </AppLayout>
+    </DashboardLayout>
   );
 }

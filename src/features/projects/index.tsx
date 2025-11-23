@@ -2,11 +2,11 @@ import { Hono } from "hono";
 import * as v from "valibot";
 import { sValidator } from "@hono/standard-validator";
 import { projectService } from "./service";
-import { CreateProject } from "./pages/create_project";
-import { EditProject } from "./pages/edit_project";
+import { CreateProjectPage } from "./components/CreateProjectPage";
+import { EditProjectPage } from "./components/EditProjectPage";
 import { requireAuth } from "../auth/middleware";
-import AppLayout from "../../lib/layoutes/AppLayout";
-import { ProjectsList } from "./pages/projects_list";
+import DashboardLayout from "../../lib/layouts/DashboardLayout";
+import { ProjectsListPage } from "./components/ProjectsListPage";
 
 const app = new Hono()
   .use(requireAuth)
@@ -15,16 +15,16 @@ const app = new Hono()
   .get("/", async (c) => {
     const projects = await projectService.getAll(true);
     return c.render(
-      <AppLayout currentPath={c.req.path}>
-        <ProjectsList projects={projects} />
-      </AppLayout>
+      <DashboardLayout currentPath={c.req.path}>
+        <ProjectsListPage projects={projects} />
+      </DashboardLayout>
     );
   })
   .get("/new", async (c) => {
     return c.render(
-      <AppLayout currentPath={c.req.path}>
-        <CreateProject />
-      </AppLayout>
+      <DashboardLayout currentPath={c.req.path}>
+        <CreateProjectPage />
+      </DashboardLayout>
     );
   })
   .post(
@@ -42,11 +42,11 @@ const app = new Hono()
         const projectColor = color && color.trim() !== "" ? color : "#14b8a6";
         await projectService.create(name, projectColor, false);
         const projects = await projectService.getAll(true);
-        return c.render(<ProjectsList projects={projects} />);
+        return c.render(<ProjectsListPage projects={projects} />);
       } catch (error: unknown) {
         const errorMessage =
           error instanceof Error ? error.message : "Failed to create project";
-        return c.render(<CreateProject errorMessage={errorMessage} />);
+        return c.render(<CreateProjectPage errorMessage={errorMessage} />);
       }
     }
   )
@@ -63,7 +63,7 @@ const app = new Hono()
         const { name } = c.req.valid("form");
         await projectService.updateName(id, name);
         const projects = await projectService.getAll(true);
-        return c.render(<ProjectsList projects={projects} />);
+        return c.render(<ProjectsListPage projects={projects} />);
       } catch (error: unknown) {
         const errorMessage =
           error instanceof Error ? error.message : "Failed to update project";
@@ -87,7 +87,7 @@ const app = new Hono()
         const { color } = c.req.valid("form");
         await projectService.updateColor(id, color);
         const projects = await projectService.getAll(true);
-        return c.render(<ProjectsList projects={projects} />);
+        return c.render(<ProjectsListPage projects={projects} />);
       } catch (error: unknown) {
         const errorMessage =
           error instanceof Error
@@ -108,7 +108,7 @@ const app = new Hono()
         const { id } = c.req.valid("param");
         await projectService.toggleSuppress(id);
         const projects = await projectService.getAll(true);
-        return c.render(<ProjectsList projects={projects} />);
+        return c.render(<ProjectsListPage projects={projects} />);
       } catch (error: unknown) {
         const errorMessage =
           error instanceof Error ? error.message : "Failed to suppress project";
@@ -132,9 +132,9 @@ const app = new Hono()
         return c.text("Cannot edit system projects", 403);
       }
       return c.render(
-        <AppLayout currentPath={c.req.path}>
-          <EditProject project={project} />
-        </AppLayout>
+        <DashboardLayout currentPath={c.req.path}>
+          <EditProjectPage project={project} />
+        </DashboardLayout>
       );
     }
   )
@@ -167,7 +167,7 @@ const app = new Hono()
           await projectService.updateSuppressed(id, suppressed);
         }
         const projects = await projectService.getAll(true);
-        return c.render(<ProjectsList projects={projects} />);
+        return c.render(<ProjectsListPage projects={projects} />);
       } catch (error: unknown) {
         const { id } = c.req.valid("param");
         const project = await projectService.getById(id);
@@ -175,7 +175,7 @@ const app = new Hono()
           error instanceof Error ? error.message : "Failed to update project";
         if (project) {
           return c.render(
-            <EditProject project={project} errorMessage={errorMessage} />
+            <EditProjectPage project={project} errorMessage={errorMessage} />
           );
         }
         return c.text(errorMessage, 400);

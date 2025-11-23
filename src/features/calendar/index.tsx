@@ -1,13 +1,13 @@
 import { Hono } from "hono";
 import { requireAuth } from "../auth/middleware";
-import AppLayout from "../../lib/layoutes/AppLayout";
-import { CalendarPage } from "./pages/CalendarPage";
+import DashboardLayout from "../../lib/layouts/DashboardLayout";
+import { CalendarPage } from "./components/CalendarPage";
 
 const app = new Hono().use(requireAuth).get("/", async (c) => {
   return c.render(
-    <AppLayout currentPath={c.req.path}>
+    <DashboardLayout currentPath={c.req.path}>
       <CalendarPage />
-    </AppLayout>
+    </DashboardLayout>
   );
 });
 

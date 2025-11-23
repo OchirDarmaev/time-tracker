@@ -2,13 +2,11 @@ interface CreateProjectProps {
   errorMessage?: string;
 }
 
-export function CreateProject({ errorMessage }: CreateProjectProps) {
+export function CreateProjectPage({ errorMessage }: CreateProjectProps) {
   return (
     <div id="create-project" hx-target="this" hx-swap="outerHTML">
       {errorMessage ? (
-        <div
-          class="mb-6 rounded-r-md border-l-4 border-l-[var(--error)] bg-[rgba(248,113,113,0.12)] p-4"
-        >
+        <div class="mb-6 rounded-r-md border-l-4 border-l-[var(--error)] bg-[rgba(248,113,113,0.12)] p-4">
           <div class="flex">
             <div class="flex-shrink-0">
               <svg
@@ -59,7 +57,7 @@ export function CreateProject({ errorMessage }: CreateProjectProps) {
               id="project-name"
               name="name"
               required
-              class="input-modern w-full rounded-lg border-[var(--border)] bg-[var(--bg-tertiary)] px-4 py-2.5 text-[var(--text-primary)] transition-all focus:outline-none focus:ring-2"
+              class="input-modern w-full rounded-lg border-[var(--border)] bg-[var(--bg-tertiary)] px-4 py-2.5 text-[var(--text-primary)] transition-all focus:ring-2 focus:outline-none"
               placeholder="e.g., Marketing Campaign, Product Development"
             />
           </div>
@@ -80,9 +78,7 @@ export function CreateProject({ errorMessage }: CreateProjectProps) {
                 oninput="document.getElementById('color-value').textContent = this.value"
                 class="h-12 w-20 cursor-pointer rounded-lg border-2 border-[var(--border)] transition-colors"
               />
-              <div
-                class="flex h-12 flex-1 items-center justify-center rounded-lg border-2 border-[var(--border)] bg-[var(--bg-tertiary)]"
-              >
+              <div class="flex h-12 flex-1 items-center justify-center rounded-lg border-2 border-[var(--border)] bg-[var(--bg-tertiary)]">
                 <span
                   class="font-mono text-xs text-[var(--text-secondary)]"
                   id="color-value"

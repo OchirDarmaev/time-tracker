@@ -1,6 +1,6 @@
 import NavBar from "../components/NavBar";
 
-export default function AppLayout({
+export default function DashboardLayout({
   children,
   currentPath,
 }: {

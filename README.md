@@ -90,40 +90,60 @@ The stack naturally supports clear separation of:
 ```text
 src/
   features/                     → main app logic, grouped by features
-    users/
-      routes.ts                → HTTP endpoints for this feature
-      service.ts               → business logic & use-cases
-      templates/               → SSR HTML + HTMX fragments
-        profile.html.ts
-      components/              → SSR UI components (tsx)
-        user-card.tsx
-      types.ts                 → feature-specific types & DTOs
-
     auth/
-      routes.ts
-      service.ts
-      templates/
+      index.tsx                → Hono routes for auth
+      auth-service.ts          → business logic (kebab-case for .ts files)
+      types.ts                 → feature-specific types
+      components/              → SSR UI components (PascalCase for .tsx files)
+        AuthPage.tsx
+      middleware.ts            → auth middleware
+
+    projects/
+      index.tsx                → Hono routes for projects
+      project-service.ts       → business logic
       components/
-      types.ts
+        ProjectsListPage.tsx
+        CreateProjectPage.tsx
+        EditProjectPage.tsx
 
-    billing/
-      routes.ts
-      service.ts
-      templates/
+    reports/
+      index.tsx
       components/
-      types.ts
+        ReportsPage.tsx
 
-  db/                           → schema, migrations, db client
-  lib/                          → shared utilities (validation, helpers)
-  middlewares/                  → auth, logging, security
-  infrastructure/               → SST stacks, bindings, env configs
-  types/                        → global/shared types
+    dashboard/
+      index.tsx
+      components/
+        DashboardPage.tsx
 
-public/                         → static assets
+    # ... other features follow same pattern
+
+  lib/                          → shared utilities
+    components/                 → shared UI components (PascalCase)
+      NavBar.tsx
+    layouts/                   → layout components (PascalCase)
+      AppLayout.tsx
+      renderer.tsx
+    services/                   → shared services (kebab-case)
+      {service-name}.ts
+    utils/                      → utility functions (kebab-case)
+      date-utils.ts
+    client.ts                   → Hono client
+    models.ts                   → shared models
+
+  static/                       → static assets
+    style.css
+    theme.js
+
+public/                         → public static assets
 sst.config.ts                   → infra entrypoint
 vite.config.ts                  → Vite + Cloudflare config
-
 ```
+
+**Naming Conventions:**
+
+- **`.tsx` files**: PascalCase (e.g., `AuthPage.tsx`, `ProjectsList.tsx`)
+- **`.ts` files**: kebab-case (e.g., `auth-service.ts`, `date-utils.ts`)
 
 Vite SSR Components supplement HTMX when we need reusable or complex UI bits—without committing to a full SPA.
 

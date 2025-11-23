@@ -74,9 +74,7 @@ export function YearlySummary({
   }
 
   return (
-    <div
-      class="w-1/3 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-6 shadow-[var(--shadow-sm)]"
-    >
+    <div class="w-1/3 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-6 shadow-[var(--shadow-sm)]">
       <h2 class="mb-4 text-xl font-semibold text-[var(--text-primary)]">
         {year} Summary
       </h2>
@@ -84,29 +82,19 @@ export function YearlySummary({
         <table class="w-full text-sm">
           <thead>
             <tr class="border-b border-[var(--border)]">
-              <th
-                class="px-3 py-2 text-left font-medium text-[var(--text-secondary)]"
-              >
+              <th class="px-3 py-2 text-left font-medium text-[var(--text-secondary)]">
                 Month
               </th>
-              <th
-                class="px-3 py-2 text-right font-medium text-[var(--info)]"
-              >
+              <th class="px-3 py-2 text-right font-medium text-[var(--info)]">
                 w
               </th>
-              <th
-                class="px-3 py-2 text-right font-medium text-[var(--error)]"
-              >
+              <th class="px-3 py-2 text-right font-medium text-[var(--error)]">
                 h
               </th>
-              <th
-                class="px-3 py-2 text-right font-medium text-[var(--text-tertiary)]"
-              >
+              <th class="px-3 py-2 text-right font-medium text-[var(--text-tertiary)]">
                 w
               </th>
-              <th
-                class="px-3 py-2 text-right font-medium text-[var(--text-secondary)]"
-              >
+              <th class="px-3 py-2 text-right font-medium text-[var(--text-secondary)]">
                 t
               </th>
             </tr>
@@ -117,7 +105,9 @@ export function YearlySummary({
               return (
                 <tr
                   class={`border-b border-[var(--border)] ${
-                    isCurrentMonth ? "bg-[var(--bg-tertiary)] font-semibold" : ""
+                    isCurrentMonth
+                      ? "bg-[var(--bg-tertiary)] font-semibold"
+                      : ""
                   }`}
                 >
                   <td class="px-3 py-2 text-[var(--text-primary)]">
@@ -165,24 +155,16 @@ export function YearlySummary({
               <td class="px-3 py-2 font-semibold text-[var(--text-primary)]">
                 Total
               </td>
-              <td
-                class="px-3 py-2 text-right font-semibold text-[var(--info)]"
-              >
+              <td class="px-3 py-2 text-right font-semibold text-[var(--info)]">
                 {yearlySummary.reduce((sum, m) => sum + m.workdays, 0)}
               </td>
-              <td
-                class="px-3 py-2 text-right font-semibold text-[var(--error)]"
-              >
+              <td class="px-3 py-2 text-right font-semibold text-[var(--error)]">
                 {yearlySummary.reduce((sum, m) => sum + m.holidays, 0)}
               </td>
-              <td
-                class="px-3 py-2 text-right font-semibold text-[var(--text-tertiary)]"
-              >
+              <td class="px-3 py-2 text-right font-semibold text-[var(--text-tertiary)]">
                 {yearlySummary.reduce((sum, m) => sum + m.weekends, 0)}
               </td>
-              <td
-                class="px-3 py-2 text-right font-semibold text-[var(--text-primary)]"
-              >
+              <td class="px-3 py-2 text-right font-semibold text-[var(--text-primary)]">
                 {yearlySummary.reduce(
                   (sum, m) =>
                     sum + m.workdays + m.holidays + m.weekends + m.notSet,

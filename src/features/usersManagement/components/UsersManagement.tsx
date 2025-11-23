@@ -49,15 +49,11 @@ export function UsersManagement({
           <table class="min-w-full divide-y border border-[var(--border)]">
             <thead class="bg-[var(--bg-tertiary)]">
               <tr>
-                <th
-                  class="sticky left-0 z-10 border-r border-[var(--border)] bg-[var(--bg-tertiary)] px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]"
-                >
+                <th class="sticky left-0 z-10 border-r border-[var(--border)] bg-[var(--bg-tertiary)] px-4 py-3 text-left text-xs font-semibold tracking-wider text-[var(--text-secondary)] uppercase">
                   User
                 </th>
                 {customProjects.map((project) => (
-                  <th
-                    class="min-w-[120px] px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]"
-                  >
+                  <th class="min-w-[120px] px-4 py-3 text-center text-xs font-semibold tracking-wider text-[var(--text-secondary)] uppercase">
                     <div class="flex items-center justify-center gap-2">
                       <div
                         class={`h-3 w-3 shrink-0 rounded bg-[${project.color}]`}
@@ -80,9 +76,7 @@ export function UsersManagement({
                   class="border-b border-[var(--border)] transition-colors"
                   id={`user-row-${user.id}`}
                 >
-                  <td
-                    class="sticky left-0 z-10 whitespace-nowrap border-r border-[var(--border)] bg-[var(--bg-secondary)] px-4 py-3"
-                  >
+                  <td class="sticky left-0 z-10 border-r border-[var(--border)] bg-[var(--bg-secondary)] px-4 py-3 whitespace-nowrap">
                     <div class="flex items-center gap-2">
                       <span
                         safe
@@ -91,9 +85,7 @@ export function UsersManagement({
                         {user.email}
                       </span>
                       {!user.active && (
-                        <span
-                          class="rounded-full bg-[var(--bg-tertiary)] px-2 py-0.5 text-xs font-semibold text-[var(--text-secondary)]"
-                        >
+                        <span class="rounded-full bg-[var(--bg-tertiary)] px-2 py-0.5 text-xs font-semibold text-[var(--text-secondary)]">
                           Inactive
                         </span>
                       )}

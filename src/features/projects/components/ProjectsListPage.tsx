@@ -4,7 +4,7 @@ interface ProjectsListProps {
   projects: Project[];
 }
 
-export function ProjectsList({ projects }: ProjectsListProps) {
+export function ProjectsListPage({ projects }: ProjectsListProps) {
   return (
     <div id="projects-list" hx-target="this" hx-swap="outerHTML">
       <div class="mb-6 flex items-center justify-between">
@@ -39,9 +39,7 @@ export function ProjectsList({ projects }: ProjectsListProps) {
         </div>
       </div>
 
-      <div
-        class="overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--bg-secondary)] shadow-sm"
-      >
+      <div class="overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--bg-secondary)] shadow-sm">
         <div class="border-b border-[var(--border)] bg-[var(--bg-tertiary)] px-6 py-4">
           <h2 class="text-lg font-semibold text-[var(--text-primary)]">
             Projects ({projects.length})
@@ -62,9 +60,7 @@ export function ProjectsList({ projects }: ProjectsListProps) {
                 d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
               />
             </svg>
-            <h3
-              class="mt-4 text-sm font-medium text-[var(--text-primary)]"
-            >
+            <h3 class="mt-4 text-sm font-medium text-[var(--text-primary)]">
               No projects
             </h3>
             <p class="mt-2 text-sm text-[var(--text-tertiary)]">
@@ -73,36 +69,24 @@ export function ProjectsList({ projects }: ProjectsListProps) {
           </div>
         ) : (
           <div class="overflow-x-auto">
-            <table
-              class="min-w-full divide-y border border-[var(--border)]"
-            >
+            <table class="min-w-full divide-y border border-[var(--border)]">
               <thead class="bg-[var(--bg-tertiary)]">
                 <tr>
-                  <th
-                    class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]"
-                  >
+                  <th class="px-6 py-3 text-left text-xs font-semibold tracking-wider text-[var(--text-secondary)] uppercase">
                     Project
                   </th>
-                  <th
-                    class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]"
-                  >
+                  <th class="px-6 py-3 text-left text-xs font-semibold tracking-wider text-[var(--text-secondary)] uppercase">
                     Status
                   </th>
-                  <th
-                    class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]"
-                  >
+                  <th class="px-6 py-3 text-left text-xs font-semibold tracking-wider text-[var(--text-secondary)] uppercase">
                     Type
                   </th>
-                  <th
-                    class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]"
-                  >
+                  <th class="px-6 py-3 text-right text-xs font-semibold tracking-wider text-[var(--text-secondary)] uppercase">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody
-                class="divide-y bg-[var(--bg-secondary)] divide-[var(--border)]"
-              >
+              <tbody class="divide-y divide-[var(--border)] bg-[var(--bg-secondary)]">
                 {projects.map((project) => (
                   <tr
                     class={`border-b border-[var(--border)] transition-colors ${project.suppressed ? "opacity-60" : ""}`}
@@ -171,20 +155,18 @@ export function ProjectsList({ projects }: ProjectsListProps) {
                               hx-patch={`/projects/${project.id}/suppress`}
                               hx-target="#projects-list"
                               hx-swap="outerHTML"
-                              class={
-                                `rounded-md px-3 py-1.5 text-sm transition-colors ${
-                                  project.suppressed
-                                    ? "text-[var(--success)]"
-                                    : "text-[var(--warning)]"
-                                }`
-                              }
+                              class={`rounded-md px-3 py-1.5 text-sm transition-colors ${
+                                project.suppressed
+                                  ? "text-[var(--success)]"
+                                  : "text-[var(--warning)]"
+                              }`}
                             >
                               {project.suppressed ? "Restore" : "Suppress"}
                             </button>
                           </>
                         )}
                         {project.isSystem && (
-                          <span class="text-xs italic text-[var(--text-tertiary)]">
+                          <span class="text-xs text-[var(--text-tertiary)] italic">
                             Read-only
                           </span>
                         )}

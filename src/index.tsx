@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { renderer } from "./lib/layoutes/renderer";
+import { renderer } from "./lib/layouts/renderer";
 import home from "./features/home";
 import auth from "./features/auth";
 import dashboard from "./features/dashboard";

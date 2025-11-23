@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import AuthPage from "./pages/AuthPage";
+import AuthPage from "./components/AuthPage";
 import * as v from "valibot";
 import { sValidator } from "@hono/standard-validator";
 import { setCookie } from "hono/cookie";

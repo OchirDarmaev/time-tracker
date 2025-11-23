@@ -1,5 +1,5 @@
-import { quickTimeReporturl } from "../quickTimeReport/quickTimeReporturl";
-import { PageLayout } from "../quickTimeReport/PageLayout";
+import { quickTimeReporturl } from "../../quickTimeReport/quickTimeReporturl";
+import { PageLayout } from "../../quickTimeReport/PageLayout";
 
 export default function DashboardPage() {
   return (

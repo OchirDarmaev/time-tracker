@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import * as v from "valibot";
 import { sValidator } from "@hono/standard-validator";
 import { calendarService } from "./service";
-import { CalendarManagement } from "./components/calendar_management";
+import { CalendarManagement } from "./components/CalendarManagement";
 import { requireAuth } from "../auth/middleware";
 import { getMonthFromDate, formatDate } from "../../lib/date_utils";
 import { type Calendar } from "../../lib/mock_db";

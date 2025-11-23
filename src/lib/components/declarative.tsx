@@ -8,7 +8,9 @@ type RenderableFactory = () => Renderable;
 const resolve = <T,>(value: Resolvable<T>): T =>
   typeof value === "function" ? (value as () => T)() : value;
 
-const resolveRenderable = (value?: Renderable | RenderableFactory): Renderable => {
+const resolveRenderable = (
+  value?: Renderable | RenderableFactory
+): Renderable => {
   if (typeof value === "function") {
     return (value as RenderableFactory)();
   }
@@ -26,7 +28,9 @@ const flattenChildren = (children: Renderable | Renderable[]): Renderable[] => {
     const next = queue.shift();
 
     if (Array.isArray(next)) {
-      queue.unshift(...next.filter((child): child is Renderable => child !== undefined));
+      queue.unshift(
+        ...next.filter((child): child is Renderable => child !== undefined)
+      );
     } else if (next !== null) {
       flattened.push(next);
     }
@@ -42,7 +46,12 @@ export interface ShowProps<T = unknown> {
   fallback?: Renderable | RenderableFactory;
 }
 
-export function Show<T>({ when, keyed = false, children, fallback }: ShowProps<T>): Renderable {
+export function Show<T>({
+  when,
+  keyed = false,
+  children,
+  fallback,
+}: ShowProps<T>): Renderable {
   const resolved = resolve(when);
 
   if (!resolved) {
@@ -52,7 +61,7 @@ export function Show<T>({ when, keyed = false, children, fallback }: ShowProps<T
   if (typeof children === "function") {
     return resolveRenderable(() =>
       (children as (value: T | Accessor<T>) => Renderable)(
-        keyed ? (resolved as T) : (() => resolve(when))
+        keyed ? (resolved as T) : () => resolve(when)
       )
     );
   }
@@ -91,8 +100,12 @@ export interface SwitchProps {
   fallback?: Renderable | RenderableFactory;
 }
 
-const isMatchElement = (child: unknown): child is JSX.Element & { props: MatchProps } =>
-  typeof child === "object" && child !== null && "type" in (child as JSX.Element);
+const isMatchElement = (
+  child: unknown
+): child is JSX.Element & { props: MatchProps } =>
+  typeof child === "object" &&
+  child !== null &&
+  "type" in (child as JSX.Element);
 
 export function Switch({ children, fallback }: SwitchProps): Renderable {
   const candidates = flattenChildren(children);
@@ -110,7 +123,7 @@ export function Switch({ children, fallback }: SwitchProps): Renderable {
     if (typeof matchChildren === "function") {
       return resolveRenderable(() =>
         (matchChildren as (value: unknown) => Renderable)(
-          matchProps.keyed ? resolved : (() => resolve(matchProps.when))
+          matchProps.keyed ? resolved : () => resolve(matchProps.when)
         )
       );
     }

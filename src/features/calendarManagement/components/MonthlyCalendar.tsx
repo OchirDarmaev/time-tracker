@@ -90,9 +90,7 @@ export function MonthlyCalendar({ month, calendarDays }: MonthlyCalendarProps) {
   const weekDayHeaders = ["M", "T", "W", "T", "F", "S", "S"];
 
   return (
-    <div
-      class="w-2/3 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-6 shadow-[var(--shadow-sm)]"
-    >
+    <div class="w-2/3 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-6 shadow-[var(--shadow-sm)]">
       <div class="mb-6 flex items-center justify-between">
         <div class="flex min-w-[200px] items-center gap-4">
           <button
@@ -124,52 +122,30 @@ export function MonthlyCalendar({ month, calendarDays }: MonthlyCalendarProps) {
 
       <div class="mb-6">
         <div class="flex gap-4">
-          <div
-            class="flex items-center gap-2 rounded-lg bg-[var(--bg-tertiary)] px-3 py-2"
-          >
-            <div
-              class="h-2 w-2 rounded-full bg-[var(--info)]"
-            ></div>
-            <span class="text-xs text-[var(--text-secondary)]">
-              Workdays:{" "}
-            </span>
+          <div class="flex items-center gap-2 rounded-lg bg-[var(--bg-tertiary)] px-3 py-2">
+            <div class="h-2 w-2 rounded-full bg-[var(--info)]"></div>
+            <span class="text-xs text-[var(--text-secondary)]">Workdays: </span>
             <span class="text-sm font-bold text-[var(--info)]">
               {workdaysCount}
             </span>
           </div>
-          <div
-            class="flex items-center gap-2 rounded-lg bg-[var(--bg-tertiary)] px-3 py-2"
-          >
-            <div
-              class="h-2 w-2 rounded-full bg-[var(--error)]"
-            ></div>
-            <span class="text-xs text-[var(--text-secondary)]">
-              Holidays:{" "}
-            </span>
+          <div class="flex items-center gap-2 rounded-lg bg-[var(--bg-tertiary)] px-3 py-2">
+            <div class="h-2 w-2 rounded-full bg-[var(--error)]"></div>
+            <span class="text-xs text-[var(--text-secondary)]">Holidays: </span>
             <span class="text-sm font-bold text-[var(--error)]">
               {publicHolidaysCount}
             </span>
           </div>
-          <div
-            class="flex items-center gap-2 rounded-lg bg-[var(--bg-tertiary)] px-3 py-2"
-          >
-            <div
-              class="h-2 w-2 rounded-full bg-[var(--text-tertiary)]"
-            ></div>
-            <span class="text-xs text-[var(--text-secondary)]">
-              Weekends:{" "}
-            </span>
+          <div class="flex items-center gap-2 rounded-lg bg-[var(--bg-tertiary)] px-3 py-2">
+            <div class="h-2 w-2 rounded-full bg-[var(--text-tertiary)]"></div>
+            <span class="text-xs text-[var(--text-secondary)]">Weekends: </span>
             <span class="text-sm font-bold text-[var(--text-tertiary)]">
               {weekendsCount}
             </span>
           </div>
           {undefinedCount > 0 && (
-            <div
-              class="flex items-center gap-2 rounded-lg bg-[var(--bg-tertiary)] px-3 py-2"
-            >
-              <div
-                class="h-2 w-2 rounded-full bg-[var(--warning)]"
-              ></div>
+            <div class="flex items-center gap-2 rounded-lg bg-[var(--bg-tertiary)] px-3 py-2">
+              <div class="h-2 w-2 rounded-full bg-[var(--warning)]"></div>
               <span class="text-xs text-[var(--text-secondary)]">
                 Not Set:{" "}
               </span>
@@ -190,7 +166,7 @@ export function MonthlyCalendar({ month, calendarDays }: MonthlyCalendarProps) {
         {weekDayHeaders.map((day) => (
           <div
             safe
-            class="pb-1 text-center text-[10px] font-medium uppercase text-[var(--text-tertiary)] tracking-[0.05em]"
+            class="pb-1 text-center text-[10px] font-medium tracking-[0.05em] text-[var(--text-tertiary)] uppercase"
           >
             {day}
           </div>
@@ -274,9 +250,7 @@ export function MonthlyCalendar({ month, calendarDays }: MonthlyCalendarProps) {
                 class={`relative flex aspect-square w-full cursor-pointer items-center justify-center rounded-lg border [background-color:${bgColor}] [border-color:${borderColor}] text-[${textColor}] shadow-[var(--shadow-sm)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md focus:outline-none`}
                 title={`${day.date} - ${typeLabel} (Click to set to ${nextTypeLabel})`}
               >
-                <span
-                  class="text-xs font-medium tracking-[-0.01em]"
-                >
+                <span class="text-xs font-medium tracking-[-0.01em]">
                   {day.dayNumber}
                 </span>
               </button>

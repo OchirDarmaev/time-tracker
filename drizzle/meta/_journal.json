@@ -15,6 +15,13 @@
       "when": 1763940108196,
       "tag": "0001_drop_users",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1763940486815,
+      "tag": "0002_init_db",
+      "breakpoints": true
     }
   ]
 }

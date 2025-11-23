@@ -386,3 +386,4 @@ export async function ReportView({ month }: { month: string }) {
     </div>
   );
 }
+

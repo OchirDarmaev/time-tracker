@@ -2,21 +2,17 @@ import { Hono } from "hono";
 import * as v from "valibot";
 import { sValidator } from "@hono/standard-validator";
 import { projectService } from "./service";
-import { calendarService } from "./service";
-import { ProjectsList } from "./pages/projects_list";
 import { CreateProject } from "./pages/create_project";
 import { EditProject } from "./pages/edit_project";
-import { CalendarManagement } from "./components/calendar_management";
 import { requireAuth } from "../auth/middleware";
-import { getMonthFromDate, formatDate } from "../../lib/date_utils";
 import AppLayout from "../../lib/layoutes/AppLayout";
-import { type Calendar } from "../../lib/mock_db";
+import { ProjectsList } from "./pages/projects_list";
 
 const app = new Hono()
   .use(requireAuth)
 
   // Projects routes
-  .get("/projects", async (c) => {
+  .get("/", async (c) => {
     const projects = await projectService.getAll(true);
     return c.render(
       <AppLayout currentPath={c.req.path}>
@@ -24,7 +20,7 @@ const app = new Hono()
       </AppLayout>
     );
   })
-  .get("/projects/new", async (c) => {
+  .get("/new", async (c) => {
     return c.render(
       <AppLayout currentPath={c.req.path}>
         <CreateProject />
@@ -32,7 +28,7 @@ const app = new Hono()
     );
   })
   .post(
-    "/projects",
+    "/",
     sValidator(
       "form",
       v.object({
@@ -55,7 +51,7 @@ const app = new Hono()
     }
   )
   .patch(
-    "/projects/:id/name",
+    "/:id/name",
     sValidator(
       "param",
       v.object({ id: v.pipe(v.string(), v.transform(Number)) })
@@ -76,7 +72,7 @@ const app = new Hono()
     }
   )
   .patch(
-    "/projects/:id/color",
+    "/:id/color",
     sValidator(
       "param",
       v.object({ id: v.pipe(v.string(), v.transform(Number)) })
@@ -102,7 +98,7 @@ const app = new Hono()
     }
   )
   .patch(
-    "/projects/:id/suppress",
+    "/:id/suppress",
     sValidator(
       "param",
       v.object({ id: v.pipe(v.string(), v.transform(Number)) })
@@ -121,7 +117,7 @@ const app = new Hono()
     }
   )
   .get(
-    "/projects/:id/edit",
+    "/:id/edit",
     sValidator(
       "param",
       v.object({ id: v.pipe(v.string(), v.transform(Number)) })
@@ -143,7 +139,7 @@ const app = new Hono()
     }
   )
   .patch(
-    "/projects/:id",
+    "/:id",
     sValidator(
       "param",
       v.object({ id: v.pipe(v.string(), v.transform(Number)) })
@@ -184,75 +180,6 @@ const app = new Hono()
         }
         return c.text(errorMessage, 400);
       }
-    }
-  )
-  // Calendar routes
-  .get("/calendar", async (c) => {
-    return c.render(
-      <AppLayout currentPath={c.req.path}>
-        <div
-          hx-get="/admin/partials/calendar"
-          hx-swap="outerHTML"
-          hx-trigger="load"
-        ></div>
-      </AppLayout>
-    );
-  })
-  .get(
-    "/partials/calendar",
-    sValidator("query", v.object({ month: v.optional(v.string()) })),
-    async (c) => {
-      const month =
-        c.req.valid("query").month || getMonthFromDate(formatDate(new Date()));
-
-      // Get calendar data for the entire year for yearly summary
-      const year = new Date(month + "-01").getFullYear();
-      const calendarDaysByMonth = new Map<string, Calendar[]>();
-
-      for (let m = 0; m < 12; m++) {
-        const monthStr = `${year}-${String(m + 1).padStart(2, "0")}`;
-        const days = await calendarService.getByMonth(monthStr);
-        calendarDaysByMonth.set(monthStr, days);
-      }
-
-      return c.render(
-        <CalendarManagement
-          month={month}
-          calendarDaysByMonth={calendarDaysByMonth}
-        />
-      );
-    }
-  )
-  .post(
-    "/partials/calendar/day-type",
-    sValidator(
-      "form",
-      v.object({
-        date: v.string(),
-        day_type: v.picklist(["workday", "public_holiday", "weekend"]),
-      })
-    ),
-    async (c) => {
-      const { date, day_type } = c.req.valid("form");
-      await calendarService.createOrUpdate(date, day_type);
-      const month = getMonthFromDate(date);
-
-      // Get calendar data for the entire year for yearly summary
-      const year = new Date(month + "-01").getFullYear();
-      const calendarDaysByMonth = new Map<string, Calendar[]>();
-
-      for (let m = 0; m < 12; m++) {
-        const monthStr = `${year}-${String(m + 1).padStart(2, "0")}`;
-        const days = await calendarService.getByMonth(monthStr);
-        calendarDaysByMonth.set(monthStr, days);
-      }
-
-      return c.render(
-        <CalendarManagement
-          month={month}
-          calendarDaysByMonth={calendarDaysByMonth}
-        />
-      );
     }
   );
 

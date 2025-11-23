@@ -28,9 +28,9 @@ export function EditProject({ project, errorMessage }: EditProjectProps) {
         style="background-color: var(--bg-secondary);"
       >
         <form
-          hx-patch={`/admin/projects/${project.id}`}
+          hx-patch={`/projects/${project.id}`}
           hx-target="body"
-          hx-push-url="/admin/projects"
+          hx-push-url="/projects"
           class="space-y-6"
         >
           <div>
@@ -106,7 +106,7 @@ export function EditProject({ project, errorMessage }: EditProjectProps) {
               Save Changes
             </button>
             <a
-              href="/admin/projects"
+              href="/projects"
               class="btn-secondary rounded-md px-4 py-2 no-underline focus:ring-2 focus:outline-none"
             >
               Cancel

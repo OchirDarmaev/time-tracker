@@ -21,7 +21,7 @@ export function ProjectsList({ projects }: ProjectsListProps) {
         </div>
         <div class="flex items-center gap-3">
           <a
-            href="/admin/projects/new"
+            href="/projects/new"
             class="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 font-medium text-white no-underline shadow-sm transition-all hover:shadow-md focus:ring-2 focus:outline-none"
             style="background-color: var(--accent);"
           >
@@ -186,14 +186,14 @@ export function ProjectsList({ projects }: ProjectsListProps) {
                         {!project.isSystem && (
                           <>
                             <a
-                              href={`/admin/projects/${project.id}/edit`}
+                              href={`/projects/${project.id}/edit`}
                               class="rounded-md px-3 py-1.5 text-sm no-underline transition-colors"
                               style="color: var(--accent);"
                             >
                               Edit
                             </a>
                             <button
-                              hx-patch={`/admin/projects/${project.id}/suppress`}
+                              hx-patch={`/projects/${project.id}/suppress`}
                               hx-target="#projects-list"
                               hx-swap="outerHTML"
                               class="rounded-md px-3 py-1.5 text-sm transition-colors"

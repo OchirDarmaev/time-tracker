@@ -16,8 +16,8 @@ export default function NavBar({ currentPath }: NavBarProps) {
     },
     {
       label: "Projects",
-      path: "/admin/projects",
-      routePath: "/admin/projects",
+      path: "/projects",
+      routePath: "/projects",
     },
     {
       label: "Users Management",
@@ -26,8 +26,8 @@ export default function NavBar({ currentPath }: NavBarProps) {
     },
     {
       label: "Calendar",
-      path: "/admin/calendar",
-      routePath: "/admin/calendar",
+      path: "/calendar",
+      routePath: "/calendar",
     },
   ];
 

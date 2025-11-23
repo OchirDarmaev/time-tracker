@@ -3,12 +3,9 @@ import * as v from "valibot";
 import { sValidator } from "@hono/standard-validator";
 
 import { requireAuth } from "../auth/middleware";
-import {
-  userService,
-  projectService,
-  projectUserService,
-} from "../admin/service";
+import { projectService } from "../projects/service";
 import { UsersManagement } from "./components/UsersManagement";
+import { userService, projectUserService } from "./service";
 
 const app = new Hono()
   .use(requireAuth)

@@ -47,9 +47,9 @@ export function CreateProject({ errorMessage }: CreateProjectProps) {
         style="background-color: var(--bg-secondary); border: 1px solid var(--border);"
       >
         <form
-          hx-post="/admin/projects"
+          hx-post="/projects"
           hx-target="body"
-          hx-push-url="/admin/projects"
+          hx-push-url="/projects"
           class="space-y-6"
         >
           <div>
@@ -118,7 +118,7 @@ export function CreateProject({ errorMessage }: CreateProjectProps) {
               Create Project
             </button>
             <a
-              href="/admin/projects"
+              href="/projects"
               class="btn-secondary rounded-lg px-6 py-2.5 no-underline transition-all focus:ring-2 focus:outline-none"
             >
               Cancel

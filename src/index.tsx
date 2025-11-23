@@ -5,27 +5,31 @@ import auth from "./features/auth";
 import dashboard from "./features/dashboard";
 import quickTimeReport from "./features/quickTimeReport";
 import timeTrackingReport from "./features/timeTrackingReport";
-import admin from "./features/admin";
+import projects from "./features/projects";
 import reports from "./features/reports";
 import usersManagement from "./features/usersManagement";
 import users from "./features/users";
+import calendarManagement from "./features/calendarManagement";
+import calendar from "./features/calendar";
 const app = new Hono()
   .use("/", renderer)
   .use("/auth", renderer)
   .use("/dashboard", renderer)
-  .use("/admin/projects", renderer)
-  .use("/admin/calendar", renderer)
+  .use("/projects", renderer)
+  .use("/calendar", renderer)
   .use("/users", renderer)
   .use("/reports", renderer)
   .route("/", home)
   .route("/auth", auth)
   .route("/dashboard", dashboard)
   .route("/users", users)
+  .route("/projects", projects)
+  .route("/reports", reports)
+  .route("/calendar", calendar)
   .route("/partials/quickTimeReport", quickTimeReport)
   .route("/partials/timeTrackingReport", timeTrackingReport)
   .route("/partials/usersManagement", usersManagement)
-  .route("/admin", admin)
-  .route("/reports", reports);
+  .route("/partials/calendarManagement", calendarManagement);
 
 export default app;
 

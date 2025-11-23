@@ -5,6 +5,7 @@ import {
   getMonthFromDate,
 } from "../../../lib/date_utils";
 import { mockDb } from "../../../lib/mock_db";
+import { client } from "../../../lib/client";
 
 const REQUIRED_DAILY_HOURS = 8;
 
@@ -189,6 +190,12 @@ export async function ReportView({ month }: { month: string }) {
   const prevMonthStr = getMonthFromDate(formatDate(prevMonth));
   const nextMonthStr = getMonthFromDate(formatDate(nextMonth));
   const monthName = monthNames[monthNum - 1];
+  const prevMonthUrl = client.reports.$url({
+    query: { month: prevMonthStr },
+  }).pathname;
+  const nextMonthUrl = client.reports.$url({
+    query: { month: nextMonthStr },
+  }).pathname;
 
   return (
     <div id="reports-content" class="space-y-6">
@@ -199,7 +206,7 @@ export async function ReportView({ month }: { month: string }) {
       </div>
       <div class="flex items-center justify-center gap-4">
         <a
-          href={`/reports?month=${prevMonthStr}`}
+          href={prevMonthUrl}
           class="rounded-xl px-4 py-2 transition-all duration-200 focus:outline-none"
           style="color: var(--text-secondary); background-color: var(--bg-elevated); border: 1px solid var(--border); box-shadow: var(--shadow-sm); letter-spacing: -0.01em; text-decoration: none;"
           onmouseover="this.style.color='var(--text-primary)'; this.style.backgroundColor='var(--bg-tertiary)'; this.style.boxShadow='var(--shadow-md)'; this.style.transform='translateY(-1px)';"
@@ -214,7 +221,7 @@ export async function ReportView({ month }: { month: string }) {
           <span safe>{`${monthName} ${year}`}</span>
         </p>
         <a
-          href={`/reports?month=${nextMonthStr}`}
+          href={nextMonthUrl}
           class="rounded-xl px-4 py-2 transition-all duration-200 focus:outline-none"
           style="color: var(--text-secondary); background-color: var(--bg-elevated); border: 1px solid var(--border); box-shadow: var(--shadow-sm); letter-spacing: -0.01em; text-decoration: none;"
           onmouseover="this.style.color='var(--text-primary)'; this.style.backgroundColor='var(--bg-tertiary)'; this.style.boxShadow='var(--shadow-md)'; this.style.transform='translateY(-1px)';"
@@ -386,4 +393,3 @@ export async function ReportView({ month }: { month: string }) {
     </div>
   );
 }
-

@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import DashboardPage from "./components/DashboardPage";
-import DashboardLayout from "./components/DashboardLayout";
+import AppLayout from "./components/AppLayout";
 import { requireAuth } from "../auth/middleware";
 
 const app = new Hono()
@@ -8,9 +8,9 @@ const app = new Hono()
 
   .get("/", (c) => {
     return c.render(
-      <DashboardLayout currentPath={c.req.path}>
+      <AppLayout currentPath={c.req.path}>
         <DashboardPage />
-      </DashboardLayout>
+      </AppLayout>
     );
   });
 

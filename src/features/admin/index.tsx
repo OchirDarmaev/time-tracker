@@ -12,7 +12,7 @@ import { ManageProjectUsers } from "./components/manage_project_users";
 import { CalendarManagement } from "./components/calendar_management";
 import { requireAuth } from "../auth/middleware";
 import { getMonthFromDate, formatDate } from "../../lib/date_utils";
-import DashboardLayout from "../dashboard/components/DashboardLayout";
+import AppLayout from "../dashboard/components/AppLayout";
 import { type Calendar } from "../../lib/mock_db";
 
 const app = new Hono()
@@ -22,16 +22,16 @@ const app = new Hono()
   .get("/projects", async (c) => {
     const projects = await projectService.getAll(true);
     return c.render(
-      <DashboardLayout currentPath={c.req.path}>
+      <AppLayout currentPath={c.req.path}>
         <ProjectsList projects={projects} />
-      </DashboardLayout>
+      </AppLayout>
     );
   })
   .get("/projects/new", async (c) => {
     return c.render(
-      <DashboardLayout currentPath={c.req.path}>
+      <AppLayout currentPath={c.req.path}>
         <CreateProject />
-      </DashboardLayout>
+      </AppLayout>
     );
   })
   .post(
@@ -139,9 +139,9 @@ const app = new Hono()
         return c.text("Cannot edit system projects", 403);
       }
       return c.render(
-        <DashboardLayout currentPath={c.req.path}>
+        <AppLayout currentPath={c.req.path}>
           <EditProject project={project} />
-        </DashboardLayout>
+        </AppLayout>
       );
     }
   )
@@ -293,13 +293,13 @@ const app = new Hono()
   // Calendar routes
   .get("/calendar", async (c) => {
     return c.render(
-      <DashboardLayout currentPath={c.req.path}>
+      <AppLayout currentPath={c.req.path}>
         <div
           hx-get="/admin/partials/calendar"
           hx-swap="outerHTML"
           hx-trigger="load"
         ></div>
-      </DashboardLayout>
+      </AppLayout>
     );
   })
   .get(

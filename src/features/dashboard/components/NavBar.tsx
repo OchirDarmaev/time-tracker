@@ -27,32 +27,30 @@ export default function NavBar({ currentPath }: NavBarProps) {
   ];
 
   return (
-    <nav class="border-b border-gray-800 bg-gray-900">
-      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div class="flex h-16 items-center justify-between">
-          <div class="flex items-center space-x-8">
+    <nav class="flex h-screen w-64 flex-col border-r border-(--border) bg-(--bg-secondary) px-6 py-8">
+      <a
+        href={client.index.$url().pathname}
+        class="mb-12 bg-linear-to-r from-indigo-400 to-purple-400 bg-clip-text text-2xl font-bold text-transparent transition-opacity hover:opacity-80"
+      >
+        TimeTrack
+      </a>
+      <div class="flex flex-col gap-2">
+        {navItems.map((item) => {
+          const isActive = currentPath.startsWith(item.routePath);
+          return (
             <a
-              href={client.index.$url().pathname}
-              class="bg-linear-to-r from-indigo-400 to-purple-400 bg-clip-text text-xl font-bold text-transparent"
+              key={item.routePath}
+              href={item.path}
+              class={`group relative flex items-center rounded-sm px-4 py-3 text-sm font-medium transition-all duration-200 ${
+                isActive
+                  ? "bg-(--accent-light) text-(--accent) shadow-sm"
+                  : "text-(--text-secondary) hover:bg-(--bg-tertiary) hover:text-(--text-primary)"
+              }`}
             >
-              TimeTrack
+              <span class="relative z-10">{item.label}</span>
             </a>
-            <div class="flex space-x-4">
-              {navItems.map((item) => {
-                const isActive = currentPath.startsWith(item.routePath);
-                return (
-                  <a
-                    key={item.routePath}
-                    href={item.path}
-                    class={`font-medium text-gray-300 hover:text-white ${isActive ? "text-white" : "text-gray-400"}`}
-                  >
-                    {item.label}
-                  </a>
-                );
-              })}
-            </div>
-          </div>
-        </div>
+          );
+        })}
       </div>
     </nav>
   );

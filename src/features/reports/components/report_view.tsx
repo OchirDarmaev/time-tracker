@@ -5,7 +5,7 @@ import {
   getMonthFromDate,
 } from "../../../lib/date_utils";
 import { mockDb } from "../../../lib/mock_db";
-import DashboardLayout from "../../dashboard/components/DashboardLayout";
+import AppLayout from "../../dashboard/components/AppLayout";
 
 const REQUIRED_DAILY_HOURS = 8;
 
@@ -192,7 +192,7 @@ export async function ReportView({ month }: { month: string }) {
   const monthName = monthNames[monthNum - 1];
 
   return (
-    <DashboardLayout currentPath="/reports">
+    <AppLayout currentPath="/reports">
       <div id="reports-content" class="space-y-6">
         <div>
           <h1
@@ -393,6 +393,6 @@ export async function ReportView({ month }: { month: string }) {
           </div>
         </div>
       </div>
-    </DashboardLayout>
+    </AppLayout>
   );
 }

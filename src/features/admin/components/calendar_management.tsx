@@ -18,19 +18,25 @@ export function CalendarManagement({
 
   return (
     <div id="calendar-management-content" class="space-y-6">
-      <div class="flex justify-between items-center">
+      <div class="flex items-center justify-between">
         <div>
-          <h1 class="text-3xl font-bold mb-2" style="color: var(--text-primary);">
+          <h1
+            class="mb-2 text-3xl font-bold"
+            style="color: var(--text-primary);"
+          >
             Manage Calendar
           </h1>
         </div>
       </div>
 
       <div class="flex gap-6">
-        <YearlySummary year={year} currentMonth={month} calendarDaysByMonth={calendarDaysByMonth} />
+        <YearlySummary
+          year={year}
+          currentMonth={month}
+          calendarDaysByMonth={calendarDaysByMonth}
+        />
         <MonthlyCalendar month={month} calendarDays={currentMonthDays} />
       </div>
     </div>
   );
 }
-

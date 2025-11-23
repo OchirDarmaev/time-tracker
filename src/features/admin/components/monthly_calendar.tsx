@@ -1,5 +1,9 @@
 import { type Calendar } from "../../../lib/mock_db";
-import { getAllDaysInMonth, formatDate, parseDate } from "../../../lib/date_utils";
+import {
+  getAllDaysInMonth,
+  formatDate,
+  parseDate,
+} from "../../../lib/date_utils";
 
 interface MonthlyCalendarProps {
   month: string;
@@ -87,14 +91,14 @@ export function MonthlyCalendar({ month, calendarDays }: MonthlyCalendarProps) {
 
   return (
     <div
-      class="rounded-2xl p-6 w-2/3"
+      class="w-2/3 rounded-2xl p-6"
       style="background-color: var(--bg-elevated); border: 1px solid var(--border-subtle); box-shadow: var(--shadow-sm);"
     >
-      <div class="flex justify-between items-center mb-6">
+      <div class="mb-6 flex items-center justify-between">
         <div class="flex items-center gap-4" style="min-width: 200px;">
           <button
             type="button"
-            class="px-4 py-2 rounded-xl transition-all duration-200 focus:outline-none shrink-0"
+            class="shrink-0 rounded-xl px-4 py-2 transition-all duration-200 focus:outline-none"
             style="color: var(--text-secondary); background-color: var(--bg-elevated); border: 1px solid var(--border); box-shadow: var(--shadow-sm); width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;"
             onmouseover="this.style.color='var(--text-primary)'; this.style.backgroundColor='var(--bg-tertiary)'; this.style.boxShadow='var(--shadow-md)'; this.style.transform='translateY(-1px)';"
             onmouseout="this.style.color='var(--text-secondary)'; this.style.backgroundColor='var(--bg-elevated)'; this.style.boxShadow='var(--shadow-sm)'; this.style.transform='translateY(0)';"
@@ -106,14 +110,14 @@ export function MonthlyCalendar({ month, calendarDays }: MonthlyCalendarProps) {
           </button>
           <h2
             safe
-            class="text-2xl font-semibold flex-1 text-center"
+            class="flex-1 text-center text-2xl font-semibold"
             style="color: var(--text-primary);"
           >
             {`${monthName} ${year}`}
           </h2>
           <button
             type="button"
-            class="px-4 py-2 rounded-xl transition-all duration-200 focus:outline-none shrink-0"
+            class="shrink-0 rounded-xl px-4 py-2 transition-all duration-200 focus:outline-none"
             style="color: var(--text-secondary); background-color: var(--bg-elevated); border: 1px solid var(--border); box-shadow: var(--shadow-sm); width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;"
             onmouseover="this.style.color='var(--text-primary)'; this.style.backgroundColor='var(--bg-tertiary)'; this.style.boxShadow='var(--shadow-md)'; this.style.transform='translateY(-1px)';"
             onmouseout="this.style.color='var(--text-secondary)'; this.style.backgroundColor='var(--bg-elevated)'; this.style.boxShadow='var(--shadow-sm)'; this.style.transform='translateY(0)';"
@@ -129,10 +133,13 @@ export function MonthlyCalendar({ month, calendarDays }: MonthlyCalendarProps) {
       <div class="mb-6">
         <div class="flex gap-4">
           <div
-            class="px-3 py-2 rounded-lg flex items-center gap-2"
+            class="flex items-center gap-2 rounded-lg px-3 py-2"
             style="background-color: var(--bg-tertiary);"
           >
-            <div class="w-2 h-2 rounded-full" style="background-color: var(--info);"></div>
+            <div
+              class="h-2 w-2 rounded-full"
+              style="background-color: var(--info);"
+            ></div>
             <span class="text-xs" style="color: var(--text-secondary);">
               Workdays:{" "}
             </span>
@@ -141,10 +148,13 @@ export function MonthlyCalendar({ month, calendarDays }: MonthlyCalendarProps) {
             </span>
           </div>
           <div
-            class="px-3 py-2 rounded-lg flex items-center gap-2"
+            class="flex items-center gap-2 rounded-lg px-3 py-2"
             style="background-color: var(--bg-tertiary);"
           >
-            <div class="w-2 h-2 rounded-full" style="background-color: var(--error);"></div>
+            <div
+              class="h-2 w-2 rounded-full"
+              style="background-color: var(--error);"
+            ></div>
             <span class="text-xs" style="color: var(--text-secondary);">
               Holidays:{" "}
             </span>
@@ -153,23 +163,32 @@ export function MonthlyCalendar({ month, calendarDays }: MonthlyCalendarProps) {
             </span>
           </div>
           <div
-            class="px-3 py-2 rounded-lg flex items-center gap-2"
+            class="flex items-center gap-2 rounded-lg px-3 py-2"
             style="background-color: var(--bg-tertiary);"
           >
-            <div class="w-2 h-2 rounded-full" style="background-color: var(--text-tertiary);"></div>
+            <div
+              class="h-2 w-2 rounded-full"
+              style="background-color: var(--text-tertiary);"
+            ></div>
             <span class="text-xs" style="color: var(--text-secondary);">
               Weekends:{" "}
             </span>
-            <span class="text-sm font-bold" style="color: var(--text-tertiary);">
+            <span
+              class="text-sm font-bold"
+              style="color: var(--text-tertiary);"
+            >
               {weekendsCount}
             </span>
           </div>
           {undefinedCount > 0 && (
             <div
-              class="px-3 py-2 rounded-lg flex items-center gap-2"
+              class="flex items-center gap-2 rounded-lg px-3 py-2"
               style="background-color: var(--bg-tertiary);"
             >
-              <div class="w-2 h-2 rounded-full" style="background-color: var(--warning);"></div>
+              <div
+                class="h-2 w-2 rounded-full"
+                style="background-color: var(--warning);"
+              ></div>
               <span class="text-xs" style="color: var(--text-secondary);">
                 Not Set:{" "}
               </span>
@@ -190,7 +209,7 @@ export function MonthlyCalendar({ month, calendarDays }: MonthlyCalendarProps) {
         {weekDayHeaders.map((day) => (
           <div
             safe
-            class="text-center text-[10px] font-medium pb-1"
+            class="pb-1 text-center text-[10px] font-medium"
             style="color: var(--text-tertiary); letter-spacing: 0.05em; text-transform: uppercase;"
           >
             {day}
@@ -272,11 +291,14 @@ export function MonthlyCalendar({ month, calendarDays }: MonthlyCalendarProps) {
               <input type="hidden" name="day_type" value={targetType} />
               <button
                 type="submit"
-                class="relative w-full aspect-square rounded-lg border transition-all duration-200 flex items-center justify-center cursor-pointer focus:outline-none hover:shadow-md hover:-translate-y-0.5"
+                class="relative flex aspect-square w-full cursor-pointer items-center justify-center rounded-lg border transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md focus:outline-none"
                 style={`background-color: ${bgColor}; border-color: ${borderColor}; color: ${textColor}; box-shadow: var(--shadow-sm);`}
                 title={`${day.date} - ${typeLabel} (Click to set to ${nextTypeLabel})`}
               >
-                <span class="text-xs font-medium" style="letter-spacing: -0.01em;">
+                <span
+                  class="text-xs font-medium"
+                  style="letter-spacing: -0.01em;"
+                >
                   {day.dayNumber}
                 </span>
               </button>
@@ -287,4 +309,3 @@ export function MonthlyCalendar({ month, calendarDays }: MonthlyCalendarProps) {
     </div>
   );
 }
-

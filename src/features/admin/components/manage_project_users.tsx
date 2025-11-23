@@ -1,4 +1,8 @@
-import { type User, type Project, type ProjectUser } from "../../../lib/mock_db";
+import {
+  type User,
+  type Project,
+  type ProjectUser,
+} from "../../../lib/mock_db";
 
 interface ManageProjectUsersProps {
   users: User[];
@@ -23,11 +27,17 @@ export function ManageProjectUsers({
     projectUserMap.get(pu.user_id)!.set(pu.project_id, pu);
   });
 
-  const isUserAssignedToProject = (userId: number, projectId: number): boolean => {
+  const isUserAssignedToProject = (
+    userId: number,
+    projectId: number
+  ): boolean => {
     return projectUserMap.get(userId)?.has(projectId) ?? false;
   };
 
-  const isUserSuppressedInProject = (userId: number, projectId: number): boolean => {
+  const isUserSuppressedInProject = (
+    userId: number,
+    projectId: number
+  ): boolean => {
     const projectUser = projectUserMap.get(userId)?.get(projectId);
     return projectUser ? projectUser.suppressed === 1 : false;
   };
@@ -36,41 +46,52 @@ export function ManageProjectUsers({
     <div id="manage-project-users" hx-target="this" hx-swap="outerHTML">
       <div class="mb-6 flex items-center justify-between">
         <div>
-          <h1 class="text-3xl font-bold mb-2" style="color: var(--text-primary);">
+          <h1
+            class="mb-2 text-3xl font-bold"
+            style="color: var(--text-primary);"
+          >
             Manage Project Users
           </h1>
           <p style="color: var(--text-secondary);">
-            Assign users to projects by checking the boxes below. System projects are always
-            assigned to all users and are hidden from this view.
+            Assign users to projects by checking the boxes below. System
+            projects are always assigned to all users and are hidden from this
+            view.
           </p>
         </div>
       </div>
 
       <div
-        class="rounded-xl shadow-sm overflow-hidden"
+        class="overflow-hidden rounded-xl shadow-sm"
         style="background-color: var(--bg-secondary); border: 1px solid var(--border);"
       >
         <div class="overflow-x-auto">
-          <table class="min-w-full divide-y" style="border-color: var(--border);">
+          <table
+            class="min-w-full divide-y"
+            style="border-color: var(--border);"
+          >
             <thead style="background-color: var(--bg-tertiary);">
               <tr>
                 <th
-                  class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider sticky left-0 z-10"
+                  class="sticky left-0 z-10 px-4 py-3 text-left text-xs font-semibold tracking-wider uppercase"
                   style="background-color: var(--bg-tertiary); color: var(--text-secondary); border-right: 1px solid var(--border);"
                 >
                   User
                 </th>
                 {customProjects.map((project) => (
                   <th
-                    class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider"
+                    class="px-4 py-3 text-center text-xs font-semibold tracking-wider uppercase"
                     style="color: var(--text-secondary); min-width: 120px;"
                   >
                     <div class="flex items-center justify-center gap-2">
                       <div
-                        class="w-3 h-3 rounded shrink-0"
+                        class="h-3 w-3 shrink-0 rounded"
                         style={`background-color: ${project.color}`}
                       ></div>
-                      <span safe class="truncate max-w-[100px]" title={project.name}>
+                      <span
+                        safe
+                        class="max-w-[100px] truncate"
+                        title={project.name}
+                      >
                         {project.name}
                       </span>
                     </div>
@@ -89,16 +110,20 @@ export function ManageProjectUsers({
                   id={`user-row-${user.id}`}
                 >
                   <td
-                    class="px-4 py-3 whitespace-nowrap sticky left-0 z-10"
+                    class="sticky left-0 z-10 px-4 py-3 whitespace-nowrap"
                     style="background-color: var(--bg-secondary); border-right: 1px solid var(--border);"
                   >
                     <div class="flex items-center gap-2">
-                      <span safe class="text-sm font-medium" style="color: var(--text-primary);">
+                      <span
+                        safe
+                        class="text-sm font-medium"
+                        style="color: var(--text-primary);"
+                      >
                         {user.email}
                       </span>
                       {!user.active && (
                         <span
-                          class="px-2 py-0.5 text-xs font-semibold rounded-full"
+                          class="rounded-full px-2 py-0.5 text-xs font-semibold"
                           style="background-color: var(--bg-tertiary); color: var(--text-secondary);"
                         >
                           Inactive
@@ -107,12 +132,21 @@ export function ManageProjectUsers({
                     </div>
                   </td>
                   {customProjects.map((project) => {
-                    const assigned = isUserAssignedToProject(user.id, project.id);
-                    const suppressed = isUserSuppressedInProject(user.id, project.id);
+                    const assigned = isUserAssignedToProject(
+                      user.id,
+                      project.id
+                    );
+                    const suppressed = isUserSuppressedInProject(
+                      user.id,
+                      project.id
+                    );
                     const cellId = `cell-${user.id}-${project.id}`;
 
                     return (
-                      <td class="px-4 py-3 text-center" style={suppressed ? "opacity: 0.5;" : ""}>
+                      <td
+                        class="px-4 py-3 text-center"
+                        style={suppressed ? "opacity: 0.5;" : ""}
+                      >
                         <div class="flex items-center justify-center">
                           <input
                             type="checkbox"
@@ -130,7 +164,7 @@ export function ManageProjectUsers({
                             hx-target="#manage-project-users"
                             hx-swap="outerHTML"
                             hx-trigger="change"
-                            class="w-4 h-4 rounded"
+                            class="h-4 w-4 rounded"
                             style="cursor: pointer; accent-color: var(--accent);"
                           />
                         </div>
@@ -146,4 +180,3 @@ export function ManageProjectUsers({
     </div>
   );
 }
-

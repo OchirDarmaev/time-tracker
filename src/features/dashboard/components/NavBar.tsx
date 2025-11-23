@@ -10,14 +10,9 @@ export default function NavBar({ currentPath }: NavBarProps) {
   const navItems = [
     { label: "Dashboard", path: dashboardPath, routePath: "/dashboard" },
     {
-      label: "Time Entries",
-      path: `${dashboardPath}/entries`,
-      routePath: "/dashboard/entries",
-    },
-    {
       label: "Reports",
-      path: `${dashboardPath}/reports`,
-      routePath: "/dashboard/reports",
+      path: `/reports`,
+      routePath: "/reports",
     },
     {
       label: "Projects",

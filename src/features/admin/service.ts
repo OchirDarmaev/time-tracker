@@ -1,4 +1,10 @@
-import { mockDb, type Project, type User, type ProjectUser, type Calendar } from "../../lib/mock_db";
+import {
+  mockDb,
+  type Project,
+  type User,
+  type ProjectUser,
+  type Calendar,
+} from "../../lib/mock_db";
 
 // Project Service
 export const projectService = {
@@ -14,11 +20,17 @@ export const projectService = {
     return projects.filter((p) => p.suppressed === 0);
   },
 
-  async create(name: string, color: string, isSystem: boolean = false): Promise<Project> {
+  async create(
+    name: string,
+    color: string,
+    isSystem: boolean = false
+  ): Promise<Project> {
     // Check if project with same name exists
     const existing = await mockDb.findProjectByName(name);
     if (existing) {
-      throw new Error("UNIQUE constraint failed: Project with this name already exists");
+      throw new Error(
+        "UNIQUE constraint failed: Project with this name already exists"
+      );
     }
     return await mockDb.createProject(name, 0, color, isSystem ? 1 : 0);
   },
@@ -34,7 +46,9 @@ export const projectService = {
     // Check if another project with same name exists
     const existing = await mockDb.findProjectByName(name);
     if (existing && existing.id !== id) {
-      throw new Error("UNIQUE constraint failed: Project with this name already exists");
+      throw new Error(
+        "UNIQUE constraint failed: Project with this name already exists"
+      );
     }
     await mockDb.updateProject(id, { name });
   },
@@ -66,7 +80,9 @@ export const projectService = {
     if (project.isSystem) {
       throw new Error("Cannot suppress system projects");
     }
-    await mockDb.updateProject(id, { suppressed: project.suppressed === 0 ? 1 : 0 });
+    await mockDb.updateProject(id, {
+      suppressed: project.suppressed === 0 ? 1 : 0,
+    });
   },
 };
 
@@ -83,7 +99,10 @@ export const projectUserService = {
     return await mockDb.findAllProjectUsers();
   },
 
-  async getByUserAndProject(userId: number, projectId: number): Promise<ProjectUser | null> {
+  async getByUserAndProject(
+    userId: number,
+    projectId: number
+  ): Promise<ProjectUser | null> {
     return await mockDb.findProjectUser(userId, projectId);
   },
 
@@ -91,7 +110,10 @@ export const projectUserService = {
     return await mockDb.createProjectUser(userId, projectId, 0);
   },
 
-  async toggleSuppressByUserAndProject(userId: number, projectId: number): Promise<void> {
+  async toggleSuppressByUserAndProject(
+    userId: number,
+    projectId: number
+  ): Promise<void> {
     const existing = await mockDb.findProjectUser(userId, projectId);
     if (!existing) {
       throw new Error("Project user assignment not found");
@@ -123,7 +145,9 @@ export const calendarService = {
   ): Promise<Calendar> {
     const existing = await mockDb.findCalendarByDate(date);
     if (existing) {
-      const updated = await mockDb.updateCalendar(existing.id, { day_type: dayType });
+      const updated = await mockDb.updateCalendar(existing.id, {
+        day_type: dayType,
+      });
       if (!updated) {
         throw new Error("Failed to update calendar");
       }
@@ -133,4 +157,3 @@ export const calendarService = {
     }
   },
 };
-

@@ -7,7 +7,7 @@ export function CreateProject({ errorMessage }: CreateProjectProps) {
     <div id="create-project" hx-target="this" hx-swap="outerHTML">
       {errorMessage ? (
         <div
-          class="mb-6 p-4 rounded-r-md"
+          class="mb-6 rounded-r-md p-4"
           style="background-color: rgba(248, 113, 113, 0.12); border-left: 4px solid var(--error);"
         >
           <div class="flex">
@@ -34,14 +34,16 @@ export function CreateProject({ errorMessage }: CreateProjectProps) {
         </div>
       ) : null}
       <div class="mb-8">
-        <h1 class="text-3xl font-bold mb-2" style="color: var(--text-primary);">
+        <h1 class="mb-2 text-3xl font-bold" style="color: var(--text-primary);">
           Create New Project
         </h1>
-        <p style="color: var(--text-secondary);">Add a new project for time tracking</p>
+        <p style="color: var(--text-secondary);">
+          Add a new project for time tracking
+        </p>
       </div>
 
       <div
-        class="rounded-xl shadow-sm p-6"
+        class="rounded-xl p-6 shadow-sm"
         style="background-color: var(--bg-secondary); border: 1px solid var(--border);"
       >
         <form
@@ -53,7 +55,7 @@ export function CreateProject({ errorMessage }: CreateProjectProps) {
           <div>
             <label
               for="project-name"
-              class="block text-sm font-medium mb-2"
+              class="mb-2 block text-sm font-medium"
               style="color: var(--text-primary);"
             >
               Project Name
@@ -63,7 +65,7 @@ export function CreateProject({ errorMessage }: CreateProjectProps) {
               id="project-name"
               name="name"
               required
-              class="w-full px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 transition-all input-modern"
+              class="input-modern w-full rounded-lg px-4 py-2.5 transition-all focus:ring-2 focus:outline-none"
               style="border-color: var(--border); background-color: var(--bg-tertiary); color: var(--text-primary);"
               placeholder="e.g., Marketing Campaign, Product Development"
             />
@@ -72,7 +74,7 @@ export function CreateProject({ errorMessage }: CreateProjectProps) {
           <div>
             <label
               for="project-color"
-              class="block text-sm font-medium mb-2"
+              class="mb-2 block text-sm font-medium"
               style="color: var(--text-primary);"
             >
               Color
@@ -84,15 +86,15 @@ export function CreateProject({ errorMessage }: CreateProjectProps) {
                 name="color"
                 value="#14b8a6"
                 oninput="document.getElementById('color-value').textContent = this.value"
-                class="w-20 h-12 border-2 rounded-lg cursor-pointer transition-colors"
+                class="h-12 w-20 cursor-pointer rounded-lg border-2 transition-colors"
                 style="border-color: var(--border);"
               />
               <div
-                class="flex-1 h-12 rounded-lg border-2 flex items-center justify-center"
+                class="flex h-12 flex-1 items-center justify-center rounded-lg border-2"
                 style="border-color: var(--border); background-color: var(--bg-tertiary);"
               >
                 <span
-                  class="text-xs font-mono"
+                  class="font-mono text-xs"
                   style="color: var(--text-secondary);"
                   id="color-value"
                 >
@@ -105,16 +107,19 @@ export function CreateProject({ errorMessage }: CreateProjectProps) {
             </p>
           </div>
 
-          <div class="flex items-center gap-4 pt-4" style="border-top: 1px solid var(--border);">
+          <div
+            class="flex items-center gap-4 pt-4"
+            style="border-top: 1px solid var(--border);"
+          >
             <button
               type="submit"
-              class="px-6 py-2.5 text-white font-medium rounded-lg shadow-sm hover:shadow-md focus:outline-none focus:ring-2 transition-all btn-primary"
+              class="btn-primary rounded-lg px-6 py-2.5 font-medium text-white shadow-sm transition-all hover:shadow-md focus:ring-2 focus:outline-none"
             >
               Create Project
             </button>
             <a
               href="/admin/projects"
-              class="px-6 py-2.5 rounded-lg focus:outline-none focus:ring-2 no-underline transition-all btn-secondary"
+              class="btn-secondary rounded-lg px-6 py-2.5 no-underline transition-all focus:ring-2 focus:outline-none"
             >
               Cancel
             </a>
@@ -124,4 +129,3 @@ export function CreateProject({ errorMessage }: CreateProjectProps) {
     </div>
   );
 }
-

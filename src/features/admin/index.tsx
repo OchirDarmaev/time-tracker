@@ -1,5 +1,4 @@
 import { Hono } from "hono";
-import { jsxRenderer } from "hono/jsx-renderer";
 import * as v from "valibot";
 import { sValidator } from "@hono/standard-validator";
 import { projectService } from "./service";

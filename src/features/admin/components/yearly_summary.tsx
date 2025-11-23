@@ -41,7 +41,9 @@ export function YearlySummary({
     const monthStr = `${year}-${String(m + 1).padStart(2, "0")}`;
     const monthDays = getAllDaysInMonth(monthStr + "-01");
     const monthCalendarDays = calendarDaysByMonth.get(monthStr) || [];
-    const monthDayTypeMap = new Map(monthCalendarDays.map((d) => [d.date, d.day_type]));
+    const monthDayTypeMap = new Map(
+      monthCalendarDays.map((d) => [d.date, d.day_type])
+    );
 
     let monthWorkdays = 0;
     let monthHolidays = 0;
@@ -73,29 +75,47 @@ export function YearlySummary({
 
   return (
     <div
-      class="rounded-2xl p-6 w-1/3"
+      class="w-1/3 rounded-2xl p-6"
       style="background-color: var(--bg-elevated); border: 1px solid var(--border-subtle); box-shadow: var(--shadow-sm);"
     >
-      <h2 class="text-xl font-semibold mb-4" style="color: var(--text-primary);">
+      <h2
+        class="mb-4 text-xl font-semibold"
+        style="color: var(--text-primary);"
+      >
         {year} Summary
       </h2>
       <div class="overflow-x-auto">
         <table class="w-full text-sm">
           <thead>
             <tr style="border-bottom: 1px solid var(--border);">
-              <th class="text-left py-2 px-3 font-medium" style="color: var(--text-secondary);">
+              <th
+                class="px-3 py-2 text-left font-medium"
+                style="color: var(--text-secondary);"
+              >
                 Month
               </th>
-              <th class="text-right py-2 px-3 font-medium" style="color: var(--info);">
+              <th
+                class="px-3 py-2 text-right font-medium"
+                style="color: var(--info);"
+              >
                 w
               </th>
-              <th class="text-right py-2 px-3 font-medium" style="color: var(--error);">
+              <th
+                class="px-3 py-2 text-right font-medium"
+                style="color: var(--error);"
+              >
                 h
               </th>
-              <th class="text-right py-2 px-3 font-medium" style="color: var(--text-tertiary);">
+              <th
+                class="px-3 py-2 text-right font-medium"
+                style="color: var(--text-tertiary);"
+              >
                 w
               </th>
-              <th class="text-right py-2 px-3 font-medium" style="color: var(--text-secondary);">
+              <th
+                class="px-3 py-2 text-right font-medium"
+                style="color: var(--text-secondary);"
+              >
                 t
               </th>
             </tr>
@@ -108,36 +128,45 @@ export function YearlySummary({
                   class={isCurrentMonth ? "font-semibold" : ""}
                   style={`border-bottom: 1px solid var(--border); ${isCurrentMonth ? "background-color: var(--bg-tertiary);" : ""}`}
                 >
-                  <td class="py-2 px-3" style="color: var(--text-primary);">
+                  <td class="px-3 py-2" style="color: var(--text-primary);">
                     <a
                       href={`/admin/partials/calendar?month=${summary.month}`}
                       hx-get={`/admin/partials/calendar?month=${summary.month}`}
                       hx-target="#calendar-management-content"
                       hx-swap="outerHTML"
-                      class="no-underline hover:underline flex items-center gap-2"
+                      class="flex items-center gap-2 no-underline hover:underline"
                       style={`color: ${isCurrentMonth ? "var(--accent)" : "var(--text-primary)"};`}
                     >
                       <span safe>{summary.monthName}</span>
                       {summary.notSet > 0 && (
                         <span
-                          class="w-2 h-2 rounded-full"
+                          class="h-2 w-2 rounded-full"
                           style="background-color: var(--warning);"
                           title={`${summary.notSet} day(s) not set`}
                         ></span>
                       )}
                     </a>
                   </td>
-                  <td class="py-2 px-3 text-right" style="color: var(--info);">
+                  <td class="px-3 py-2 text-right" style="color: var(--info);">
                     {summary.workdays}
                   </td>
-                  <td class="py-2 px-3 text-right" style="color: var(--error);">
+                  <td class="px-3 py-2 text-right" style="color: var(--error);">
                     {summary.holidays}
                   </td>
-                  <td class="py-2 px-3 text-right" style="color: var(--text-tertiary);">
+                  <td
+                    class="px-3 py-2 text-right"
+                    style="color: var(--text-tertiary);"
+                  >
                     {summary.weekends}
                   </td>
-                  <td class="py-2 px-3 text-right" style="color: var(--text-primary);">
-                    {summary.workdays + summary.holidays + summary.weekends + summary.notSet}
+                  <td
+                    class="px-3 py-2 text-right"
+                    style="color: var(--text-primary);"
+                  >
+                    {summary.workdays +
+                      summary.holidays +
+                      summary.weekends +
+                      summary.notSet}
                   </td>
                 </tr>
               );
@@ -145,21 +174,37 @@ export function YearlySummary({
           </tbody>
           <tfoot>
             <tr style="border-top: 2px solid var(--border);">
-              <td class="py-2 px-3 font-semibold" style="color: var(--text-primary);">
+              <td
+                class="px-3 py-2 font-semibold"
+                style="color: var(--text-primary);"
+              >
                 Total
               </td>
-              <td class="py-2 px-3 text-right font-semibold" style="color: var(--info);">
+              <td
+                class="px-3 py-2 text-right font-semibold"
+                style="color: var(--info);"
+              >
                 {yearlySummary.reduce((sum, m) => sum + m.workdays, 0)}
               </td>
-              <td class="py-2 px-3 text-right font-semibold" style="color: var(--error);">
+              <td
+                class="px-3 py-2 text-right font-semibold"
+                style="color: var(--error);"
+              >
                 {yearlySummary.reduce((sum, m) => sum + m.holidays, 0)}
               </td>
-              <td class="py-2 px-3 text-right font-semibold" style="color: var(--text-tertiary);">
+              <td
+                class="px-3 py-2 text-right font-semibold"
+                style="color: var(--text-tertiary);"
+              >
                 {yearlySummary.reduce((sum, m) => sum + m.weekends, 0)}
               </td>
-              <td class="py-2 px-3 text-right font-semibold" style="color: var(--text-primary);">
+              <td
+                class="px-3 py-2 text-right font-semibold"
+                style="color: var(--text-primary);"
+              >
                 {yearlySummary.reduce(
-                  (sum, m) => sum + m.workdays + m.holidays + m.weekends + m.notSet,
+                  (sum, m) =>
+                    sum + m.workdays + m.holidays + m.weekends + m.notSet,
                   0
                 )}
               </td>
@@ -170,4 +215,3 @@ export function YearlySummary({
     </div>
   );
 }
-

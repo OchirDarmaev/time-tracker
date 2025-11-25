@@ -7,16 +7,17 @@ import { EntriesTable } from "./components/EntriesTable";
 import { formatDate } from "../../lib/date_utils";
 import { projectModel } from "../../lib/models";
 import { timeEntryModel } from "../../lib/models";
-import { mockDb } from "../../lib/mock_db";
+import { repo } from "../../lib/repo";
 import { REQUIRED_DAILY_HOURS } from "./getMonthlySummaryData";
 import { requireAuth } from "../auth/middleware";
+import { ContextType } from "../..";
 
 // const DateOnlySchema = v.pipe(
 //   v.string(),
 //   v.regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format')
 // )
 
-const app = new Hono()
+const app = new Hono<ContextType>()
   .use(requireAuth)
   .get("/", sValidator("query", v.object({ date: v.string() })), async (c) => {
     const userId = getCookie(c, "user_id");
@@ -24,7 +25,7 @@ const app = new Hono()
       return c.redirect("/auth/login", 302);
     }
 
-    const user = await mockDb.findUserById(Number(userId));
+    const user = await repo.findUserById(c, Number(userId));
     if (!user) {
       return c.redirect("/auth/login", 302);
     }
@@ -37,7 +38,11 @@ const app = new Hono()
     };
 
     return c.render(
-      <QuickTimeReportView currentUser={currentUser} selectedDate={date} />
+      <QuickTimeReportView
+        c={c}
+        currentUser={currentUser}
+        selectedDate={date}
+      />
     );
   })
   .get("/entries", async (c) => {
@@ -46,7 +51,7 @@ const app = new Hono()
       return c.text("Unauthorized", 401);
     }
 
-    const user = await mockDb.findUserById(Number(userId));
+    const user = await repo.findUserById(c, Number(userId));
     if (!user) {
       return c.text("Unauthorized", 401);
     }
@@ -58,8 +63,9 @@ const app = new Hono()
       role: JSON.parse(user.roles)[0] || "account",
     };
 
-    const projects = await projectModel.getByUserId(currentUser.id);
+    const projects = await projectModel.getByUserId(c, currentUser.id);
     const entries = await timeEntryModel.getByUserIdAndDate(
+      c,
       currentUser.id,
       date
     );
@@ -83,7 +89,7 @@ const app = new Hono()
         return c.text("Unauthorized", 401);
       }
 
-      const user = await mockDb.findUserById(Number(userId));
+      const user = await repo.findUserById(c, Number(userId));
       if (!user) {
         return c.text("Unauthorized", 401);
       }
@@ -98,6 +104,7 @@ const app = new Hono()
       let localHours = 0;
       if (!data.hours) {
         const availableHours = await timeEntryModel.getTotalHoursByUserAndDate(
+          c,
           currentUser.id,
           data.date
         );
@@ -106,17 +113,18 @@ const app = new Hono()
         localHours = data.hours;
       }
 
-      const project = await projectModel.getById(data.project_id);
+      const project = await projectModel.getById(c, data.project_id);
       if (!project) {
         return c.text("Invalid project", 400);
       }
 
-      const userProjects = await projectModel.getByUserId(currentUser.id);
+      const userProjects = await projectModel.getByUserId(c, currentUser.id);
       if (!userProjects.find((p) => p.id === project.id)) {
         return c.text("Access denied to this project", 403);
       }
 
       await timeEntryModel.create(
+        c,
         currentUser.id,
         project.id,
         data.date,
@@ -126,6 +134,7 @@ const app = new Hono()
 
       return c.render(
         <QuickTimeReportView
+          c={c}
           currentUser={currentUser}
           selectedDate={data.date}
         />
@@ -138,7 +147,7 @@ const app = new Hono()
       return c.text("Unauthorized", 401);
     }
 
-    const user = await mockDb.findUserById(Number(userId));
+    const user = await repo.findUserById(c, Number(userId));
     if (!user) {
       return c.text("Unauthorized", 401);
     }
@@ -150,7 +159,7 @@ const app = new Hono()
       role: JSON.parse(user.roles)[0] || "account",
     };
 
-    const entry = await timeEntryModel.getById(entryId);
+    const entry = await timeEntryModel.getById(c, entryId);
     if (!entry) {
       return c.text("Entry not found", 404);
     }
@@ -159,11 +168,15 @@ const app = new Hono()
       return c.text("Access denied", 403);
     }
 
-    await timeEntryModel.delete(entryId);
+    await timeEntryModel.delete(c, entryId);
     const date = entry.date;
 
     return c.render(
-      <QuickTimeReportView currentUser={currentUser} selectedDate={date} />
+      <QuickTimeReportView
+        c={c}
+        currentUser={currentUser}
+        selectedDate={date}
+      />
     );
   })
   .post(
@@ -183,7 +196,7 @@ const app = new Hono()
         return c.text("Unauthorized", 401);
       }
 
-      const user = await mockDb.findUserById(Number(userId));
+      const user = await repo.findUserById(c, Number(userId));
       if (!user) {
         return c.text("Unauthorized", 401);
       }
@@ -198,6 +211,7 @@ const app = new Hono()
       let localHours: number;
       if (!data.hours) {
         const availableHours = await timeEntryModel.getTotalHoursByUserAndDate(
+          c,
           currentUser.id,
           data.date
         );
@@ -206,13 +220,14 @@ const app = new Hono()
         localHours = data.hours;
       }
 
-      const userProjects = await projectModel.getByUserId(currentUser.id);
+      const userProjects = await projectModel.getByUserId(c, currentUser.id);
       const project = userProjects.find((p) => p.id === data.project_id);
       if (!project) {
         return c.text("Access denied to this project", 403);
       }
 
       await timeEntryModel.create(
+        c,
         currentUser.id,
         data.project_id,
         data.date,
@@ -222,6 +237,7 @@ const app = new Hono()
 
       return c.render(
         <QuickTimeReportView
+          c={c}
           currentUser={currentUser}
           selectedDate={data.date}
         />
@@ -243,7 +259,7 @@ const app = new Hono()
         return c.text("Unauthorized", 401);
       }
 
-      const user = await mockDb.findUserById(Number(userId));
+      const user = await repo.findUserById(c, Number(userId));
       if (!user) {
         return c.text("Unauthorized", 401);
       }
@@ -256,7 +272,7 @@ const app = new Hono()
         role: JSON.parse(user.roles)[0] || "account",
       };
 
-      const entry = await timeEntryModel.getById(entryId);
+      const entry = await timeEntryModel.getById(c, entryId);
       if (!entry) {
         return c.text("Entry not found", 404);
       }
@@ -273,10 +289,11 @@ const app = new Hono()
         updates.comment = data.comment || null;
       }
 
-      await timeEntryModel.update(entryId, updates);
+      await timeEntryModel.update(c, entryId, updates);
 
       return c.render(
         <QuickTimeReportView
+          c={c}
           currentUser={currentUser}
           selectedDate={entry.date}
         />
@@ -295,7 +312,7 @@ const app = new Hono()
         return c.text("Unauthorized", 401);
       }
 
-      const user = await mockDb.findUserById(Number(userId));
+      const user = await repo.findUserById(c, Number(userId));
       if (!user) {
         return c.text("Unauthorized", 401);
       }
@@ -307,7 +324,7 @@ const app = new Hono()
         role: JSON.parse(user.roles)[0] || "account",
       };
 
-      const entry = await timeEntryModel.getById(entryId);
+      const entry = await timeEntryModel.getById(c, entryId);
       if (!entry) {
         return c.text("Entry not found", 404);
       }
@@ -317,10 +334,14 @@ const app = new Hono()
       }
 
       const date = entry.date;
-      await timeEntryModel.delete(entryId);
+      await timeEntryModel.delete(c, entryId);
 
       return c.render(
-        <QuickTimeReportView currentUser={currentUser} selectedDate={date} />
+        <QuickTimeReportView
+          c={c}
+          currentUser={currentUser}
+          selectedDate={date}
+        />
       );
     }
   );

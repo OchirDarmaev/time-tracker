@@ -1,4 +1,4 @@
-import type { TimeEntry, Project } from "../../../lib/mock_db";
+import type { TimeEntry, Project } from "../../../lib/repo";
 
 export function EntriesTable({
   entries,

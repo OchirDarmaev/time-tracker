@@ -13,7 +13,7 @@ const app = new Hono()
     async (c) => {
       const month =
         c.req.valid("query").month || getMonthFromDate(formatDate(new Date()));
-      return c.render(<ReportView month={month} />);
+      return c.render(<ReportView c={c} month={month} />);
     }
   );
 

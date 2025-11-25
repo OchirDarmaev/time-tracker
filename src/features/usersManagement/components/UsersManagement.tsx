@@ -1,8 +1,4 @@
-import {
-  type User,
-  type Project,
-  type ProjectUser,
-} from "../../../lib/mock_db";
+import { type User, type Project, type ProjectUser } from "../../../lib/repo";
 
 interface ManageProjectUsersProps {
   users: User[];

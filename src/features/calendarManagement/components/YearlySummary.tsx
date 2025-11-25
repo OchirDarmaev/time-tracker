@@ -1,4 +1,4 @@
-import { type Calendar } from "../../../lib/mock_db";
+import { type Calendar } from "../../../lib/repo";
 import { getAllDaysInMonth } from "../../../lib/date_utils";
 
 interface YearlySummaryProps {

@@ -1,34 +1,50 @@
-import { mockDb, type Project, type TimeEntry, type Calendar } from "./mock_db";
+import { repo, type Project, type TimeEntry, type Calendar } from "./repo";
+import type { Context } from "hono";
+import { ContextType } from "..";
 
 // Project Model - async wrappers
 export const projectModel = {
-  getById: async (id: number): Promise<Project | null> => {
-    return await mockDb.findProjectById(id);
+  getById: async (
+    c: Context<ContextType>,
+    id: number
+  ): Promise<Project | null> => {
+    return await repo.findProjectById(c, id);
   },
 
-  getByUserId: async (userId: number): Promise<Project[]> => {
-    return await mockDb.getUserProjects(userId);
+  getByUserId: async (
+    c: Context<ContextType>,
+    userId: number
+  ): Promise<Project[]> => {
+    return await repo.getUserProjects(c, userId);
   },
 };
 
 // TimeEntry Model - async wrappers
 export const timeEntryModel = {
-  getById: async (id: number): Promise<TimeEntry | null> => {
-    return await mockDb.findTimeEntryById(id);
+  getById: async (
+    c: Context<ContextType>,
+    id: number
+  ): Promise<TimeEntry | null> => {
+    return await repo.findTimeEntryById(c, id);
   },
 
-  getByUserId: async (userId: number): Promise<TimeEntry[]> => {
-    return await mockDb.findTimeEntriesByUserId(userId);
+  getByUserId: async (
+    c: Context<ContextType>,
+    userId: number
+  ): Promise<TimeEntry[]> => {
+    return await repo.findTimeEntriesByUserId(c, userId);
   },
 
   getByUserIdAndDate: async (
+    c: Context<ContextType>,
     userId: number,
     date: string
   ): Promise<TimeEntry[]> => {
-    return await mockDb.findTimeEntriesByUserAndDateRange(userId, date, date);
+    return await repo.findTimeEntriesByUserAndDateRange(c, userId, date, date);
   },
 
   getByUserIdAndMonth: async (
+    c: Context<ContextType>,
     userId: number,
     month: string
   ): Promise<TimeEntry[]> => {
@@ -37,7 +53,8 @@ export const timeEntryModel = {
     const date = new Date(startDate + "T00:00:00");
     const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
     const endDate = `${month}-${String(lastDay.getDate()).padStart(2, "0")}`;
-    return await mockDb.findTimeEntriesByUserAndDateRange(
+    return await repo.findTimeEntriesByUserAndDateRange(
+      c,
       userId,
       startDate,
       endDate
@@ -45,10 +62,12 @@ export const timeEntryModel = {
   },
 
   getTotalHoursByUserAndDate: async (
+    c: Context<ContextType>,
     userId: number,
     date: string
   ): Promise<number> => {
-    const entries = await mockDb.findTimeEntriesByUserAndDateRange(
+    const entries = await repo.findTimeEntriesByUserAndDateRange(
+      c,
       userId,
       date,
       date
@@ -57,13 +76,15 @@ export const timeEntryModel = {
   },
 
   create: async (
+    c: Context<ContextType>,
     userId: number,
     projectId: number,
     date: string,
     hours: number,
     comment: string | null
   ): Promise<TimeEntry> => {
-    return await mockDb.createTimeEntry(
+    return await repo.createTimeEntry(
+      c,
       userId,
       projectId,
       date,
@@ -73,29 +94,36 @@ export const timeEntryModel = {
   },
 
   update: async (
+    c: Context<ContextType>,
     id: number,
     updates: { hours?: number; comment?: string | null }
   ): Promise<TimeEntry | null> => {
-    return await mockDb.updateTimeEntry(id, updates);
+    return await repo.updateTimeEntry(c, id, updates);
   },
 
-  delete: async (id: number): Promise<boolean> => {
-    return await mockDb.deleteTimeEntry(id);
+  delete: async (c: Context<ContextType>, id: number): Promise<boolean> => {
+    return await repo.deleteTimeEntry(c, id);
   },
 };
 
 // Calendar Model - async wrappers
 export const calendarModel = {
-  getByDate: async (date: string): Promise<Calendar | null> => {
-    return await mockDb.findCalendarByDate(date);
+  getByDate: async (
+    c: Context<ContextType>,
+    date: string
+  ): Promise<Calendar | null> => {
+    return await repo.findCalendarByDate(c, date);
   },
 
-  getByMonth: async (month: string): Promise<Calendar[]> => {
+  getByMonth: async (
+    c: Context<ContextType>,
+    month: string
+  ): Promise<Calendar[]> => {
     // month is in YYYY-MM format
     const startDate = `${month}-01`;
     const date = new Date(startDate + "T00:00:00");
     const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
     const endDate = `${month}-${String(lastDay.getDate()).padStart(2, "0")}`;
-    return await mockDb.findCalendarByDateRange(startDate, endDate);
+    return await repo.findCalendarByDateRange(c, startDate, endDate);
   },
 };

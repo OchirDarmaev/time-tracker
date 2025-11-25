@@ -1,5 +1,7 @@
+import { ContextType } from "../..";
 import { projectModel, timeEntryModel } from "../../lib/models";
-import type { TimeEntry, Project } from "../../lib/mock_db";
+import type { TimeEntry, Project } from "../../lib/repo";
+import type { Context } from "hono";
 
 export type Segment = {
   entry_id?: number;
@@ -21,12 +23,18 @@ export type TimeSliderData = {
 };
 
 export async function getTimeSliderData(
+  c: Context<ContextType>,
   currentUser: { id: number; email: string; role: string },
   date: string
 ): Promise<TimeSliderData> {
-  const entries = await timeEntryModel.getByUserIdAndDate(currentUser.id, date);
-  const projects = await projectModel.getByUserId(currentUser.id);
+  const entries = await timeEntryModel.getByUserIdAndDate(
+    c,
+    currentUser.id,
+    date
+  );
+  const projects = await projectModel.getByUserId(c, currentUser.id);
   const totalHours = await timeEntryModel.getTotalHoursByUserAndDate(
+    c,
     currentUser.id,
     date
   );

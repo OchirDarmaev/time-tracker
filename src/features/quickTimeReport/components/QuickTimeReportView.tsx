@@ -9,18 +9,22 @@ import { getMonthlySummaryData } from "../getMonthlySummaryData";
 import MonthlySummary from "./MonthlySummary";
 import TimeSlider from "./TimeSlider";
 import { getTimeSliderData } from "../getTimeSliderData";
+import type { Context } from "hono";
 
 export default async function QuickTimeReportView({
+  c,
   currentUser,
   selectedDate,
 }: {
+  c: Context<ContextType>;
   currentUser: { id: number; email: string; role: string };
   selectedDate: string;
 }) {
-  const projects = await projectModel.getByUserId(currentUser.id);
+  const projects = await projectModel.getByUserId(c, currentUser.id);
 
   const month = getMonthFromDate(selectedDate);
   const monthEntries = await timeEntryModel.getByUserIdAndMonth(
+    c,
     currentUser.id,
     month
   );
@@ -31,7 +35,7 @@ export default async function QuickTimeReportView({
     Array<{ project_id: number; hours: number }>
   > = {};
 
-  const calendarDays = await calendarModel.getByMonth(month);
+  const calendarDays = await calendarModel.getByMonth(c, month);
   const dayConfigurations: Record<
     string,
     "workday" | "public_holiday" | "weekend"
@@ -40,7 +44,7 @@ export default async function QuickTimeReportView({
     dayConfigurations[day.date] = day.day_type;
   });
 
-  const selectedDayConfig = await calendarModel.getByDate(selectedDate);
+  const selectedDayConfig = await calendarModel.getByDate(c, selectedDate);
 
   allDaysInMonth.forEach((day) => {
     dayHoursMap[day.date] = 0;
@@ -70,10 +74,11 @@ export default async function QuickTimeReportView({
   const selectedDayType = selectedDayConfig?.day_type;
 
   const monthlySummaryData = await getMonthlySummaryData(
+    c,
     selectedDate,
     currentUser
   );
-  const timeSliderData = await getTimeSliderData(currentUser, selectedDate);
+  const timeSliderData = await getTimeSliderData(c, currentUser, selectedDate);
 
   return (
     <div id="time-tracking-content" class="space-y-8">

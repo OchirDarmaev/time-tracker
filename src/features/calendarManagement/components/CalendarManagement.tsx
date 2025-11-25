@@ -1,5 +1,5 @@
 import { parseDate } from "../../../lib/date_utils";
-import { type Calendar } from "../../../lib/mock_db";
+import { type Calendar } from "../../../lib/repo";
 import { YearlySummary } from "./YearlySummary";
 import { MonthlyCalendar } from "./MonthlyCalendar";
 

@@ -1,13 +1,18 @@
-import { mockDb, type Project } from "../../lib/mock_db";
+import { repo, type Project } from "../../lib/repo";
+import type { Context } from "hono";
+import { ContextType } from "../..";
 
 // Project Service
 export const projectService = {
-  async getById(id: number): Promise<Project | null> {
-    return await mockDb.findProjectById(id);
+  async getById(c: Context<ContextType>, id: number): Promise<Project | null> {
+    return await repo.findProjectById(c, id);
   },
 
-  async getAll(includeSuppressed: boolean = false): Promise<Project[]> {
-    const projects = await mockDb.findAllProjects();
+  async getAll(
+    c: Context<ContextType>,
+    includeSuppressed: boolean = false
+  ): Promise<Project[]> {
+    const projects = await repo.findAllProjects(c);
     if (includeSuppressed) {
       return projects;
     }
@@ -15,22 +20,27 @@ export const projectService = {
   },
 
   async create(
+    c: Context<ContextType>,
     name: string,
     color: string,
     isSystem: boolean = false
   ): Promise<Project> {
     // Check if project with same name exists
-    const existing = await mockDb.findProjectByName(name);
+    const existing = await repo.findProjectByName(c, name);
     if (existing) {
       throw new Error(
         "UNIQUE constraint failed: Project with this name already exists"
       );
     }
-    return await mockDb.createProject(name, 0, color, isSystem ? 1 : 0);
+    return await repo.createProject(c, name, 0, color, isSystem ? 1 : 0);
   },
 
-  async updateName(id: number, name: string): Promise<void> {
-    const project = await mockDb.findProjectById(id);
+  async updateName(
+    c: Context<ContextType>,
+    id: number,
+    name: string
+  ): Promise<void> {
+    const project = await repo.findProjectById(c, id);
     if (!project) {
       throw new Error("Project not found");
     }
@@ -38,43 +48,51 @@ export const projectService = {
       throw new Error("Cannot modify system projects");
     }
     // Check if another project with same name exists
-    const existing = await mockDb.findProjectByName(name);
+    const existing = await repo.findProjectByName(c, name);
     if (existing && existing.id !== id) {
       throw new Error(
         "UNIQUE constraint failed: Project with this name already exists"
       );
     }
-    await mockDb.updateProject(id, { name });
+    await repo.updateProject(c, id, { name });
   },
 
-  async updateColor(id: number, color: string): Promise<void> {
-    const project = await mockDb.findProjectById(id);
+  async updateColor(
+    c: Context<ContextType>,
+    id: number,
+    color: string
+  ): Promise<void> {
+    const project = await repo.findProjectById(c, id);
     if (!project) {
       throw new Error("Project not found");
     }
-    await mockDb.updateProject(id, { color });
+    await repo.updateProject(c, id, { color });
   },
 
-  async updateSuppressed(id: number, suppressed: boolean): Promise<void> {
-    const project = await mockDb.findProjectById(id);
+  async updateSuppressed(
+    c: Context<ContextType>,
+    id: number,
+    suppressed: boolean
+  ): Promise<void> {
+    const project = await repo.findProjectById(c, id);
     if (!project) {
       throw new Error("Project not found");
     }
     if (project.isSystem) {
       throw new Error("Cannot suppress system projects");
     }
-    await mockDb.updateProject(id, { suppressed: suppressed ? 1 : 0 });
+    await repo.updateProject(c, id, { suppressed: suppressed ? 1 : 0 });
   },
 
-  async toggleSuppress(id: number): Promise<void> {
-    const project = await mockDb.findProjectById(id);
+  async toggleSuppress(c: Context<ContextType>, id: number): Promise<void> {
+    const project = await repo.findProjectById(c, id);
     if (!project) {
       throw new Error("Project not found");
     }
     if (project.isSystem) {
       throw new Error("Cannot suppress system projects");
     }
-    await mockDb.updateProject(id, {
+    await repo.updateProject(c, id, {
       suppressed: project.suppressed === 0 ? 1 : 0,
     });
   },

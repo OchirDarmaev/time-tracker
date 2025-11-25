@@ -1,7 +1,7 @@
 import { drizzle } from "drizzle-orm/d1";
 import type { Context } from "hono";
-import type{ Resource } from "sst";
+import { ContextType } from "..";
 
-export const db = (c: Context<{ Bindings: typeof Resource }>) => {
+export const db = (c: Context<ContextType>) => {
   return drizzle(c.env.D1);
 };

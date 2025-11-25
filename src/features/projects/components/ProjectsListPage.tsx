@@ -1,4 +1,4 @@
-import { type Project } from "../../../lib/mock_db";
+import { type Project } from "../../../lib/repo";
 
 interface ProjectsListProps {
   projects: Project[];

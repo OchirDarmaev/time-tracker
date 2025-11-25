@@ -4,19 +4,27 @@ import {
   formatDate,
   getMonthFromDate,
 } from "../../../lib/date_utils";
-import { mockDb } from "../../../lib/mock_db";
+import { repo } from "../../../lib/repo";
 import { client } from "../../../lib/client";
 import DashboardLayout from "../../../lib/layouts/DashboardLayout";
+import type { Context } from "hono";
+import { ContextType } from "../../..";
 
 const REQUIRED_DAILY_HOURS = 8;
 
-export async function ReportView({ month }: { month: string }) {
+export async function ReportView({
+  c,
+  month,
+}: {
+  c: Context<ContextType>;
+  month: string;
+}) {
   const baseDate = parseDate(month + "-01");
   const year = baseDate.getFullYear();
   const monthNum = baseDate.getMonth() + 1;
 
   // Get all users
-  const allUsers = await mockDb.findAllUsers();
+  const allUsers = await repo.findAllUsers(c);
   const users = allUsers.filter((u) => u.active === 1);
 
   // Get all days in the month
@@ -26,17 +34,22 @@ export async function ReportView({ month }: { month: string }) {
   const startDate = `${year}-${String(monthNum).padStart(2, "0")}-01`;
   const lastDay = new Date(year, monthNum, 0).getDate();
   const endDate = `${year}-${String(monthNum).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}`;
-  const timeEntries = await mockDb.findTimeEntriesByDateRange(
+  const timeEntries = await repo.findTimeEntriesByDateRange(
+    c,
     startDate,
     endDate
   );
 
   // Get all projects to map project IDs to project info
-  const allProjects = await mockDb.findAllProjects();
+  const allProjects = await repo.findAllProjects(c);
   const projectMap = new Map(allProjects.map((p) => [p.id, p]));
 
   // Get calendar days for day type info
-  const calendarDays = await mockDb.findCalendarByDateRange(startDate, endDate);
+  const calendarDays = await repo.findCalendarByDateRange(
+    c,
+    startDate,
+    endDate
+  );
   const dayTypeMap = new Map(calendarDays.map((d) => [d.date, d.day_type]));
 
   // Build a map of user_id -> date -> entries

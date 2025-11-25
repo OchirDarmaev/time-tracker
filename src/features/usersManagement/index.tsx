@@ -6,13 +6,14 @@ import { requireAuth } from "../auth/middleware";
 import { projectService } from "../projects/service";
 import { UsersManagement } from "./components/UsersManagement";
 import { userService, projectUserService } from "./service";
+import { ContextType } from "../..";
 
-const app = new Hono()
+const app = new Hono<ContextType>()
   .use(requireAuth)
   .get("/", async (c) => {
-    const users = await userService.getAll();
-    const projects = await projectService.getAll(true);
-    const projectUsers = await projectUserService.getAll();
+    const users = await userService.getAll(c);
+    const projects = await projectService.getAll(c, true);
+    const projectUsers = await projectUserService.getAll(c);
     return c.render(
       <UsersManagement
         users={users}
@@ -34,22 +35,24 @@ const app = new Hono()
       try {
         const { user_id, project_id } = c.req.valid("form");
         const existing = await projectUserService.getByUserAndProject(
+          c,
           user_id,
           project_id
         );
         if (existing) {
           if (existing.suppressed === 1) {
             await projectUserService.toggleSuppressByUserAndProject(
+              c,
               user_id,
               project_id
             );
           }
         } else {
-          await projectUserService.create(user_id, project_id);
+          await projectUserService.create(c, user_id, project_id);
         }
-        const users = await userService.getAll();
-        const projects = await projectService.getAll(true);
-        const projectUsers = await projectUserService.getAll();
+        const users = await userService.getAll(c);
+        const projects = await projectService.getAll(c, true);
+        const projectUsers = await projectUserService.getAll(c);
         return c.render(
           <UsersManagement
             users={users}
@@ -79,6 +82,7 @@ const app = new Hono()
       try {
         const { user_id, project_id } = c.req.valid("form");
         const existing = await projectUserService.getByUserAndProject(
+          c,
           user_id,
           project_id
         );
@@ -87,13 +91,14 @@ const app = new Hono()
         }
         if (existing.suppressed === 0) {
           await projectUserService.toggleSuppressByUserAndProject(
+            c,
             user_id,
             project_id
           );
         }
-        const users = await userService.getAll();
-        const projects = await projectService.getAll(true);
-        const projectUsers = await projectUserService.getAll();
+        const users = await userService.getAll(c);
+        const projects = await projectService.getAll(c, true);
+        const projectUsers = await projectUserService.getAll(c);
         return c.render(
           <UsersManagement
             users={users}

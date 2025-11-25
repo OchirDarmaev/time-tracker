@@ -5,9 +5,10 @@ import { calendarService } from "./service";
 import { CalendarManagement } from "./components/CalendarManagement";
 import { requireAuth } from "../auth/middleware";
 import { getMonthFromDate, formatDate } from "../../lib/date_utils";
-import { type Calendar } from "../../lib/mock_db";
+import { type Calendar } from "../../lib/repo";
+import { ContextType } from "../..";
 
-const app = new Hono()
+const app = new Hono<ContextType>()
   .use(requireAuth)
   .get(
     "/",
@@ -22,7 +23,7 @@ const app = new Hono()
 
       for (let m = 0; m < 12; m++) {
         const monthStr = `${year}-${String(m + 1).padStart(2, "0")}`;
-        const days = await calendarService.getByMonth(monthStr);
+        const days = await calendarService.getByMonth(c, monthStr);
         calendarDaysByMonth.set(monthStr, days);
       }
 
@@ -45,7 +46,7 @@ const app = new Hono()
     ),
     async (c) => {
       const { date, day_type } = c.req.valid("form");
-      await calendarService.createOrUpdate(date, day_type);
+      await calendarService.createOrUpdate(c, date, day_type);
       const month = getMonthFromDate(date);
 
       // Get calendar data for the entire year for yearly summary
@@ -54,7 +55,7 @@ const app = new Hono()
 
       for (let m = 0; m < 12; m++) {
         const monthStr = `${year}-${String(m + 1).padStart(2, "0")}`;
-        const days = await calendarService.getByMonth(monthStr);
+        const days = await calendarService.getByMonth(c, monthStr);
         calendarDaysByMonth.set(monthStr, days);
       }
 

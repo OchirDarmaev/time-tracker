@@ -3,6 +3,6 @@ import {
   type User,
   type ProjectUser,
   type Calendar,
-} from "../../lib/mock_db";
+} from "../../lib/repo";
 
 export type { Project, User, ProjectUser, Calendar };

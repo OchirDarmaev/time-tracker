@@ -11,13 +11,12 @@ import usersManagement from "./features/usersManagement";
 import users from "./features/users";
 import calendarManagement from "./features/calendarManagement";
 import calendar from "./features/calendar";
-import { db } from "./lib/db";
-import { users as usersTable } from "./db/schema";
 import type { Resource } from "sst";
 
+export type Bindings = typeof Resource;
+export type ContextType = { Bindings: Bindings };
 
-
-const app = new Hono<{ Bindings: typeof Resource }>()
+const app = new Hono<ContextType>()
   .use("/", renderer)
   .use("/auth", renderer)
   .use("/dashboard", renderer)
@@ -37,11 +36,7 @@ const app = new Hono<{ Bindings: typeof Resource }>()
   .route("/partials/quickTimeReport", quickTimeReport)
   .route("/partials/timeTrackingReport", timeTrackingReport)
   .route("/partials/usersManagement", usersManagement)
-  .route("/partials/calendarManagement", calendarManagement)
-  .get("/api/db", async (c) => {
-    const result = await db(c).select().from(usersTable).all();
-    return c.text(JSON.stringify(result));
-  });
+  .route("/partials/calendarManagement", calendarManagement);
 
 export default app;
 

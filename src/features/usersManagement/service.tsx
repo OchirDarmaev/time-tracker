@@ -1,40 +1,48 @@
 // User Service
 
-import { mockDb } from "../../lib/mock_db";
+import { ContextType } from "../..";
+import { repo } from "../../lib/repo";
 import { User, ProjectUser, Calendar } from "../calendarManagement/models";
+import type { Context } from "hono";
 
 export const userService = {
-  async getAll(): Promise<User[]> {
-    return await mockDb.findAllUsers();
+  async getAll(c: Context<ContextType>): Promise<User[]> {
+    return await repo.findAllUsers(c);
   },
 };
 // ProjectUser Service
 
 export const projectUserService = {
-  async getAll(): Promise<ProjectUser[]> {
-    return await mockDb.findAllProjectUsers();
+  async getAll(c: Context<ContextType>): Promise<ProjectUser[]> {
+    return await repo.findAllProjectUsers(c);
   },
 
   async getByUserAndProject(
+    c: Context<ContextType>,
     userId: number,
     projectId: number
   ): Promise<ProjectUser | null> {
-    return await mockDb.findProjectUser(userId, projectId);
+    return await repo.findProjectUser(c, userId, projectId);
   },
 
-  async create(userId: number, projectId: number): Promise<ProjectUser> {
-    return await mockDb.createProjectUser(userId, projectId, 0);
+  async create(
+    c: Context<ContextType>,
+    userId: number,
+    projectId: number
+  ): Promise<ProjectUser> {
+    return await repo.createProjectUser(c, userId, projectId, 0);
   },
 
   async toggleSuppressByUserAndProject(
+    c: Context<ContextType>,
     userId: number,
     projectId: number
   ): Promise<void> {
-    const existing = await mockDb.findProjectUser(userId, projectId);
+    const existing = await repo.findProjectUser(c, userId, projectId);
     if (!existing) {
       throw new Error("Project user assignment not found");
     }
-    await mockDb.updateProjectUser(existing.id, {
+    await repo.updateProjectUser(c, existing.id, {
       suppressed: existing.suppressed === 0 ? 1 : 0,
     });
   },
@@ -42,26 +50,33 @@ export const projectUserService = {
 // Calendar Service
 
 export const calendarService = {
-  async getByDate(date: string): Promise<Calendar | null> {
-    return await mockDb.findCalendarByDate(date);
+  async getByDate(
+    c: Context<ContextType>,
+    date: string
+  ): Promise<Calendar | null> {
+    return await repo.findCalendarByDate(c, date);
   },
 
-  async getByMonth(month: string): Promise<Calendar[]> {
+  async getByMonth(
+    c: Context<ContextType>,
+    month: string
+  ): Promise<Calendar[]> {
     // month is in YYYY-MM format
     const startDate = `${month}-01`;
     const date = new Date(startDate + "T00:00:00");
     const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
     const endDate = `${month}-${String(lastDay.getDate()).padStart(2, "0")}`;
-    return await mockDb.findCalendarByDateRange(startDate, endDate);
+    return await repo.findCalendarByDateRange(c, startDate, endDate);
   },
 
   async createOrUpdate(
+    c: Context<ContextType>,
     date: string,
     dayType: "workday" | "public_holiday" | "weekend"
   ): Promise<Calendar> {
-    const existing = await mockDb.findCalendarByDate(date);
+    const existing = await repo.findCalendarByDate(c, date);
     if (existing) {
-      const updated = await mockDb.updateCalendar(existing.id, {
+      const updated = await repo.updateCalendar(c, existing.id, {
         day_type: dayType,
       });
       if (!updated) {
@@ -69,7 +84,7 @@ export const calendarService = {
       }
       return updated;
     } else {
-      return await mockDb.createCalendar(date, dayType);
+      return await repo.createCalendar(c, date, dayType);
     }
   },
 };

@@ -1,6 +1,8 @@
 import { calendarModel, projectModel, timeEntryModel } from "../../lib/models";
 import { getMonthFromDate, getAllDaysInMonth } from "../../lib/date_utils";
-import type { Calendar, TimeEntry, Project } from "../../lib/mock_db";
+import type { Calendar, TimeEntry, Project } from "../../lib/repo";
+import type { Context } from "hono";
+import { ContextType } from "../..";
 
 export const REQUIRED_DAILY_HOURS = 8;
 export const HOLIDAY_PROJECT_NAME = "Holiday";
@@ -25,17 +27,19 @@ export type MonthlySummaryData = {
 };
 
 export async function getMonthlySummaryData(
+  c: Context<ContextType>,
   date: string,
   currentUser: { id: number; email: string; role: string }
 ): Promise<MonthlySummaryData> {
   const month = getMonthFromDate(date);
   const monthlyEntries = await timeEntryModel.getByUserIdAndMonth(
+    c,
     currentUser.id,
     month
   );
-  const projects = await projectModel.getByUserId(currentUser.id);
+  const projects = await projectModel.getByUserId(c, currentUser.id);
 
-  const calendarDays = await calendarModel.getByMonth(month);
+  const calendarDays = await calendarModel.getByMonth(c, month);
   const allDaysInMonth = getAllDaysInMonth(date);
 
   const dayTypeMap = new Map<

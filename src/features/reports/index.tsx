@@ -4,8 +4,9 @@ import { sValidator } from "@hono/standard-validator";
 import { requireAuth } from "../auth/middleware";
 import { getMonthFromDate, formatDate } from "../../lib/date_utils";
 import { ReportView } from "../timeTrackingReport/components/report_view";
+import { ContextType } from "../..";
 
-const app = new Hono()
+const app = new Hono<ContextType>()
   .use(requireAuth)
   .get(
     "/",
@@ -13,9 +14,8 @@ const app = new Hono()
     async (c) => {
       const month =
         c.req.valid("query").month || getMonthFromDate(formatDate(new Date()));
-      return c.render(<ReportView month={month} />);
+      return c.render(<ReportView c={c} month={month} />);
     }
   );
 
 export default app;
-

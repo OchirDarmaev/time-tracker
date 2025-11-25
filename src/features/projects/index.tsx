@@ -13,7 +13,7 @@ const app = new Hono()
 
   // Projects routes
   .get("/", async (c) => {
-    const projects = await projectService.getAll(true);
+    const projects = await projectService.getAll(c, true);
     return c.render(
       <DashboardLayout currentPath={c.req.path}>
         <ProjectsListPage projects={projects} />
@@ -40,8 +40,8 @@ const app = new Hono()
       try {
         const { name, color } = c.req.valid("form");
         const projectColor = color && color.trim() !== "" ? color : "#14b8a6";
-        await projectService.create(name, projectColor, false);
-        const projects = await projectService.getAll(true);
+        await projectService.create(c, name, projectColor, false);
+        const projects = await projectService.getAll(c, true);
         return c.render(<ProjectsListPage projects={projects} />);
       } catch (error: unknown) {
         const errorMessage =
@@ -61,8 +61,8 @@ const app = new Hono()
       try {
         const { id } = c.req.valid("param");
         const { name } = c.req.valid("form");
-        await projectService.updateName(id, name);
-        const projects = await projectService.getAll(true);
+        await projectService.updateName(c, id, name);
+        const projects = await projectService.getAll(c, true);
         return c.render(<ProjectsListPage projects={projects} />);
       } catch (error: unknown) {
         const errorMessage =
@@ -85,8 +85,8 @@ const app = new Hono()
       try {
         const { id } = c.req.valid("param");
         const { color } = c.req.valid("form");
-        await projectService.updateColor(id, color);
-        const projects = await projectService.getAll(true);
+        await projectService.updateColor(c, id, color);
+        const projects = await projectService.getAll(c, true);
         return c.render(<ProjectsListPage projects={projects} />);
       } catch (error: unknown) {
         const errorMessage =
@@ -106,8 +106,8 @@ const app = new Hono()
     async (c) => {
       try {
         const { id } = c.req.valid("param");
-        await projectService.toggleSuppress(id);
-        const projects = await projectService.getAll(true);
+        await projectService.toggleSuppress(c, id);
+        const projects = await projectService.getAll(c, true);
         return c.render(<ProjectsListPage projects={projects} />);
       } catch (error: unknown) {
         const errorMessage =
@@ -124,7 +124,7 @@ const app = new Hono()
     ),
     async (c) => {
       const { id } = c.req.valid("param");
-      const project = await projectService.getById(id);
+      const project = await projectService.getById(c, id);
       if (!project) {
         return c.text("Project not found", 404);
       }
@@ -161,16 +161,16 @@ const app = new Hono()
       try {
         const { id } = c.req.valid("param");
         const { name, color, suppressed } = c.req.valid("form");
-        await projectService.updateName(id, name);
-        await projectService.updateColor(id, color);
+        await projectService.updateName(c, id, name);
+        await projectService.updateColor(c, id, color);
         if (suppressed !== undefined) {
-          await projectService.updateSuppressed(id, suppressed);
+          await projectService.updateSuppressed(c, id, suppressed);
         }
-        const projects = await projectService.getAll(true);
+        const projects = await projectService.getAll(c, true);
         return c.render(<ProjectsListPage projects={projects} />);
       } catch (error: unknown) {
         const { id } = c.req.valid("param");
-        const project = await projectService.getById(id);
+        const project = await projectService.getById(c, id);
         const errorMessage =
           error instanceof Error ? error.message : "Failed to update project";
         if (project) {

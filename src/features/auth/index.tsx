@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import AuthPage from "./components/AuthPage";
 import * as v from "valibot";
 import { sValidator } from "@hono/standard-validator";
-import { setCookie } from "hono/cookie";
+import { setCookie, deleteCookie } from "hono/cookie";
 import {
   getCurrentUser,
   getRoleLabel,
@@ -40,6 +40,10 @@ const app = new Hono()
 
       return c.redirect(data.redirectUrl, 302);
     }
-  );
+  )
+  .post("/logout", (c) => {
+    deleteCookie(c, "user_id");
+    return c.redirect("/auth", 302);
+  });
 
 export default app;

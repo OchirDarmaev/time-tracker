@@ -6,6 +6,7 @@ interface NavBarProps {
 
 export default function NavBar({ currentPath }: NavBarProps) {
   const dashboardPath = client.dashboard.$url().pathname;
+  const logoutPath = client.auth.logout.$url().pathname;
 
   const navItems = [
     { label: "Dashboard", path: dashboardPath, routePath: "/dashboard" },
@@ -56,6 +57,16 @@ export default function NavBar({ currentPath }: NavBarProps) {
             </a>
           );
         })}
+      </div>
+      <div class="mt-auto pb-4">
+        <form method="post" action={logoutPath}>
+          <button
+            type="submit"
+            class="w-full rounded-sm px-4 py-3 text-sm font-medium text-(--text-secondary) transition-all duration-200 hover:bg-(--bg-tertiary) hover:text-(--text-primary)"
+          >
+            Logout
+          </button>
+        </form>
       </div>
     </nav>
   );

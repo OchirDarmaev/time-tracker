@@ -19,7 +19,7 @@ import { ContextType } from "../..";
 
 const app = new Hono<ContextType>()
   .use(requireAuth)
-  .get("/", sValidator("query", v.object({ date: v.string() })), async (c) => {
+  .get("", sValidator("query", v.object({ date: v.string() })), async (c) => {
     const userId = getCookie(c, "user_id");
     if (!userId) {
       return c.redirect("/auth/login", 302);

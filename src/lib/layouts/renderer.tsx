@@ -1,5 +1,5 @@
 import { jsxRenderer } from "hono/jsx-renderer";
-import { Link, ViteClient } from "vite-ssr-components/hono";
+import { Link, Script, ViteClient } from "vite-ssr-components/hono";
 
 export const renderer = jsxRenderer(({ children }) => {
   return (
@@ -25,7 +25,7 @@ export const renderer = jsxRenderer(({ children }) => {
           integrity="sha384-/TgkGk7p307TH7EXJDuUlgG3Ce1UVolAOFopFekQkkXihi5u/6OCvVKyz1W+idaz"
           crossorigin="anonymous"
         ></script>
-        <script src="/src/static/theme.js"></script>
+        <Script src="/src/static/theme.js" />
       </head>
       <body>{children}</body>
     </html>

@@ -1,7 +1,6 @@
 import { JSX } from "hono/jsx";
 import { DailyStatus } from "./DailyStatus";
 import { DayType } from "./MonthlyCalendar";
-import { client } from "../../../lib/client";
 
 export interface Segment {
   entry_id?: number;
@@ -89,7 +88,8 @@ export default function TimeSlider(props: TimeSliderProps) {
 
     segmentElements.push(
       <div
-        class={`absolute top-0 flex h-full items-center justify-center overflow-hidden rounded [left:${leftPercent}%] [width:${segmentWidth}%] [background:${color.bg}]`}
+        class={`absolute top-0 flex h-full items-center justify-center overflow-hidden rounded [left:${leftPercent}%] [width:${segmentWidth}%]`}
+        style={{ background: color.bg, left: `${leftPercent}%`, width: `${segmentWidth}%` }}
       >
         <div class="pointer-events-none text-center">
           <div class="text-xs font-bold tracking-[-0.01em] text-white drop-shadow-md">
@@ -126,7 +126,8 @@ export default function TimeSlider(props: TimeSliderProps) {
             if (isDisabled) {
               return (
                 <div
-                  class={`cursor-not-allowed rounded border bg-[var(--bg-tertiary)] px-3 py-1.5 text-xs font-medium opacity-40 [border-color:${color.solid}] text-[${color.solid}]`}
+                  class={`cursor-not-allowed rounded border px-3 py-1.5 text-xs font-medium opacity-40`}
+                  style={{ borderColor: color.solid, color: color.solid }}
                   safe
                 >
                   {project.name}
@@ -140,9 +141,7 @@ export default function TimeSlider(props: TimeSliderProps) {
               )!.entry_id!;
               return (
                 <form
-                  hx-delete={client.partials.quickTimeReport.entries[
-                    ":entryId"
-                  ].$url({ param: { entryId: entryId.toString() } })}
+                  hx-delete={"/partials/quickTimeReport/entries/" + entryId}
                   hx-target={hxTarget}
                   hx-swap="outerHTML"
                   hx-trigger="submit"
@@ -158,7 +157,8 @@ export default function TimeSlider(props: TimeSliderProps) {
                   <input type="hidden" name="comment" value="" />
                   <button
                     type="submit"
-                    class={`rounded border px-3 py-1.5 text-xs font-semibold [border-color:${color.solid}] text-[${color.solid}] [background-color:${color.solid}15]`}
+                    class={`rounded border px-3 py-1.5 text-xs font-semibold`}
+                    style={{ borderColor: color.solid, color: color.solid, backgroundColor: `${color.solid}15` }}
                     safe
                   >
                     {project.name}
@@ -169,7 +169,7 @@ export default function TimeSlider(props: TimeSliderProps) {
             return (
               <form
                 hx-post={
-                  client.partials.quickTimeReport.segments.$url().pathname
+                  "/partials/quickTimeReport/segments"
                 }
                 hx-target={hxTarget}
                 hx-swap="outerHTML"
@@ -186,8 +186,8 @@ export default function TimeSlider(props: TimeSliderProps) {
                 <input type="hidden" name="hours" value={String(0)} />
                 <button
                   type="submit"
-                  class={`rounded border bg-[var(--bg-elevated)] px-3 py-1.5 text-xs font-medium [border-color:${color.solid}] text-[${color.solid}]`}
-                  safe
+                  class={`rounded border px-3 py-1.5 text-xs font-medium`}
+                  style={{ borderColor: color.solid, color: color.solid, backgroundColor: `${color.solid}15` }}
                 >
                   {project.name}
                 </button>
@@ -239,11 +239,7 @@ export default function TimeSlider(props: TimeSliderProps) {
                         {project ? project.name : "Unknown"}
                       </div>
                       <form
-                        hx-patch={client.partials.quickTimeReport.segments[
-                          ":entryId"
-                        ].$url({
-                          param: { entryId: segment.entry_id!.toString() },
-                        })}
+                        hx-patch={"/partials/quickTimeReport/segments/" + segment.entry_id}
                         hx-target={hxTarget}
                         hx-swap="outerHTML"
                         hx-trigger="change delay:500ms"
@@ -262,11 +258,7 @@ export default function TimeSlider(props: TimeSliderProps) {
                       </form>
                     </div>
                     <form
-                      hx-patch={client.partials.quickTimeReport.segments[
-                        ":entryId"
-                      ].$url({
-                        param: { entryId: segment.entry_id!.toString() },
-                      })}
+                      hx-patch={"/partials/quickTimeReport/segments/" + segment.entry_id}
                       hx-target={hxTarget}
                       hx-swap="outerHTML"
                       hx-trigger="change"
@@ -287,11 +279,7 @@ export default function TimeSlider(props: TimeSliderProps) {
                     </form>
                   </div>
                   <form
-                    hx-delete={client.partials.quickTimeReport.segments[
-                      ":entryId"
-                    ].$url({
-                      param: { entryId: segment.entry_id!.toString() },
-                    })}
+                    hx-delete={"/partials/quickTimeReport/segments/" + segment.entry_id}
                     hx-target={hxTarget}
                     hx-swap="outerHTML"
                     hx-trigger="submit"

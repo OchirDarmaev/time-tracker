@@ -10,6 +10,7 @@ import MonthlySummary from "./MonthlySummary";
 import TimeSlider from "./TimeSlider";
 import { getTimeSliderData } from "../getTimeSliderData";
 import type { Context } from "hono";
+import { ContextType } from "../../..";
 
 export default async function QuickTimeReportView({
   c,
@@ -83,10 +84,7 @@ export default async function QuickTimeReportView({
   return (
     <div id="time-tracking-content" class="space-y-8">
       <div class="flex w-full flex-row gap-8">
-        <div class="w-1/3">
-          <MonthlySummary {...monthlySummaryData} />
-        </div>
-        <div class="w-1/3">
+        <div class="flex w-1/3 flex-col gap-4">
           <MonthlyCalendar
             props={{
               selectedDate: selectedDate,
@@ -101,8 +99,9 @@ export default async function QuickTimeReportView({
               dayConfigurations: dayConfigurations,
             }}
           />
+          <MonthlySummary {...monthlySummaryData} />
         </div>
-        <div class="w-1/3">
+        <div class="w-2/3">
           <TimeSlider
             dayType={selectedDayType}
             reportedHours={timeSliderData.sliderTotalHours}

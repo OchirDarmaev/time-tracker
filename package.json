@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format:write": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,md}\" --",
-    "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,css,md}\""
+    "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,css,md}\"",
+    "drizzle-kit": "drizzle-kit"
   },
   "dependencies": {
     "@hono/standard-validator": "^0.2.0",

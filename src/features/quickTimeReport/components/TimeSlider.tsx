@@ -89,7 +89,11 @@ export default function TimeSlider(props: TimeSliderProps) {
     segmentElements.push(
       <div
         class={`absolute top-0 flex h-full items-center justify-center overflow-hidden rounded [left:${leftPercent}%] [width:${segmentWidth}%]`}
-        style={{ background: color.bg, left: `${leftPercent}%`, width: `${segmentWidth}%` }}
+        style={{
+          background: color.bg,
+          left: `${leftPercent}%`,
+          width: `${segmentWidth}%`,
+        }}
       >
         <div class="pointer-events-none text-center">
           <div class="text-xs font-bold tracking-[-0.01em] text-white drop-shadow-md">
@@ -158,7 +162,11 @@ export default function TimeSlider(props: TimeSliderProps) {
                   <button
                     type="submit"
                     class={`rounded border px-3 py-1.5 text-xs font-semibold`}
-                    style={{ borderColor: color.solid, color: color.solid, backgroundColor: `${color.solid}15` }}
+                    style={{
+                      borderColor: color.solid,
+                      color: color.solid,
+                      backgroundColor: `${color.solid}15`,
+                    }}
                     safe
                   >
                     {project.name}
@@ -168,9 +176,7 @@ export default function TimeSlider(props: TimeSliderProps) {
             }
             return (
               <form
-                hx-post={
-                  "/partials/quickTimeReport/segments"
-                }
+                hx-post={"/partials/quickTimeReport/segments"}
                 hx-target={hxTarget}
                 hx-swap="outerHTML"
                 hx-trigger="submit"
@@ -187,7 +193,11 @@ export default function TimeSlider(props: TimeSliderProps) {
                 <button
                   type="submit"
                   class={`rounded border px-3 py-1.5 text-xs font-medium`}
-                  style={{ borderColor: color.solid, color: color.solid, backgroundColor: `${color.solid}15` }}
+                  style={{
+                    borderColor: color.solid,
+                    color: color.solid,
+                    backgroundColor: `${color.solid}15`,
+                  }}
                 >
                   {project.name}
                 </button>
@@ -239,7 +249,10 @@ export default function TimeSlider(props: TimeSliderProps) {
                         {project ? project.name : "Unknown"}
                       </div>
                       <form
-                        hx-patch={"/partials/quickTimeReport/segments/" + segment.entry_id}
+                        hx-patch={
+                          "/partials/quickTimeReport/segments/" +
+                          segment.entry_id
+                        }
                         hx-target={hxTarget}
                         hx-swap="outerHTML"
                         hx-trigger="change delay:500ms"
@@ -258,7 +271,9 @@ export default function TimeSlider(props: TimeSliderProps) {
                       </form>
                     </div>
                     <form
-                      hx-patch={"/partials/quickTimeReport/segments/" + segment.entry_id}
+                      hx-patch={
+                        "/partials/quickTimeReport/segments/" + segment.entry_id
+                      }
                       hx-target={hxTarget}
                       hx-swap="outerHTML"
                       hx-trigger="change"
@@ -279,7 +294,9 @@ export default function TimeSlider(props: TimeSliderProps) {
                     </form>
                   </div>
                   <form
-                    hx-delete={"/partials/quickTimeReport/segments/" + segment.entry_id}
+                    hx-delete={
+                      "/partials/quickTimeReport/segments/" + segment.entry_id
+                    }
                     hx-target={hxTarget}
                     hx-swap="outerHTML"
                     hx-trigger="submit"

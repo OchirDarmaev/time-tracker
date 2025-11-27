@@ -181,6 +181,7 @@ A foundation for building fast — and staying fast.
 This project is licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0)**.
 
 This means:
+
 - ✅ You are free to use, modify, and distribute this software
 - ✅ You can use it for personal and commercial projects
 - ⚠️ If you modify the software and run it on a server, you must make your source code available to users

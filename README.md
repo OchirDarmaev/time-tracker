@@ -1,5 +1,9 @@
 # 🚀 Project Architecture Overview
 
+demo: https://time-tracker-dev-honoscript-zwudcnhx.ochirdarmaev-4da.workers.dev
+
+![demo](./doc/demo.png)
+
 _A fast, minimal, scalable foundation for building from POC → MVP → Production_
 
 This project is built to deliver **maximum development speed**, **excellent DX**, and **a simple, predictable architecture** that scales without increasing complexity.

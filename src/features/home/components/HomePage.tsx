@@ -5,7 +5,7 @@ export default function HomePage() {
     <div class="flex min-h-screen items-center justify-center bg-gray-950 text-gray-100">
       <div class="mx-auto max-w-4xl px-4 py-20 text-center sm:px-6 lg:px-8">
         <h1 class="mb-6 bg-linear-to-r from-indigo-400 to-purple-400 bg-clip-text text-6xl font-bold text-transparent">
-          TimeTrack
+          TimeTracker
         </h1>
         <p class="mx-auto mb-16 max-w-xl text-xl text-gray-400">
           Track time across projects. Get warnings. View reports.

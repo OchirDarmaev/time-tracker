@@ -38,7 +38,7 @@ export default function NavBar({ currentPath }: NavBarProps) {
         href={client.index.$url().pathname}
         class="mb-12 bg-linear-to-r from-indigo-400 to-purple-400 bg-clip-text text-2xl font-bold text-transparent transition-opacity hover:opacity-80"
       >
-        TimeTrack
+        TimeTracker
       </a>
       <div class="flex flex-col gap-2">
         {navItems.map((item) => {

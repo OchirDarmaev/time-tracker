@@ -169,7 +169,24 @@ This repository is a **lean, high-DX platform** designed for rapid evolution wit
 - low operational costs
 - effortless onboarding for teammates
 
-It follows a “**server-powered UI**” philosophy:
+It follows a "**server-powered UI**" philosophy:
 **small components, SSR everywhere, HTML as the API.**
 
 A foundation for building fast — and staying fast.
+
+---
+
+## 📄 License
+
+This project is licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0)**.
+
+This means:
+- ✅ You are free to use, modify, and distribute this software
+- ✅ You can use it for personal and commercial projects
+- ⚠️ If you modify the software and run it on a server, you must make your source code available to users
+
+**Commercial Licensing Available**
+
+For commercial use that requires proprietary modifications or deployment without source code disclosure, commercial licenses are available. Please contact ochirdarmaev@gmail.com for commercial licensing inquiries.
+
+See the [LICENSE](LICENSE) file for full details.
